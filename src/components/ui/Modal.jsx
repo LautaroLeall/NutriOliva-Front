@@ -3,20 +3,21 @@ import { useEffect } from 'react'
 
 /**
  * Modal reutilizable con overlay y tecla Escape para cerrar.
- * @param {boolean}   open       - Si el modal está visible
- * @param {function}  onClose    - Callback al cerrar
- * @param {string}    title      - Título del modal
- * @param {ReactNode} children   - Contenido
- * @param {string}    [size]     - 'sm' | 'md' | 'lg'
+ * {boolean}   open                - Si el modal está visible
+ * {function}  onClose             - Callback al cerrar
+ * {string}    title               - Título del modal
+ * {ReactNode} children            - Contenido
+ * {string}    [size]              - 'sm' | 'md' | 'lg'
+ * {boolean}   [preventOverlayClose] - Si true, click en overlay NO cierra el modal
  */
-export default function Modal({ open, onClose, title, children, size = 'md' }) {
-  // Cerrar con Escape
+export default function Modal({ open, onClose, title, children, size = 'md', preventOverlayClose = false }) {
+  // Cerrar con Escape (solo si no está prevenido)
   useEffect(() => {
-    if (!open) return
+    if (!open || preventOverlayClose) return
     const handler = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [open, onClose])
+  }, [open, onClose, preventOverlayClose])
 
   if (!open) return null
 
@@ -25,7 +26,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }) {
   return (
     <div
       className="fixed inset-0 bg-olive-dark/45 z-50 flex items-center justify-center p-4"
-      onClick={e => e.target === e.currentTarget && onClose()}
+      onClick={e => !preventOverlayClose && e.target === e.currentTarget && onClose()}
     >
       <div className={`bg-white rounded-card shadow-modal w-full ${widths[size]} animate-fade-scale`}>
         {/* Header */}
