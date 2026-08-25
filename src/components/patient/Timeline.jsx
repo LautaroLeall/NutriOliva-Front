@@ -1,14 +1,16 @@
 import { ClipboardList } from 'lucide-react'
 import TimelineEntry from './TimelineEntry'
-import EmptyState    from '@/components/ui/EmptyState'
+import EmptyState from '@/components/ui/EmptyState'
 
-/**
- * Timeline del día: mezcla comidas y actividades, ordenadas por hora.
- */
-export default function Timeline({ comidas, actividades, onEliminarComida, onEliminarActividad, onEditarComida }) {
+// Timeline del día: mezcla comidas y actividades, ordenadas por hora.
+export default function Timeline({
+  comidas, actividades,
+  onEliminarComida, onEliminarActividad, onEditarComida,
+  pacienteId, comidasPlan = [],
+}) {
   // Mezclar y ordenar por hora
   const entries = [
-    ...comidas.map(r     => ({ ...r, _tipo: 'comida' })),
+    ...comidas.map(r => ({ ...r, _tipo: 'comida' })),
     ...actividades.map(r => ({ ...r, _tipo: 'actividad' })),
   ].sort((a, b) => (a.hora || '').localeCompare(b.hora || ''))
 
@@ -17,7 +19,7 @@ export default function Timeline({ comidas, actividades, onEliminarComida, onEli
       <EmptyState
         icon={ClipboardList}
         title="Sin registros para este día"
-        description="Tocá + para registrar lo que comiste o la actividad que hiciste."
+        description="Toca + para registrar lo que comiste o la actividad que hiciste."
       />
     )
   }
@@ -29,6 +31,8 @@ export default function Timeline({ comidas, actividades, onEliminarComida, onEli
           key={`${entry._tipo}-${entry.id}`}
           registro={entry}
           tipo={entry._tipo}
+          pacienteId={pacienteId}
+          comidasPlan={comidasPlan}
           onEliminar={
             entry._tipo === 'comida'
               ? onEliminarComida
