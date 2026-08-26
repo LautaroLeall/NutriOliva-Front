@@ -3,14 +3,14 @@ import { AlertTriangle, Trash2, X } from 'lucide-react'
 /**
  * Diálogo de confirmación para acciones destructivas o importantes.
  *
- * @param {boolean}  open         - Si el diálogo está visible
- * @param {function} onClose      - Cancelar
- * @param {function} onConfirm    - Confirmar (puede ser async)
- * @param {string}   title        - Título del diálogo
- * @param {string}   message      - Mensaje descriptivo
- * @param {string}   [confirmLabel] - Texto del botón de confirmación
- * @param {string}   [variant]    - 'danger' | 'warning' | 'default'
- * @param {boolean}  [loading]    - Si está procesando
+ * {boolean}  open         - Si el diálogo está visible
+ * {function} onClose      - Cancelar
+ * {function} onConfirm    - Confirmar (puede ser async)
+ * {string}   title        - Título del diálogo
+ * {string}   message      - Mensaje descriptivo
+ * {string}   [confirmLabel] - Texto del botón de confirmación
+ * {string}   [variant]    - 'danger' | 'warning' | 'default'
+ * {boolean}  [loading]    - Si está procesando
  */
 export default function ConfirmDialog({
   open,
@@ -26,18 +26,18 @@ export default function ConfirmDialog({
 
   const variantConfig = {
     danger: {
-      icon:       <Trash2 size={18} className="text-red-500" />,
-      iconBg:     'bg-red-50',
+      icon: <Trash2 size={18} className="text-red-500" />,
+      iconBg: 'bg-red-50',
       confirmBtn: 'bg-red-500 hover:bg-red-600 text-white',
     },
     warning: {
-      icon:       <AlertTriangle size={18} className="text-amber-500" />,
-      iconBg:     'bg-amber-50',
+      icon: <AlertTriangle size={18} className="text-amber-500" />,
+      iconBg: 'bg-amber-50',
       confirmBtn: 'bg-amber-500 hover:bg-amber-600 text-white',
     },
     default: {
-      icon:       null,
-      iconBg:     'bg-olive/10',
+      icon: null,
+      iconBg: 'bg-olive/10',
       confirmBtn: 'bg-olive hover:bg-olive-deep text-cream',
     },
   }
@@ -67,8 +67,8 @@ export default function ConfirmDialog({
             onClick={onClose}
             disabled={loading}
             className="flex-1 py-2.5 rounded-lg border border-cream-darker bg-white text-muted
-                       font-display text-[12px] hover:bg-cream transition-colors
-                       flex items-center justify-center gap-1.5 disabled:opacity-50"
+                      font-display text-[12px] hover:bg-cream transition-colors
+                      flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
             <X size={12} /> Cancelar
           </button>
