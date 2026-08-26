@@ -17,8 +17,8 @@ function toLocalISO(date) {
  */
 function generarSemana(fechaBase) {
   const dias = []
-  const base  = new Date(fechaBase + 'T12:00:00') // evitar timezone shifts
-  const dow   = base.getDay() // 0=Dom
+  const base = new Date(fechaBase + 'T12:00:00') // evitar timezone shifts
+  const dow = base.getDay() // 0=Dom
   // Queremos mostrar desde Lun (o Dom si ese es el inicio)
   const inicio = new Date(base)
   inicio.setDate(base.getDate() - dow + 1) // Lunes de esa semana
@@ -27,8 +27,8 @@ function generarSemana(fechaBase) {
     const d = new Date(inicio)
     d.setDate(inicio.getDate() + i)
     dias.push({
-      fecha:    toLocalISO(d),
-      diaNro:   d.getDate(),
+      fecha: toLocalISO(d),
+      diaNro: d.getDate(),
       diaLabel: DIAS_CORTO[d.getDay()],
     })
   }
@@ -42,8 +42,8 @@ function generarSemana(fechaBase) {
  * @param {function} onChange     - (fecha: string) => void
  */
 export default function DayCalendar({ fechaActiva, onChange }) {
-  const hoy     = toLocalISO(new Date())
-  const semana  = generarSemana(fechaActiva)
+  const hoy = toLocalISO(new Date())
+  const semana = generarSemana(fechaActiva)
 
   function semanaAnterior() {
     const base = new Date(fechaActiva + 'T12:00:00')
@@ -52,17 +52,17 @@ export default function DayCalendar({ fechaActiva, onChange }) {
   }
 
   function semanaProxima() {
-    const base     = new Date(fechaActiva + 'T12:00:00')
-    const proxLun  = new Date(base)
+    const base = new Date(fechaActiva + 'T12:00:00')
+    const proxLun = new Date(base)
     proxLun.setDate(base.getDate() + 7)
-    const hoyDate  = new Date(hoy + 'T12:00:00')
+    const hoyDate = new Date(hoy + 'T12:00:00')
     // No navegar al futuro
     if (proxLun > hoyDate) return
     onChange(toLocalISO(proxLun))
   }
 
   const puedeAvanzar = (() => {
-    const base    = new Date(fechaActiva + 'T12:00:00')
+    const base = new Date(fechaActiva + 'T12:00:00')
     const proxLun = new Date(base)
     proxLun.setDate(base.getDate() + 7)
     return proxLun <= new Date(hoy + 'T12:00:00')
@@ -82,9 +82,9 @@ export default function DayCalendar({ fechaActiva, onChange }) {
         {/* Días */}
         <div className="flex-1 flex justify-between gap-1">
           {semana.map(({ fecha, diaNro, diaLabel }) => {
-            const esHoy     = fecha === hoy
-            const esActivo  = fecha === fechaActiva
-            const esFuturo  = fecha > hoy
+            const esHoy = fecha === hoy
+            const esActivo = fecha === fechaActiva
+            const esFuturo = fecha > hoy
 
             return (
               <button
@@ -94,8 +94,8 @@ export default function DayCalendar({ fechaActiva, onChange }) {
                 className={`flex flex-col items-center rounded-xl px-2 py-2 transition-all duration-150
                             flex-1 min-w-0 disabled:opacity-30 disabled:cursor-not-allowed
                             ${esActivo
-                              ? 'bg-olive text-cream shadow-sm'
-                              : 'hover:bg-cream text-muted hover:text-olive-dark'}`}
+                    ? 'bg-olive text-cream shadow-sm'
+                    : 'hover:bg-cream text-muted hover:text-olive-dark'}`}
               >
                 <span className={`text-[9px] font-display uppercase tracking-wide mb-1
                                   ${esActivo ? 'text-cream/80' : ''}`}>
@@ -118,7 +118,7 @@ export default function DayCalendar({ fechaActiva, onChange }) {
           onClick={semanaProxima}
           disabled={!puedeAvanzar}
           className="p-1.5 rounded-lg text-muted hover:bg-cream hover:text-olive-dark
-                     transition-colors flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                    transition-colors flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <ChevronRight size={15} />
         </button>
