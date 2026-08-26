@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react'
 import {
   LogOut, Plus, Flame, Dumbbell, ClipboardList,
-  X, Loader2, ChevronRight
+  X, Loader2,
 } from 'lucide-react'
 import { toast, Toaster } from 'sonner'
-import { useNavigate }   from 'react-router-dom'
-import { supabase }      from '@/lib/supabaseClient'
-import { useAuth }       from '@/hooks/useAuth'
-import { useRegistros }  from '@/hooks/useRegistros'
-import { useBalance }    from '@/hooks/useBalance'
-import Logo              from '@/components/ui/Logo'
-import DayCalendar       from '@/components/patient/DayCalendar'
-import Timeline          from '@/components/patient/Timeline'
-import FoodForm          from '@/components/patient/FoodForm'
-import ActivityForm      from '@/components/patient/ActivityForm'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/hooks/useAuth'
+import { useRegistros } from '@/hooks/useRegistros'
+import { useBalance } from '@/hooks/useBalance'
+import { useWeeklyBalance } from '@/hooks/useWeeklyBalance'
+import Logo from '@/components/ui/Logo'
+import DayCalendar from '@/components/patient/DayCalendar'
+import Timeline from '@/components/patient/Timeline'
+import FoodForm from '@/components/patient/FoodForm'
+import ActivityForm from '@/components/patient/ActivityForm'
+import WeeklyCaloriesChart from '@/components/ui/WeeklyCaloriesChart'
 
 // ── Helper fecha local ────────────────────────────────────────────────────────
 function toLocalISO(date) {
@@ -24,9 +26,9 @@ function toLocalISO(date) {
 }
 
 function formatFechaLegible(iso) {
-  const hoy  = toLocalISO(new Date())
+  const hoy = toLocalISO(new Date())
   const ayer = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return toLocalISO(d) })()
-  if (iso === hoy)  return 'Hoy'
+  if (iso === hoy) return 'Hoy'
   if (iso === ayer) return 'Ayer'
   return new Date(iso + 'T12:00:00').toLocaleDateString('es-AR', {
     weekday: 'long', day: 'numeric', month: 'long'
@@ -97,13 +99,13 @@ function BalanceCard({ balance, caloriasObjetivo, loading }) {
 function AddMenu({ onComida, onActividad, onClose }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-end pb-24 px-5"
-         onClick={onClose}>
+      onClick={onClose}>
       <div className="flex flex-col gap-2 items-end" onClick={e => e.stopPropagation()}>
         <button
           onClick={() => { onActividad(); onClose() }}
           className="flex items-center gap-3 bg-white border border-cream-darker rounded-2xl
-                     px-5 py-3 shadow-modal font-display text-[13px] text-olive-dark
-                     hover:bg-cream transition-colors animate-fade-scale"
+                    px-5 py-3 shadow-modal font-display text-[13px] text-olive-dark
+                  hover:bg-cream transition-colors animate-fade-scale"
         >
           Actividad física
           <span className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
@@ -113,8 +115,8 @@ function AddMenu({ onComida, onActividad, onClose }) {
         <button
           onClick={() => { onComida(); onClose() }}
           className="flex items-center gap-3 bg-white border border-cream-darker rounded-2xl
-                     px-5 py-3 shadow-modal font-display text-[13px] text-olive-dark
-                     hover:bg-cream transition-colors animate-fade-scale"
+                    px-5 py-3 shadow-modal font-display text-[13px] text-olive-dark
+                  hover:bg-cream transition-colors animate-fade-scale"
         >
           Lo que comí
           <span className="w-8 h-8 rounded-full bg-olive/10 flex items-center justify-center">
@@ -131,14 +133,20 @@ export default function PatientPanel() {
   const { session, nombre, signOut } = useAuth()
   const navigate = useNavigate()
 
-  const [fecha,        setFecha]       = useState(toLocalISO(new Date()))
-  const [pacienteId,   setPacienteId]  = useState(null)
-  const [planActivo,   setPlanActivo]  = useState(null)
-  const [loadingInf,   setLoadingInf]  = useState(true)
-  const [fabAbierto,   setFabAbierto]  = useState(false)
-  const [modalComida,  setModalComida] = useState(false)
-  const [modalActiv,   setModalActiv]  = useState(false)
-  const [tab,          setTab]         = useState('hoy') // 'hoy' | 'plan'
+  const [fecha, setFecha] = useState(toLocalISO(new Date()))
+  const [pacienteId, setPacienteId] = useState(null)
+  const [planActivo, setPlanActivo] = useState(null)
+  const [loadingInf, setLoadingInf] = useState(true)
+  const [fabAbierto, setFabAbierto] = useState(false)
+  const [modalComida, setModalComida] = useState(false)
+  const [modalActiv, setModalActiv] = useState(false)
+  const [tab, setTab] = useState('hoy') // 'hoy' | 'plan' | 'tendencia'
+
+  // Hook de tendencia semanal — solo activo cuando el paciente ya está cargado
+  const { puntos: puntosSemanales, loading: loadingTendencia } = useWeeklyBalance(
+    pacienteId,
+    planActivo?.calorias_objetivo || 0
+  )
 
   // Cargar info del paciente y su plan activo
   useEffect(() => {
@@ -181,27 +189,27 @@ export default function PatientPanel() {
   async function handleGuardarComida(datos) {
     const { error } = await agregarComida(datos)
     if (!error) toast.success('Comida registrada.')
-    else        toast.error(error)
+    else toast.error(error)
     return { error }
   }
 
   async function handleGuardarActividad(datos) {
     const { error } = await agregarActividad(datos)
     if (!error) toast.success('Actividad registrada.')
-    else        toast.error(error)
+    else toast.error(error)
     return { error }
   }
 
   async function handleEliminarComida(id) {
     const { error } = await eliminarComida(id)
     if (!error) toast.success('Registro eliminado.')
-    else        toast.error(error)
+    else toast.error(error)
   }
 
   async function handleEliminarActividad(id) {
     const { error } = await eliminarActividad(id)
     if (!error) toast.success('Actividad eliminada.')
-    else        toast.error(error)
+    else toast.error(error)
   }
 
   async function handleEditarComida(id, datos) {
@@ -242,16 +250,17 @@ export default function PatientPanel() {
         {/* Tabs */}
         <div className="flex gap-1 bg-cream rounded-xl p-1 mb-5 border border-cream-darker">
           {[
-            { key: 'hoy',  label: 'Mi día' },
+            { key: 'hoy', label: 'Mi día' },
             { key: 'plan', label: 'Mi plan' },
+            { key: 'tendencia', label: 'Tendencia' },
           ].map(t => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`flex-1 py-2 rounded-lg font-display text-[12.5px] font-medium transition-all
                           ${tab === t.key
-                            ? 'bg-white text-olive-dark shadow-sm'
-                            : 'text-muted hover:text-olive-dark'}`}
+                  ? 'bg-white text-olive-dark shadow-sm'
+                  : 'text-muted hover:text-olive-dark'}`}
             >
               {t.label}
             </button>
@@ -294,6 +303,8 @@ export default function PatientPanel() {
                   onEliminarComida={handleEliminarComida}
                   onEliminarActividad={handleEliminarActividad}
                   onEditarComida={handleEditarComida}
+                  pacienteId={pacienteId}
+                  comidasPlan={comidasPlan}
                 />
               </div>
             )}
@@ -326,8 +337,10 @@ export default function PatientPanel() {
                 {(['desayuno', 'almuerzo', 'merienda', 'cena', 'snack']).map(tipo => {
                   const items = comidasPlan.filter(c => c.tipo_comida === tipo)
                   if (items.length === 0) return null
-                  const tipoLabel = { desayuno: 'Desayuno', almuerzo: 'Almuerzo',
-                    merienda: 'Merienda', cena: 'Cena', snack: 'Snack' }[tipo]
+                  const tipoLabel = {
+                    desayuno: 'Desayuno', almuerzo: 'Almuerzo',
+                    merienda: 'Merienda', cena: 'Cena', snack: 'Snack'
+                  }[tipo]
                   const totalCal = items.reduce((s, c) => s + (c.calorias_aprox || 0), 0)
 
                   return (
@@ -348,8 +361,8 @@ export default function PatientPanel() {
                               <p className="text-[10px] text-muted mt-0.5">
                                 {c.calorias_aprox} kcal
                                 {c.proteinas_g && ` · P: ${c.proteinas_g}g`}
-                                {c.carbos_g    && ` · C: ${c.carbos_g}g`}
-                                {c.grasas_g    && ` · G: ${c.grasas_g}g`}
+                                {c.carbos_g && ` · C: ${c.carbos_g}g`}
+                                {c.grasas_g && ` · G: ${c.grasas_g}g`}
                               </p>
                             )}
                           </div>
@@ -372,6 +385,55 @@ export default function PatientPanel() {
             )}
           </div>
         )}
+
+        {/* ── TAB: Tendencia ──────────────────────────────────────────────────── */}
+        {tab === 'tendencia' && (
+          <div className="space-y-4">
+            <WeeklyCaloriesChart
+              puntos={puntosSemanales}
+              loading={loadingTendencia}
+              titulo="Mis últimos 7 días"
+              caloriasObjetivo={planActivo?.calorias_objetivo || 0}
+            />
+
+            {/* Resumen textual */}
+            {!loadingTendencia && puntosSemanales.length > 0 && (() => {
+              const conDatos = puntosSemanales.filter(p => p.registroExistente)
+              const diasCumple = conDatos.filter(p => p.estado === 'cumple').length
+              const diasExceso = conDatos.filter(p => p.estado === 'exceso').length
+              const promedio = conDatos.length > 0
+                ? Math.round(conDatos.reduce((s, p) => s + (p.netas || 0), 0) / conDatos.length)
+                : 0
+              return (
+                <div className="bg-white rounded-2xl border border-cream-darker p-5">
+                  <p className="text-[9.5px] font-display text-muted uppercase tracking-wide mb-3">
+                    Resumen de la semana
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { label: 'Dias registrados', value: conDatos.length, unit: `/ ${puntosSemanales.length}` },
+                      { label: 'Dias en objetivo', value: diasCumple, unit: 'dias' },
+                      { label: 'Promedio diario', value: promedio, unit: 'kcal' },
+                    ].map(({ label, value, unit }) => (
+                      <div key={label} className="text-center">
+                        <div className="font-display font-bold text-xl text-olive-dark">{value}</div>
+                        <div className="text-[9px] text-muted mt-0.5 font-display">{unit}</div>
+                        <div className="text-[9px] text-muted mt-0.5">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {diasExceso > 0 && (
+                    <p className="text-[10.5px] text-muted mt-4 pt-3 border-t border-cream">
+                      {diasExceso === 1
+                        ? 'Tuviste 1 dia con exceso calorico esta semana.'
+                        : `Tuviste ${diasExceso} dias con exceso calorico esta semana.`}
+                    </p>
+                  )}
+                </div>
+              )
+            })()}
+          </div>
+        )}
       </div>
 
       {/* FAB y overlay */}
@@ -386,8 +448,8 @@ export default function PatientPanel() {
         <button
           onClick={() => setFabAbierto(o => !o)}
           className={`fixed bottom-8 right-6 z-50 w-14 h-14 rounded-full shadow-modal
-                       flex items-center justify-center transition-all duration-200
-                       ${fabAbierto ? 'bg-cream-dark' : 'bg-olive hover:bg-olive-deep'}`}
+                      flex items-center justify-center transition-all duration-200
+                      ${fabAbierto ? 'bg-cream-dark' : 'bg-olive hover:bg-olive-deep'}`}
         >
           {fabAbierto
             ? <X size={20} className="text-muted" />
@@ -401,11 +463,14 @@ export default function PatientPanel() {
         open={modalComida}
         onClose={() => setModalComida(false)}
         onGuardar={handleGuardarComida}
+        comidasPlan={planActivo?.comidas_plan || []}
+        pacienteId={pacienteId}
       />
       <ActivityForm
         open={modalActiv}
         onClose={() => setModalActiv(false)}
         onGuardar={handleGuardarActividad}
+        pacienteId={pacienteId}
       />
     </div>
   )
