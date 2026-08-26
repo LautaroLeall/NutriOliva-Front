@@ -4,9 +4,9 @@ import { useMemo } from 'react'
  * Calcula el balance calórico del día a partir de comidas y actividades.
  * Puro — no hace fetch, recibe los arrays como parámetros.
  *
- * @param {Array}  comidas            - Registros de comida del día
- * @param {Array}  actividades        - Registros de actividad del día
- * @param {number} caloriasObjetivo   - Objetivo calórico diario del plan activo
+ * comidas            - Registros de comida del día
+ * actividades        - Registros de actividad del día
+ * caloriasObjetivo   - Objetivo calórico diario del plan activo
  */
 export function useBalance(comidas, actividades, caloriasObjetivo = 2000) {
   return useMemo(() => {
@@ -17,19 +17,19 @@ export function useBalance(comidas, actividades, caloriasObjetivo = 2000) {
       (sum, r) => sum + (r.calorias_gastadas || 0), 0
     )
 
-    const netas    = consumidas - gastadas
+    const netas = consumidas - gastadas
     const restante = caloriasObjetivo - netas
-    const pct      = caloriasObjetivo > 0
+    const pct = caloriasObjetivo > 0
       ? Math.min(Math.round((netas / caloriasObjetivo) * 100), 100)
       : 0
 
     const estaEnExceso = netas > caloriasObjetivo
-    const hayDatos     = consumidas > 0 || gastadas > 0
+    const hayDatos = consumidas > 0 || gastadas > 0
 
     // Color de la barra de progreso
     let barColor = 'bg-olive'
     if (pct >= 90 && pct <= 100) barColor = 'bg-green-500'
-    if (estaEnExceso)            barColor = 'bg-red-400'
+    if (estaEnExceso) barColor = 'bg-red-400'
 
     return {
       consumidas,

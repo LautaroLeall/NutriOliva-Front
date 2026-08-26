@@ -3,14 +3,14 @@ import { supabase } from '@/lib/supabaseClient'
 
 /**
  * Hook para registros diarios del paciente (comidas + actividad).
- * @param {string} pacienteId
- * @param {string} fecha - formato 'YYYY-MM-DD'
+ * {string} pacienteId
+ * {string} fecha - formato 'YYYY-MM-DD'
  */
 export function useRegistros(pacienteId, fecha) {
-  const [comidas,     setComidas]     = useState([])
+  const [comidas, setComidas] = useState([])
   const [actividades, setActividades] = useState([])
-  const [loading,     setLoading]     = useState(true)
-  const [error,       setError]       = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const fetchRegistros = useCallback(async () => {
     if (!pacienteId || !fecha) return
@@ -32,7 +32,7 @@ export function useRegistros(pacienteId, fecha) {
         .order('hora', { ascending: true }),
     ])
 
-    if (resComidas.error)     setError(resComidas.error.message)
+    if (resComidas.error) setError(resComidas.error.message)
     if (resActividades.error) setError(resActividades.error.message)
 
     setComidas(resComidas.data || [])
@@ -47,17 +47,17 @@ export function useRegistros(pacienteId, fecha) {
     if (!descripcion?.trim()) return { error: 'La descripción es obligatoria.' }
 
     const ahora = new Date()
-    const hora  = ahora.toTimeString().slice(0, 8)
+    const hora = ahora.toTimeString().slice(0, 8)
 
     const { data, error: e } = await supabase
       .from('registros_comida')
       .insert({
-        paciente_id:        pacienteId,
+        paciente_id: pacienteId,
         fecha,
         hora,
-        descripcion:        descripcion.trim(),
+        descripcion: descripcion.trim(),
         calorias_estimadas: calorias_estimadas ? Number(calorias_estimadas) : null,
-        fuente_estimacion:  fuente_estimacion || 'manual',
+        fuente_estimacion: fuente_estimacion || 'manual',
       })
       .select()
       .single()
@@ -72,7 +72,7 @@ export function useRegistros(pacienteId, fecha) {
     const { error: e } = await supabase
       .from('registros_comida')
       .update({
-        descripcion:        descripcion.trim(),
+        descripcion: descripcion.trim(),
         calorias_estimadas: calorias_estimadas ? Number(calorias_estimadas) : null,
       })
       .eq('id', id)
@@ -93,21 +93,21 @@ export function useRegistros(pacienteId, fecha) {
 
   // ── Actividad física ───────────────────────────────────────────────────────
   async function agregarActividad({ tipo, duracion_min, intensidad, calorias_gastadas }) {
-    if (!tipo?.trim())                return { error: 'El tipo de actividad es obligatorio.' }
+    if (!tipo?.trim()) return { error: 'El tipo de actividad es obligatorio.' }
     if (!duracion_min || duracion_min < 1) return { error: 'La duración debe ser al menos 1 minuto.' }
 
     const ahora = new Date()
-    const hora  = ahora.toTimeString().slice(0, 8)
+    const hora = ahora.toTimeString().slice(0, 8)
 
     const { data, error: e } = await supabase
       .from('registros_actividad')
       .insert({
-        paciente_id:       pacienteId,
+        paciente_id: pacienteId,
         fecha,
         hora,
-        tipo:              tipo.trim(),
-        duracion_min:      Number(duracion_min),
-        intensidad:        intensidad || 'media',
+        tipo: tipo.trim(),
+        duracion_min: Number(duracion_min),
+        intensidad: intensidad || 'media',
         calorias_gastadas: calorias_gastadas ? Number(calorias_gastadas) : null,
       })
       .select()

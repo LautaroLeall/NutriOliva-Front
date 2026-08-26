@@ -3,12 +3,12 @@ import { supabase } from '@/lib/supabaseClient'
 
 /**
  * Hook para gestión de planes alimenticios y sus comidas.
- * @param {string} pacienteId
+ * {string} pacienteId
  */
 export function usePlans(pacienteId) {
-  const [planes,  setPlanes]  = useState([])
+  const [planes, setPlanes] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(null)
+  const [error, setError] = useState(null)
 
   const fetchPlanes = useCallback(async () => {
     if (!pacienteId) return
@@ -44,22 +44,20 @@ export function usePlans(pacienteId) {
 
   useEffect(() => { fetchPlanes() }, [fetchPlanes])
 
-  const planActivo  = planes.find(p => p.estado === 'activo')
-  const historial   = planes.filter(p => p.estado === 'archivado')
+  const planActivo = planes.find(p => p.estado === 'activo')
+  const historial = planes.filter(p => p.estado === 'archivado')
 
-  /**
-   * Crear un nuevo plan (borrador).
-   */
+  //  Crear un nuevo plan (borrador).
   async function crearPlan(caloriasObjetivo) {
     const version = planes.length > 0 ? Math.max(...planes.map(p => p.version)) + 1 : 1
 
     const { data, error } = await supabase
       .from('planes')
       .insert({
-        paciente_id:       pacienteId,
+        paciente_id: pacienteId,
         calorias_objetivo: caloriasObjetivo,
         version,
-        estado:            'borrador',
+        estado: 'borrador',
       })
       .select()
       .single()
@@ -68,21 +66,19 @@ export function usePlans(pacienteId) {
     return { data, error }
   }
 
-  /**
-   * Agregar una comida a un plan.
-   */
+  //  Agregar una comida a un plan.
   async function agregarComida(planId, comida) {
     const { data, error } = await supabase
       .from('comidas_plan')
       .insert({
-        plan_id:        planId,
-        tipo_comida:    comida.tipo_comida,
-        descripcion:    comida.descripcion.trim(),
+        plan_id: planId,
+        tipo_comida: comida.tipo_comida,
+        descripcion: comida.descripcion.trim(),
         calorias_aprox: comida.calorias_aprox ? Number(comida.calorias_aprox) : null,
-        proteinas_g:    comida.proteinas_g    ? Number(comida.proteinas_g)    : null,
-        carbos_g:       comida.carbos_g       ? Number(comida.carbos_g)       : null,
-        grasas_g:       comida.grasas_g       ? Number(comida.grasas_g)       : null,
-        orden:          comida.orden || 0,
+        proteinas_g: comida.proteinas_g ? Number(comida.proteinas_g) : null,
+        carbos_g: comida.carbos_g ? Number(comida.carbos_g) : null,
+        grasas_g: comida.grasas_g ? Number(comida.grasas_g) : null,
+        orden: comida.orden || 0,
       })
       .select()
       .single()
@@ -91,19 +87,17 @@ export function usePlans(pacienteId) {
     return { data, error }
   }
 
-  /**
-   * Editar una comida existente.
-   */
+  //  Editar una comida existente.
   async function editarComida(comidaId, datos) {
     const { data, error } = await supabase
       .from('comidas_plan')
       .update({
-        tipo_comida:    datos.tipo_comida,
-        descripcion:    datos.descripcion.trim(),
+        tipo_comida: datos.tipo_comida,
+        descripcion: datos.descripcion.trim(),
         calorias_aprox: datos.calorias_aprox ? Number(datos.calorias_aprox) : null,
-        proteinas_g:    datos.proteinas_g    ? Number(datos.proteinas_g)    : null,
-        carbos_g:       datos.carbos_g       ? Number(datos.carbos_g)       : null,
-        grasas_g:       datos.grasas_g       ? Number(datos.grasas_g)       : null,
+        proteinas_g: datos.proteinas_g ? Number(datos.proteinas_g) : null,
+        carbos_g: datos.carbos_g ? Number(datos.carbos_g) : null,
+        grasas_g: datos.grasas_g ? Number(datos.grasas_g) : null,
       })
       .eq('id', comidaId)
       .select()
@@ -113,9 +107,7 @@ export function usePlans(pacienteId) {
     return { data, error }
   }
 
-  /**
-   * Eliminar una comida del plan.
-   */
+  //  Eliminar una comida del plan.
   async function eliminarComida(comidaId) {
     const { error } = await supabase
       .from('comidas_plan')
@@ -126,9 +118,7 @@ export function usePlans(pacienteId) {
     return { error }
   }
 
-  /**
-   * Actualizar el objetivo calórico de un plan.
-   */
+  //  Actualizar el objetivo calórico de un plan.
   async function actualizarCalorias(planId, calorias) {
     const { error } = await supabase
       .from('planes')
@@ -172,11 +162,11 @@ export function usePlans(pacienteId) {
     const { data: nuevoPlan, error: errPlan } = await supabase
       .from('planes')
       .insert({
-        paciente_id:       pacienteId,
+        paciente_id: pacienteId,
         calorias_objetivo: base.calorias_objetivo,
-        version:           base.version + 1,
-        estado:            'borrador',
-        notas:             base.notas,
+        version: base.version + 1,
+        estado: 'borrador',
+        notas: base.notas,
       })
       .select()
       .single()
@@ -186,14 +176,14 @@ export function usePlans(pacienteId) {
     // Copiar las comidas del plan original
     if (base.comidas_plan?.length > 0) {
       const comidas = base.comidas_plan.map(c => ({
-        plan_id:        nuevoPlan.id,
-        tipo_comida:    c.tipo_comida,
-        descripcion:    c.descripcion,
+        plan_id: nuevoPlan.id,
+        tipo_comida: c.tipo_comida,
+        descripcion: c.descripcion,
         calorias_aprox: c.calorias_aprox,
-        proteinas_g:    c.proteinas_g,
-        carbos_g:       c.carbos_g,
-        grasas_g:       c.grasas_g,
-        orden:          c.orden,
+        proteinas_g: c.proteinas_g,
+        carbos_g: c.carbos_g,
+        grasas_g: c.grasas_g,
+        orden: c.orden,
       }))
       await supabase.from('comidas_plan').insert(comidas)
     }

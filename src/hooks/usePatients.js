@@ -74,8 +74,8 @@ export function usePatients() {
 
   /**
    * Crear un nuevo paciente.
-   * @param {{ nombre, email, telefono, fecha_nacimiento }} datos
-   * @returns {{ data, error }}
+   * {{ nombre, email, telefono, fecha_nacimiento }} datos
+   * {{ data, error }}
    */
   async function crearPaciente(datos) {
     const { data: nutri } = await supabase
@@ -103,9 +103,7 @@ export function usePatients() {
     return { data, error }
   }
 
-  /**
-   * Actualizar datos de un paciente.
-   */
+  //  Actualizar datos de un paciente.
   async function actualizarPaciente(id, datos) {
     const { data, error } = await supabase
       .from('pacientes')
@@ -123,9 +121,7 @@ export function usePatients() {
     return { data, error }
   }
 
-  /**
-   * Desactivar un paciente (no eliminar).
-   */
+  //  Desactivar un paciente (no eliminar).
   async function desactivarPaciente(id) {
     const { error } = await supabase
       .from('pacientes')
@@ -136,9 +132,7 @@ export function usePatients() {
     return { error }
   }
 
-  /**
-   * Reactivar un paciente.
-   */
+  //  Reactivar un paciente.
   async function reactivarPaciente(id) {
     const { error } = await supabase
       .from('pacientes')
