@@ -1,6 +1,4 @@
-/**
- * Estado vacío genérico con ícono, título y descripción.
- */
+// Estado vacío genérico con ícono, título y descripción.
 export default function EmptyState({ icon: Icon, title, description, action }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
