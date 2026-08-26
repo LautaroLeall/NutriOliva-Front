@@ -6,30 +6,30 @@ import {
   Pencil, X, Check, ChevronDown
 } from 'lucide-react'
 import { toast, Toaster } from 'sonner'
-import { usePlans }     from '@/hooks/usePlans'
-import PlanBuilder      from '@/components/plans/PlanBuilder'
-import Logo             from '@/components/ui/Logo'
-import Modal            from '@/components/ui/Modal'
-import EmptyState       from '@/components/ui/EmptyState'
-import ConfirmDialog    from '@/components/ui/ConfirmDialog'
-import { useAuth }      from '@/hooks/useAuth'
+import { usePlans } from '@/hooks/usePlans'
+import PlanBuilder from '@/components/plans/PlanBuilder'
+import Logo from '@/components/ui/Logo'
+import Modal from '@/components/ui/Modal'
+import EmptyState from '@/components/ui/EmptyState'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { useAuth } from '@/hooks/useAuth'
 
 // ── Validaciones de calorías ──────────────────────────────────────────────────
 function validarCalorias(val) {
   const n = Number(val)
-  if (!val || isNaN(n))    return 'Ingresá un número válido.'
-  if (n < 500)             return 'El mínimo es 500 kcal.'
-  if (n > 6000)            return 'El máximo es 6000 kcal.'
-  if (!Number.isInteger(n))return 'Debe ser un número entero.'
+  if (!val || isNaN(n)) return 'Ingresá un número válido.'
+  if (n < 500) return 'El mínimo es 500 kcal.'
+  if (n > 6000) return 'El máximo es 6000 kcal.'
+  if (!Number.isInteger(n)) return 'Debe ser un número entero.'
   return null
 }
 
 // ── Cabecera del plan ─────────────────────────────────────────────────────────
 function PlanHeader({ plan, onPublicar, onNuevaVersion, onEliminar, publicando }) {
   const estado = {
-    borrador:  { label: 'Borrador',  dot: 'bg-amber-400' },
-    activo:    { label: 'Activo',    dot: 'bg-green-500' },
-    archivado: { label: 'Archivado', dot: 'bg-gray-400'  },
+    borrador: { label: 'Borrador', dot: 'bg-amber-400' },
+    activo: { label: 'Activo', dot: 'bg-green-500' },
+    archivado: { label: 'Archivado', dot: 'bg-gray-400' },
   }[plan.estado] || { label: plan.estado, dot: 'bg-gray-400' }
 
   const puedeEliminar = plan.estado !== 'activo'
@@ -77,7 +77,7 @@ function PlanHeader({ plan, onPublicar, onNuevaVersion, onEliminar, publicando }
           {puedeEliminar && (
             <button onClick={onEliminar}
               className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-500 font-display
-                         hover:bg-red-100 transition-colors flex items-center gap-1.5">
+                        hover:bg-red-100 transition-colors flex items-center gap-1.5">
               <Trash2 size={12} /> Eliminar
             </button>
           )}
@@ -93,7 +93,7 @@ function VersionSelector({ planes, planVisibleId, onSelect }) {
   const actual = planes.find(p => p.id === planVisibleId) || planes[0]
 
   const estadoLabel = { borrador: 'Borrador', activo: 'Activo', archivado: 'Archivado' }
-  const estadoDot   = { borrador: 'bg-amber-400', activo: 'bg-green-500', archivado: 'bg-gray-400' }
+  const estadoDot = { borrador: 'bg-amber-400', activo: 'bg-green-500', archivado: 'bg-gray-400' }
 
   if (planes.length <= 1) return null
 
@@ -102,7 +102,7 @@ function VersionSelector({ planes, planVisibleId, onSelect }) {
       <button
         onClick={() => setOpen(o => !o)}
         className="flex items-center gap-2 bg-white border border-cream-darker rounded-xl
-                   px-4 py-2.5 font-display text-sm text-olive-dark hover:bg-cream transition-colors"
+                  px-4 py-2.5 font-display text-sm text-olive-dark hover:bg-cream transition-colors"
       >
         <span className={`w-2 h-2 rounded-full ${estadoDot[actual?.estado] || 'bg-gray-400'}`} />
         Plan v{actual?.version} — {estadoLabel[actual?.estado]}
@@ -133,8 +133,8 @@ function VersionSelector({ planes, planVisibleId, onSelect }) {
 
 // ── Página principal ──────────────────────────────────────────────────────────
 export default function PatientPlan() {
-  const { id }      = useParams()
-  const navigate    = useNavigate()
+  const { id } = useParams()
+  const navigate = useNavigate()
   const { signOut } = useAuth()
 
   const {
@@ -144,26 +144,26 @@ export default function PatientPlan() {
     eliminarPlan, actualizarNotas,
   } = usePlans(id)
 
-  const [planVisibleId,  setPlanVisibleId]  = useState(null)
-  const [modalNuevo,     setModalNuevo]     = useState(false)
-  const [caloriaInput,   setCaloriaInput]   = useState('2000')
-  const [calError,       setCalError]       = useState('')
-  const [publicando,     setPublicando]     = useState(false)
+  const [planVisibleId, setPlanVisibleId] = useState(null)
+  const [modalNuevo, setModalNuevo] = useState(false)
+  const [caloriaInput, setCaloriaInput] = useState('2000')
+  const [calError, setCalError] = useState('')
+  const [publicando, setPublicando] = useState(false)
 
   // Objetivo calórico editable
-  const [editandoCal,   setEditandoCal]     = useState(false)
-  const [nuevasCal,     setNuevasCal]       = useState('')
-  const [calEditError,  setCalEditError]    = useState('')
+  const [editandoCal, setEditandoCal] = useState(false)
+  const [nuevasCal, setNuevasCal] = useState('')
+  const [calEditError, setCalEditError] = useState('')
 
   // Notas del plan
-  const [editandoNotas, setEditandoNotas]   = useState(false)
-  const [notasInput,    setNotasInput]      = useState('')
+  const [editandoNotas, setEditandoNotas] = useState(false)
+  const [notasInput, setNotasInput] = useState('')
 
   // Confirms
   const [confirmEliminar, setConfirmEliminar] = useState(null) // planId a eliminar
   const [confirmPublicar, setConfirmPublicar] = useState(false)
-  const [confirmVersion,  setConfirmVersion]  = useState(false)
-  const [procesando,      setProcesando]      = useState(false)
+  const [confirmVersion, setConfirmVersion] = useState(false)
+  const [procesando, setProcesando] = useState(false)
 
   // Plan visible: el seleccionado, o el activo, o el primero
   const planVisible = planes.find(p => p.id === planVisibleId)
@@ -193,7 +193,7 @@ export default function PatientPlan() {
     setProcesando(false)
     setConfirmPublicar(false)
     if (e) toast.error('Error al publicar: ' + e.message)
-    else   toast.success('Plan publicado y activo correctamente.')
+    else toast.success('Plan publicado y activo correctamente.')
   }
 
   // ── Nueva versión ───────────────────────────────────────────────────────────
@@ -364,12 +364,12 @@ export default function PatientPlan() {
                   <div className="flex gap-2">
                     <button onClick={() => setEditandoNotas(false)}
                       className="flex-1 py-1.5 rounded-lg border border-cream-darker bg-white text-muted
-                                 font-display text-[11px] hover:bg-cream transition-colors">
+                                font-display text-[11px] hover:bg-cream transition-colors">
                       <X size={11} className="inline mr-1" />Cancelar
                     </button>
                     <button onClick={handleGuardarNotas}
                       className="flex-1 py-1.5 rounded-lg bg-olive text-cream font-display text-[11px]
-                                 hover:bg-olive-deep transition-colors">
+                                hover:bg-olive-deep transition-colors">
                       <Check size={11} className="inline mr-1" />Guardar
                     </button>
                   </div>
@@ -431,16 +431,15 @@ export default function PatientPlan() {
               {/* Resumen calorías del plan */}
               {planVisible.comidas_plan?.length > 0 && (() => {
                 const total = planVisible.comidas_plan.reduce((s, c) => s + (c.calorias_aprox || 0), 0)
-                const diff  = total - planVisible.calorias_objetivo
+                const diff = total - planVisible.calorias_objetivo
                 if (total === 0) return null
                 return (
                   <div className="text-right flex-shrink-0">
                     <p className="text-[9.5px] font-display text-muted uppercase tracking-wide mb-0.5">
                       Total en el plan
                     </p>
-                    <p className={`font-display font-semibold text-xl ${
-                      Math.abs(diff) < 100 ? 'text-green-500' : diff > 0 ? 'text-red-500' : 'text-olive-dark'
-                    }`}>
+                    <p className={`font-display font-semibold text-xl ${Math.abs(diff) < 100 ? 'text-green-500' : diff > 0 ? 'text-red-500' : 'text-olive-dark'
+                      }`}>
                       {total} kcal
                     </p>
                     <p className="text-[10px] text-muted">

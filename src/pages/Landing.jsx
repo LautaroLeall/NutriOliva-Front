@@ -47,7 +47,7 @@ export default function Landing() {
         <Link to="/login">
           <button
             className="font-display font-semibold text-olive-dark bg-cream px-7 py-3 rounded-pill
-                       text-sm transition-all hover:bg-cream-dark hover:-translate-y-0.5"
+                      text-sm transition-all hover:bg-cream-dark hover:-translate-y-0.5"
           >
             Empezar ahora
           </button>

@@ -7,28 +7,40 @@ import { useAuth } from '@/hooks/useAuth'
 import Logo from '@/components/ui/Logo'
 
 const PLANS = {
-  starter: { label: 'Starter',  price: 75000,  patients: 10 },
-  pro:     { label: 'Pro',      price: 125000, patients: 25 },
-  clinic:  { label: 'Clinic',   price: 150000, patients: 50 },
+  starter: {
+    label: 'Starter', price: 75000, patients: 10
+  },
+  pro: {
+    label: 'Pro', price: 125000, patients: 25
+  },
+  clinic: {
+    label: 'Clinic', price: 150000, patients: 50
+  },
 }
 
 const STATUS_CONFIG = {
-  'Activo':          { dot: 'bg-success', text: 'Activo' },
-  'Pago pendiente':  { dot: 'bg-warning', text: 'Pago pendiente' },
-  'Inactivo':        { dot: 'bg-danger',  text: 'Inactivo' },
+  'Activo': {
+    dot: 'bg-success', text: 'Activo'
+  },
+  'Pago pendiente': {
+    dot: 'bg-warning', text: 'Pago pendiente'
+  },
+  'Inactivo': {
+    dot: 'bg-danger', text: 'Inactivo'
+  },
 }
 
 const NAV_ITEMS = [
   { label: 'Nutricionistas', icon: Users },
-  { label: 'Facturación',    icon: CreditCard },
-  { label: 'Métricas',       icon: BarChart2 },
-  { label: 'Ajustes',        icon: Settings },
+  { label: 'Facturación', icon: CreditCard },
+  { label: 'Métricas', icon: BarChart2 },
+  { label: 'Ajustes', icon: Settings },
 ]
 
 // Datos de ejemplo — se reemplaza con datos reales de Supabase en E0
 const SAMPLE_NUTRIS = [
-  { id: 1, name: 'Elena Medina',   email: 'elena@ejemplo.com',  plan: 'clinic',  patients: 0, status: 'Activo' },
-  { id: 2, name: 'Carlos Mendoza', email: 'carlos@ejemplo.com', plan: 'pro',     patients: 0, status: 'Activo' },
+  { id: 1, name: 'Elena Medina', email: 'elena@ejemplo.com', plan: 'clinic', patients: 0, status: 'Activo' },
+  { id: 2, name: 'Carlos Mendoza', email: 'carlos@ejemplo.com', plan: 'pro', patients: 0, status: 'Activo' },
 ]
 
 function initials(name) {
@@ -43,18 +55,18 @@ function formatARS(amount) {
 
 export default function AdminPanel() {
   const { signOut } = useAuth()
-  const [nutris,    setNutris]    = useState(SAMPLE_NUTRIS)
+  const [nutris, setNutris] = useState(SAMPLE_NUTRIS)
   const [activeNav, setActiveNav] = useState('Nutricionistas')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
-  const [form,      setForm]      = useState({ name: '', email: '', plan: 'starter', status: 'Activo' })
+  const [form, setForm] = useState({ name: '', email: '', plan: 'starter', status: 'Activo' })
 
   // Métricas
-  const totalNutris   = nutris.length
+  const totalNutris = nutris.length
   const totalPatients = nutris.reduce((s, n) => s + n.patients, 0)
-  const activeNutris  = nutris.filter(n => n.status !== 'Inactivo')
-  const totalRevenue  = activeNutris.reduce((s, n) => s + PLANS[n.plan].price, 0)
-  const planCount     = { starter: 0, pro: 0, clinic: 0 }
+  const activeNutris = nutris.filter(n => n.status !== 'Inactivo')
+  const totalRevenue = activeNutris.reduce((s, n) => s + PLANS[n.plan].price, 0)
+  const planCount = { starter: 0, pro: 0, clinic: 0 }
   activeNutris.forEach(n => planCount[n.plan]++)
 
   function openCreate() {
@@ -84,8 +96,8 @@ export default function AdminPanel() {
   }
 
   const metrics = [
-    { label: 'Nutricionistas',      value: totalNutris,         sub: 'activos en la plataforma' },
-    { label: 'Pacientes totales',   value: totalPatients,       sub: 'bajo seguimiento activo' },
+    { label: 'Nutricionistas', value: totalNutris, sub: 'activos en la plataforma' },
+    { label: 'Pacientes totales', value: totalPatients, sub: 'bajo seguimiento activo' },
     {
       label: 'Ingresos est. / mes',
       value: formatARS(totalRevenue),
@@ -115,10 +127,10 @@ export default function AdminPanel() {
                     key={label}
                     onClick={() => setActiveNav(label)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left
-                               font-display text-[11.5px] transition-all duration-100
-                               ${activeNav === label
-                                 ? 'bg-olive text-cream'
-                                 : 'text-[#C9D3AC] hover:bg-[#4A5633]'}`}
+                              font-display text-[11.5px] transition-all duration-100
+                              ${activeNav === label
+                        ? 'bg-olive text-cream'
+                        : 'text-[#C9D3AC] hover:bg-[#4A5633]'}`}
                   >
                     <Icon size={13} />
                     {label}
@@ -130,7 +142,7 @@ export default function AdminPanel() {
                 <button
                   onClick={openCreate}
                   className="w-full bg-olive text-cream font-display text-[11px] py-2.5
-                             rounded-lg hover:bg-olive-deep transition-colors flex items-center justify-center gap-1.5"
+                            rounded-lg hover:bg-olive-deep transition-colors flex items-center justify-center gap-1.5"
                 >
                   <Plus size={12} />
                   Crear nutricionista
@@ -138,7 +150,7 @@ export default function AdminPanel() {
                 <button
                   onClick={signOut}
                   className="w-full text-[#9AA37D] font-display text-[10px] py-2 rounded-lg
-                             hover:text-cream transition-colors flex items-center justify-center gap-1.5"
+                            hover:text-cream transition-colors flex items-center justify-center gap-1.5"
                 >
                   <LogOut size={11} />
                   Salir
@@ -195,7 +207,7 @@ export default function AdminPanel() {
                         <th
                           key={h}
                           className="bg-white text-muted font-display text-[9.5px] uppercase
-                                     tracking-wide text-left px-4 py-2.5 border-b border-cream-dark"
+                                    tracking-wide text-left px-4 py-2.5 border-b border-cream-dark"
                         >
                           {h}
                         </th>
@@ -230,8 +242,8 @@ export default function AdminPanel() {
                             <button
                               onClick={() => openEdit(n)}
                               className="border border-cream-darker text-olive font-display text-[10px]
-                                         px-3 py-1.5 rounded-full hover:bg-cream transition-colors
-                                         flex items-center gap-1 ml-auto"
+                                        px-3 py-1.5 rounded-full hover:bg-cream transition-colors
+                                        flex items-center gap-1 ml-auto"
                             >
                               <Pencil size={10} />
                               Editar
@@ -302,8 +314,8 @@ export default function AdminPanel() {
               <button
                 onClick={() => setModalOpen(false)}
                 className="flex-1 py-2.5 rounded-lg bg-cream-dark text-muted font-display
-                           text-[11.5px] cursor-pointer hover:bg-cream-darker transition-colors
-                           flex items-center justify-center gap-1.5"
+                          text-[11.5px] cursor-pointer hover:bg-cream-darker transition-colors
+                          flex items-center justify-center gap-1.5"
               >
                 <X size={12} />
                 Cancelar
@@ -311,8 +323,8 @@ export default function AdminPanel() {
               <button
                 onClick={saveNutricionista}
                 className="flex-1 py-2.5 rounded-lg bg-olive text-cream font-display
-                           text-[11.5px] cursor-pointer hover:bg-olive-deep transition-colors
-                           flex items-center justify-center gap-1.5"
+                          text-[11.5px] cursor-pointer hover:bg-olive-deep transition-colors
+                          flex items-center justify-center gap-1.5"
               >
                 <Check size={12} />
                 Guardar

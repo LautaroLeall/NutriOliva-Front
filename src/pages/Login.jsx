@@ -6,10 +6,10 @@ import Logo from '@/components/ui/Logo'
 
 export default function Login() {
   const navigate = useNavigate()
-  const [email,    setEmail]    = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error,    setError]    = useState('')
-  const [loading,  setLoading]  = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -32,9 +32,9 @@ export default function Login() {
         .single()
 
       // Redirigir según el rol
-      if (perfil?.rol === 'superadmin')         navigate('/admin',   { replace: true })
-      else if (perfil?.rol === 'nutricionista') navigate('/panel',   { replace: true })
-      else if (perfil?.rol === 'paciente')      navigate('/mi-plan', { replace: true })
+      if (perfil?.rol === 'superadmin') navigate('/admin', { replace: true })
+      else if (perfil?.rol === 'nutricionista') navigate('/panel', { replace: true })
+      else if (perfil?.rol === 'paciente') navigate('/mi-plan', { replace: true })
       else navigate('/', { replace: true })
 
     } catch (err) {
@@ -103,9 +103,9 @@ export default function Login() {
           >
             {loading
               ? <span className="flex items-center justify-center gap-2">
-                  <Loader2 size={14} className="animate-spin" />
-                  Ingresando...
-                </span>
+                <Loader2 size={14} className="animate-spin" />
+                Ingresando...
+              </span>
               : 'Iniciar sesión'
             }
           </button>

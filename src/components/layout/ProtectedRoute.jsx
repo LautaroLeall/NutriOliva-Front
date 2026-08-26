@@ -45,16 +45,14 @@ export function RoleRoute({ allowedRoles, children }) {
   return children
 }
 
-/**
- * Ruta pública — si ya está logueado, redirige al panel correcto.
- */
+// Ruta pública — si ya está logueado, redirige al panel correcto.
 export function PublicRoute({ children }) {
   const { isAuthenticated, loading, rol } = useAuth()
   if (loading) return <LoadingScreen />
   if (isAuthenticated) {
-    if (rol === 'superadmin')    return <Navigate to="/admin"   replace />
-    if (rol === 'nutricionista') return <Navigate to="/panel"   replace />
-    if (rol === 'paciente')      return <Navigate to="/mi-plan" replace />
+    if (rol === 'superadmin') return <Navigate to="/admin" replace />
+    if (rol === 'nutricionista') return <Navigate to="/panel" replace />
+    if (rol === 'paciente') return <Navigate to="/mi-plan" replace />
   }
   return children
 }
