@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nutri-oliva.vercel.app/sitemap.xml
