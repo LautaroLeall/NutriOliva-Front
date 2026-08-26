@@ -2,13 +2,13 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from '@/hooks/useAuth'
 import { ProtectedRoute, RoleRoute, PublicRoute } from '@/components/layout/ProtectedRoute'
 
-import Landing       from '@/pages/Landing'
-import Login         from '@/pages/Login'
-import NutriPanel    from '@/pages/nutri/NutriPanel'
+import Landing from '@/pages/Landing'
+import Login from '@/pages/Login'
+import NutriPanel from '@/pages/nutri/NutriPanel'
 import PatientDetail from '@/pages/nutri/PatientDetail'
-import PatientPlan   from '@/pages/nutri/PatientPlan'
-import PatientPanel  from '@/pages/patient/PatientPanel'
-import AdminPanel    from '@/pages/admin/AdminPanel'
+import PatientPlan from '@/pages/nutri/PatientPlan'
+import PatientPanel from '@/pages/patient/PatientPanel'
+import AdminPanel from '@/pages/admin/AdminPanel'
 
 export default function App() {
   return (
