@@ -1,9 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { AlertCircle, Clock, ChevronRight, Pencil, UserX, UserCheck } from 'lucide-react'
 
-/**
- * Fila individual de la tabla de pacientes.
- */
+// Fila individual de la tabla de pacientes.
 export default function PatientRow({ paciente, onEditar, onDesactivar, onReactivar }) {
   const navigate = useNavigate()
 
@@ -14,9 +12,9 @@ export default function PatientRow({ paciente, onEditar, onDesactivar, onReactiv
   function formatFecha(fecha) {
     if (!fecha) return 'Sin actividad'
     const diff = (new Date() - new Date(fecha)) / (1000 * 60 * 60)
-    if (diff < 1)   return 'Hace menos de 1h'
-    if (diff < 24)  return `Hace ${Math.floor(diff)}h`
-    if (diff < 48)  return 'Ayer'
+    if (diff < 1) return 'Hace menos de 1h'
+    if (diff < 24) return `Hace ${Math.floor(diff)}h`
+    if (diff < 48) return 'Ayer'
     return `Hace ${Math.floor(diff / 24)} días`
   }
 
