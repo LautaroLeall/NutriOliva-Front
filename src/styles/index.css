@@ -141,7 +141,7 @@ h6 {
 
   /* Form inputs */
   .input {
-    @apply w-full border border-cream-darker bg-cream rounded-lg px-3 py-2.5 text-sm text-olive-dark font-body placeholder-muted/60 focus:outline-none focus:ring-2 focus:ring-olive/40 focus:border-olive transition-all duration-150;
+    @apply w-full border border-cream-darker bg-cream rounded-lg px-3 py-2.5 text-base md:text-sm text-olive-dark font-body placeholder-muted/60 focus:outline-none focus:ring-2 focus:ring-olive/40 focus:border-olive transition-all duration-150;
   }
 
   .label {
