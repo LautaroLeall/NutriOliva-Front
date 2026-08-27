@@ -48,7 +48,7 @@ function MealRow({ comida, onEditar, onEliminar, readonly }) {
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="label">Tipo</label>
-            <select name="tipo_comida" className="input py-1.5 text-xs"
+            <select name="tipo_comida" className="input py-1.5 text-base md:text-xs"
               value={form.tipo_comida}
               onChange={e => setForm(f => ({ ...f, tipo_comida: e.target.value }))}>
               {TIPOS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -56,14 +56,14 @@ function MealRow({ comida, onEditar, onEliminar, readonly }) {
           </div>
           <div>
             <label className="label">Calorias aprox.</label>
-            <input name="calorias_aprox" type="number" className="input py-1.5 text-xs"
+            <input name="calorias_aprox" type="number" className="input py-1.5 text-base md:text-xs"
               placeholder="kcal" value={form.calorias_aprox}
               onChange={e => setForm(f => ({ ...f, calorias_aprox: e.target.value }))} />
           </div>
         </div>
         <div>
           <label className="label">Descripcion</label>
-          <input name="descripcion" className="input py-1.5 text-xs"
+          <input name="descripcion" className="input py-1.5 text-base md:text-xs"
             placeholder="Ej: 2 tostadas con palta y huevo" value={form.descripcion}
             onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))} />
         </div>
@@ -71,7 +71,7 @@ function MealRow({ comida, onEditar, onEliminar, readonly }) {
           {[['proteinas_g', 'Proteinas (g)'], ['carbos_g', 'Carbos (g)'], ['grasas_g', 'Grasas (g)']].map(([n, l]) => (
             <div key={n}>
               <label className="label">{l}</label>
-              <input name={n} type="number" className="input py-1.5 text-xs"
+              <input name={n} type="number" className="input py-1.5 text-base md:text-xs"
                 placeholder="0" value={form[n]}
                 onChange={e => setForm(f => ({ ...f, [n]: e.target.value }))} />
             </div>
@@ -382,7 +382,7 @@ function AddMealForm({ tipo, onAgregar, onCancel, nutricionistaId }) {
         <div className="space-y-2">
           <div>
             <label className="label">Descripcion *</label>
-            <input className="input py-1.5 text-xs"
+            <input className="input py-1.5 text-base md:text-xs"
               placeholder="Ej: Tarta de verdura casera"
               value={formNueva.descripcion}
               onChange={e => setFormNueva(f => ({ ...f, descripcion: e.target.value }))}
@@ -391,13 +391,13 @@ function AddMealForm({ tipo, onAgregar, onCancel, nutricionistaId }) {
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="label">Calorias aprox.</label>
-              <input type="number" className="input py-1.5 text-xs" placeholder="kcal"
+              <input type="number" className="input py-1.5 text-base md:text-xs" placeholder="kcal"
                 value={formNueva.calorias_aprox}
                 onChange={e => setFormNueva(f => ({ ...f, calorias_aprox: e.target.value }))} />
             </div>
             <div>
               <label className="label">Proteinas (g)</label>
-              <input type="number" className="input py-1.5 text-xs" placeholder="0"
+              <input type="number" className="input py-1.5 text-base md:text-xs" placeholder="0"
                 value={formNueva.proteinas_g}
                 onChange={e => setFormNueva(f => ({ ...f, proteinas_g: e.target.value }))} />
             </div>
@@ -405,13 +405,13 @@ function AddMealForm({ tipo, onAgregar, onCancel, nutricionistaId }) {
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="label">Carbohidratos (g)</label>
-              <input type="number" className="input py-1.5 text-xs" placeholder="0"
+              <input type="number" className="input py-1.5 text-base md:text-xs" placeholder="0"
                 value={formNueva.carbos_g}
                 onChange={e => setFormNueva(f => ({ ...f, carbos_g: e.target.value }))} />
             </div>
             <div>
               <label className="label">Grasas (g)</label>
-              <input type="number" className="input py-1.5 text-xs" placeholder="0"
+              <input type="number" className="input py-1.5 text-base md:text-xs" placeholder="0"
                 value={formNueva.grasas_g}
                 onChange={e => setFormNueva(f => ({ ...f, grasas_g: e.target.value }))} />
             </div>
