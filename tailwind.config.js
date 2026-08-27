@@ -22,7 +22,7 @@ export default {
           DEFAULT: '#D85A30',
           bg: '#FAECE7',
         },
-        muted: '#8A8567',
+        muted: '#69644D',
         success: '#6E9B5C',
         warning: '#D8A93A',
         danger: '#C4573F',
