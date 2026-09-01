@@ -99,8 +99,29 @@ export function usePatients() {
       .select()
       .single()
 
-    if (!error) await fetchPacientes()
-    return { data, error }
+    if (error) return { data: null, error, inviteError: null }
+
+    // Enviar invitacion por mail — si falla, NO revertir el alta
+    let inviteError = null
+    try {
+      const { error: invErr } = await supabase.functions.invoke('invite-patient', {
+        body: {
+          paciente_id: data.id,
+          nombre: datos.nombre.trim(),
+          email: datos.email.trim().toLowerCase(),
+        },
+      })
+      if (invErr) {
+        console.warn('[invite-patient] Error al enviar invitacion:', invErr)
+        inviteError = invErr.message || 'Error al enviar el mail de invitacion.'
+      }
+    } catch (e) {
+      console.warn('[invite-patient] Excepcion al invocar Edge Function:', e)
+      inviteError = 'No se pudo contactar el servidor de invitaciones.'
+    }
+
+    await fetchPacientes()
+    return { data, error: null, inviteError }
   }
 
   //  Actualizar datos de un paciente.
