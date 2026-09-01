@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -21,9 +21,9 @@ const UNIDADES = ["g", "ml", "unidad", "porcion", "taza", "cda", "cdita"];
 const FORM_VACIO = {
   nombre: "",
   calorias_por_unidad: "",
-  proteinas: "",
-  carbohidratos: "",
-  grasas: "",
+  proteinas_g: "",
+  carbos_g: "",
+  grasas_g: "",
   unidad: "g",
 };
 
@@ -41,7 +41,7 @@ function validar(form) {
   )
     errs.calorias_por_unidad = "Ingresa un numero valido.";
 
-  for (const campo of ["proteinas", "carbohidratos", "grasas"]) {
+  for (const campo of ["proteinas_g", "carbos_g", "grasas_g"]) {
     if (
       form[campo] !== "" &&
       (isNaN(Number(form[campo])) || Number(form[campo]) < 0)
@@ -87,9 +87,9 @@ export default function Catalogo() {
     setForm({
       nombre: alimento.nombre || "",
       calorias_por_unidad: alimento.calorias_por_unidad?.toString() || "",
-      proteinas: alimento.proteinas?.toString() || "",
-      carbohidratos: alimento.carbohidratos?.toString() || "",
-      grasas: alimento.grasas?.toString() || "",
+      proteinas_g: alimento.proteinas_g?.toString() || "",
+      carbos_g: alimento.carbos_g?.toString() || "",
+      grasas_g: alimento.grasas_g?.toString() || "",
       unidad: alimento.unidad || "g",
     });
     setErrors({});
@@ -270,13 +270,13 @@ export default function Catalogo() {
                       {a.calorias_por_unidad}
                     </td>
                     <td className="px-5 py-3 text-sm text-muted">
-                      {a.proteinas != null ? `${a.proteinas}g` : "—"}
+                      {a.proteinas_g != null ? `${a.proteinas_g}g` : "—"}
                     </td>
                     <td className="px-5 py-3 text-sm text-muted">
-                      {a.carbohidratos != null ? `${a.carbohidratos}g` : "—"}
+                      {a.carbos_g != null ? `${a.carbos_g}g` : "—"}
                     </td>
                     <td className="px-5 py-3 text-sm text-muted">
-                      {a.grasas != null ? `${a.grasas}g` : "—"}
+                      {a.grasas_g != null ? `${a.grasas_g}g` : "—"}
                     </td>
                     <td className="px-5 py-3 text-sm text-muted">{a.unidad}</td>
                     <td className="px-5 py-3">
@@ -371,9 +371,9 @@ export default function Catalogo() {
           </p>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { name: "proteinas", label: "Proteinas (g)" },
-              { name: "carbohidratos", label: "Carbos (g)" },
-              { name: "grasas", label: "Grasas (g)" },
+              { name: "proteinas_g", label: "Proteinas (g)" },
+              { name: "carbos_g", label: "Carbos (g)" },
+              { name: "grasas_g", label: "Grasas (g)" },
             ].map(({ name, label }) => (
               <div key={name}>
                 <label className="label">{label}</label>

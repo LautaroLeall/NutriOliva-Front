@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -17,7 +17,7 @@ export function useCatalogo() {
     setError(null)
     const { data, error: fetchErr } = await supabase
       .from('catalogo_alimentos')
-      .select('id, nombre, calorias_por_unidad, proteinas, carbohidratos, grasas, unidad')
+      .select('id, nombre, calorias_por_unidad, proteinas_g, carbos_g, grasas_g, unidad')
       .order('nombre', { ascending: true })
 
     if (fetchErr) setError(fetchErr.message)
@@ -39,9 +39,9 @@ export function useCatalogo() {
       .insert({
         nombre: datos.nombre.trim(),
         calorias_por_unidad: Number(datos.calorias_por_unidad),
-        proteinas: datos.proteinas ? Number(datos.proteinas) : null,
-        carbohidratos: datos.carbohidratos ? Number(datos.carbohidratos) : null,
-        grasas: datos.grasas ? Number(datos.grasas) : null,
+        proteinas_g: datos.proteinas_g ? Number(datos.proteinas_g) : null,
+        carbos_g: datos.carbos_g ? Number(datos.carbos_g) : null,
+        grasas_g: datos.grasas_g ? Number(datos.grasas_g) : null,
         unidad: datos.unidad || 'g',
       })
       .select()
@@ -62,9 +62,9 @@ export function useCatalogo() {
       .update({
         nombre: datos.nombre.trim(),
         calorias_por_unidad: Number(datos.calorias_por_unidad),
-        proteinas: datos.proteinas ? Number(datos.proteinas) : null,
-        carbohidratos: datos.carbohidratos ? Number(datos.carbohidratos) : null,
-        grasas: datos.grasas ? Number(datos.grasas) : null,
+        proteinas_g: datos.proteinas_g ? Number(datos.proteinas_g) : null,
+        carbos_g: datos.carbos_g ? Number(datos.carbos_g) : null,
+        grasas_g: datos.grasas_g ? Number(datos.grasas_g) : null,
         unidad: datos.unidad || 'g',
       })
       .eq('id', id)
