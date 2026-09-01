@@ -12,6 +12,7 @@ const Login = lazy(() => import("@/pages/Login"));
 const NutriPanel = lazy(() => import("@/pages/nutri/NutriPanel"));
 const PatientDetail = lazy(() => import("@/pages/nutri/PatientDetail"));
 const PatientPlan = lazy(() => import("@/pages/nutri/PatientPlan"));
+const Catalogo = lazy(() => import("@/pages/nutri/Catalogo"));
 const PatientPanel = lazy(() => import("@/pages/patient/PatientPanel"));
 const AdminPanel = lazy(() => import("@/pages/admin/AdminPanel"));
 
@@ -67,6 +68,15 @@ export default function App() {
               element={
                 <RoleRoute allowedRoles="nutricionista">
                   <PatientPlan />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/panel/catalogo"
+              element={
+                <RoleRoute allowedRoles="nutricionista">
+                  <Catalogo />
                 </RoleRoute>
               }
             />
