@@ -1,51 +1,75 @@
-import { useState, useEffect } from 'react'
-import { Loader2 } from 'lucide-react'
-import Modal from '@/components/ui/Modal'
+import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import Modal from "@/components/ui/Modal";
 
-const FORM_VACIO = { nombre: '', email: '', telefono: '', fecha_nacimiento: '' }
+const FORM_VACIO = {
+  nombre: "",
+  email: "",
+  telefono: "",
+  fecha_nacimiento: "",
+};
 
 // ── Validaciones ──────────────────────────────────────────────────────────────
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const TEL_RE = /^[+\d\s\-().]{6,20}$/
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const TEL_RE = /^[+\d\s\-().]{6,20}$/;
 
 function validar(form, original) {
-  const errs = {}
+  const errs = {};
 
-  const nombre = form.nombre.trim()
-  if (!nombre) errs.nombre = 'El nombre es obligatorio.'
-  else if (nombre.length < 2) errs.nombre = 'El nombre debe tener al menos 2 caracteres.'
-  else if (/\d/.test(nombre)) errs.nombre = 'El nombre no puede contener números.'
+  const nombre = form.nombre.trim();
+  if (!nombre) errs.nombre = "El nombre es obligatorio.";
+  else if (nombre.length < 2)
+    errs.nombre = "El nombre debe tener al menos 2 caracteres.";
+  else if (/\d/.test(nombre))
+    errs.nombre = "El nombre no puede contener números.";
 
-  const email = form.email.trim()
-  if (!email) errs.email = 'El mail es obligatorio.'
-  else if (!EMAIL_RE.test(email)) errs.email = 'El mail no tiene un formato válido.'
+  const email = form.email.trim();
+  if (!email) errs.email = "El mail es obligatorio.";
+  else if (!EMAIL_RE.test(email))
+    errs.email = "El mail no tiene un formato válido.";
 
   if (form.telefono?.trim() && !TEL_RE.test(form.telefono.trim()))
-    errs.telefono = 'El teléfono no es válido.'
+    errs.telefono = "El teléfono no es válido.";
 
-  // Si es edición: verificar que algo haya cambiado
-  if (original) {
-    const sin_cambios =
-      nombre === (original.nombre || '').trim() &&
-      email === (original.email || '').trim() &&
-      (form.telefono || '') === (original.telefono || '') &&
-      (form.fecha_nacimiento || '') === (original.fecha_nacimiento || '')
-    if (sin_cambios) errs._nochanges = 'No realizaste ningún cambio.'
+  if (form.fecha_nacimiento) {
+    const fecha = new Date(form.fecha_nacimiento);
+    const hoy = new Date();
+    const minFecha = new Date("1900-01-01");
+    if (isNaN(fecha.getTime()))
+      errs.fecha_nacimiento = "La fecha no es válida.";
+    else if (fecha > hoy)
+      errs.fecha_nacimiento = "La fecha de nacimiento no puede ser futura.";
+    else if (fecha < minFecha)
+      errs.fecha_nacimiento = "La fecha de nacimiento no es realista.";
   }
 
-  return errs
+  if (original) {
+    const sin_cambios =
+      nombre === (original.nombre || "").trim() &&
+      email === (original.email || "").trim() &&
+      (form.telefono || "") === (original.telefono || "") &&
+      (form.fecha_nacimiento || "") === (original.fecha_nacimiento || "");
+    if (sin_cambios) errs._nochanges = "No realizaste ningún cambio.";
+  }
+
+  return errs;
 }
 
 /**
  * Formulario de alta y edición de paciente dentro de un Modal.
  * Incluye validación completa y reset al abrir/cerrar.
  */
-export default function PatientForm({ open, onClose, paciente = null, onGuardar }) {
-  const esEdicion = !!paciente
+export default function PatientForm({
+  open,
+  onClose,
+  paciente = null,
+  onGuardar,
+}) {
+  const esEdicion = !!paciente;
 
-  const [form, setForm] = useState(FORM_VACIO)
-  const [errors, setErrors] = useState({})
-  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState(FORM_VACIO);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   // Resetear el formulario cada vez que el modal abre o cambia el paciente
   useEffect(() => {
@@ -53,72 +77,74 @@ export default function PatientForm({ open, onClose, paciente = null, onGuardar 
       setForm(
         paciente
           ? {
-            nombre: paciente.nombre || '',
-            email: paciente.email || '',
-            telefono: paciente.telefono || '',
-            fecha_nacimiento: paciente.fecha_nacimiento || '',
-          }
-          : FORM_VACIO
-      )
-      setErrors({})
+              nombre: paciente.nombre || "",
+              email: paciente.email || "",
+              telefono: paciente.telefono || "",
+              fecha_nacimiento: paciente.fecha_nacimiento || "",
+            }
+          : FORM_VACIO,
+      );
+      setErrors({});
     }
-  }, [open, paciente])
+  }, [open, paciente]);
 
   function handleChange(e) {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
     // Limpiar error del campo al escribir
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }))
-    if (errors._nochanges) setErrors(prev => ({ ...prev, _nochanges: undefined }))
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
+    if (errors._nochanges)
+      setErrors((prev) => ({ ...prev, _nochanges: undefined }));
   }
 
   async function handleSubmit(e) {
-    e.preventDefault()
-    const errs = validar(form, esEdicion ? paciente : null)
+    e.preventDefault();
+    const errs = validar(form, esEdicion ? paciente : null);
     if (Object.keys(errs).length > 0) {
-      setErrors(errs)
-      return
+      setErrors(errs);
+      return;
     }
-    setErrors({})
-    setLoading(true)
+    setErrors({});
+    setLoading(true);
     const { error: err } = await onGuardar({
       nombre: form.nombre.trim(),
       email: form.email.trim().toLowerCase(),
       telefono: form.telefono.trim() || null,
       fecha_nacimiento: form.fecha_nacimiento || null,
-    })
-    setLoading(false)
+    });
+    setLoading(false);
     if (err) {
-      setErrors({ _server: err.message || 'Ocurrió un error al guardar.' })
+      setErrors({ _server: err.message || "Ocurrió un error al guardar." });
     } else {
-      onClose()
+      onClose();
     }
   }
 
   function handleClose() {
-    if (!loading) onClose()
+    if (!loading) onClose();
   }
 
   return (
     <Modal
       open={open}
       onClose={handleClose}
-      title={esEdicion ? 'Editar paciente' : 'Nuevo paciente'}
+      title={esEdicion ? "Editar paciente" : "Nuevo paciente"}
     >
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-
         {/* Nombre */}
         <div>
           <label className="label">Nombre completo *</label>
           <input
             name="nombre"
-            className={`input ${errors.nombre ? 'border-red-400 focus:ring-red-300/40' : ''}`}
+            className={`input ${errors.nombre ? "border-red-400 focus:ring-red-300/40" : ""}`}
             placeholder="Ej: María García"
             value={form.nombre}
             onChange={handleChange}
             autoFocus
           />
-          {errors.nombre && <p className="text-[10.5px] text-red-500 mt-1">{errors.nombre}</p>}
+          {errors.nombre && (
+            <p className="text-[10.5px] text-red-500 mt-1">{errors.nombre}</p>
+          )}
         </div>
 
         {/* Email */}
@@ -127,12 +153,14 @@ export default function PatientForm({ open, onClose, paciente = null, onGuardar 
           <input
             name="email"
             type="email"
-            className={`input ${errors.email ? 'border-red-400 focus:ring-red-300/40' : ''}`}
+            className={`input ${errors.email ? "border-red-400 focus:ring-red-300/40" : ""}`}
             placeholder="paciente@mail.com"
             value={form.email}
             onChange={handleChange}
           />
-          {errors.email && <p className="text-[10.5px] text-red-500 mt-1">{errors.email}</p>}
+          {errors.email && (
+            <p className="text-[10.5px] text-red-500 mt-1">{errors.email}</p>
+          )}
         </div>
 
         {/* Teléfono + Fecha de nac */}
@@ -141,22 +169,32 @@ export default function PatientForm({ open, onClose, paciente = null, onGuardar 
             <label className="label">Teléfono</label>
             <input
               name="telefono"
-              className={`input ${errors.telefono ? 'border-red-400 focus:ring-red-300/40' : ''}`}
+              className={`input ${errors.telefono ? "border-red-400 focus:ring-red-300/40" : ""}`}
               placeholder="+54 9 11 ..."
               value={form.telefono}
               onChange={handleChange}
             />
-            {errors.telefono && <p className="text-[10.5px] text-red-500 mt-1">{errors.telefono}</p>}
+            {errors.telefono && (
+              <p className="text-[10.5px] text-red-500 mt-1">
+                {errors.telefono}
+              </p>
+            )}
           </div>
           <div>
             <label className="label">Fecha de nacimiento</label>
             <input
               name="fecha_nacimiento"
               type="date"
-              className="input"
+              className={`input ${errors.fecha_nacimiento ? "border-red-400 focus:ring-red-300/40" : ""}`}
               value={form.fecha_nacimiento}
               onChange={handleChange}
+              max={new Date().toISOString().split("T")[0]}
             />
+            {errors.fecha_nacimiento && (
+              <p className="text-[10.5px] text-red-500 mt-1">
+                {errors.fecha_nacimiento}
+              </p>
+            )}
           </div>
         </div>
 
@@ -193,16 +231,19 @@ export default function PatientForm({ open, onClose, paciente = null, onGuardar 
             className="btn-primary flex-1 py-2.5"
             disabled={loading}
           >
-            {loading
-              ? <span className="flex items-center justify-center gap-2">
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
                 <Loader2 size={13} className="animate-spin" />
                 Guardando...
               </span>
-              : esEdicion ? 'Guardar cambios' : 'Crear paciente'
-            }
+            ) : esEdicion ? (
+              "Guardar cambios"
+            ) : (
+              "Crear paciente"
+            )}
           </button>
         </div>
       </form>
     </Modal>
-  )
+  );
 }
