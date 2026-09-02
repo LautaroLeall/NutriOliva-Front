@@ -9,6 +9,7 @@ import {
 
 const Landing = lazy(() => import("@/pages/Landing"));
 const Login = lazy(() => import("@/pages/Login"));
+const SetPassword = lazy(() => import("@/pages/SetPassword"));
 const NutriPanel = lazy(() => import("@/pages/nutri/NutriPanel"));
 const PatientDetail = lazy(() => import("@/pages/nutri/PatientDetail"));
 const PatientPlan = lazy(() => import("@/pages/nutri/PatientPlan"));
@@ -28,7 +29,7 @@ export default function App() {
           }
         >
           <Routes>
-            {/* Pública */}
+            {/* Publica */}
             <Route
               path="/"
               element={
@@ -45,6 +46,10 @@ export default function App() {
                 </PublicRoute>
               }
             />
+
+            {/* Ruta publica para definir/restablecer contraseña — NO protegida */}
+            {/* Supabase redirige aqui con el token en el hash */}
+            <Route path="/set-password" element={<SetPassword />} />
 
             {/* Panel nutricionista */}
             <Route
