@@ -1,5 +1,6 @@
-import { Toaster } from "sonner";
-import { ArrowLeft, Loader2, AlertCircle, ClipboardList } from "lucide-react";
+import { useState } from "react";
+import { Toaster, toast } from "sonner";
+import { ArrowLeft, Loader2, AlertCircle, ClipboardList, ClipboardPaste } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import PlanBuilder from "@/components/plans/PlanBuilder";
 import EmptyState from "@/components/ui/EmptyState";
@@ -10,6 +11,7 @@ import VersionSelector from "./plan/VersionSelector";
 import CaloriasEditor from "./plan/CaloriasEditor";
 import NotasEditor from "./plan/NotasEditor";
 import ModalNuevoPlan from "./plan/ModalNuevoPlan";
+import ModalParsePdf from "./plan/ModalParsePdf";
 
 export default function PatientPlan() {
   const {
@@ -61,6 +63,31 @@ export default function PatientPlan() {
     eliminarComida,
   } = usePatientPlan();
 
+  // ── Estado del modal de carga desde PDF ────────────────────────────────────
+  const [modalPdf, setModalPdf] = useState(false);
+
+  // Inserta en el plan activo todas las comidas extraidas del PDF
+  async function handleConfirmarPdf(comidas) {
+    if (!planVisible) return;
+    let errores = 0;
+    for (const comida of comidas) {
+      const { error } = await agregarComida(planVisible.id, {
+        tipo_comida:   comida.tipo_comida,
+        descripcion:   comida.descripcion,
+        calorias_aprox: comida.calorias_aprox ?? null,
+        proteinas_g:   comida.proteinas_g ?? null,
+        carbos_g:      comida.carbos_g ?? null,
+        grasas_g:      comida.grasas_g ?? null,
+      });
+      if (error) errores++;
+    }
+    if (errores === 0) {
+      toast.success(`${comidas.length} comida${comidas.length !== 1 ? 's' : ''} agregada${comidas.length !== 1 ? 's' : ''} al plan.`);
+    } else {
+      toast.warning(`Se agregaron ${comidas.length - errores} de ${comidas.length} comidas. ${errores} fallaron.`);
+    }
+  }
+
   return (
     <div className="page min-h-screen bg-[#EFEAE0]">
       <Toaster position="bottom-right" richColors />
@@ -97,16 +124,29 @@ export default function PatientPlan() {
               </p>
             )}
           </div>
-          <button
-            onClick={() => {
-              setCaloriaInput("2000");
-              setCalError("");
-              setModalNuevo(true);
-            }}
-            className="btn-secondary text-xs px-4 py-2"
-          >
-            + Nuevo plan
-          </button>
+          <div className="flex gap-2 items-center">
+            {/* Boton cargar desde PDF — solo disponible cuando hay un plan editable */}
+            {planVisible && !readonly && (
+              <button
+                onClick={() => setModalPdf(true)}
+                className="btn-ghost text-xs px-3 py-2 flex items-center gap-1.5"
+                title="Importar comidas pegando el texto del plan (Word, Google Docs, email)"
+              >
+                <ClipboardPaste size={13} />
+                Importar con IA
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setCaloriaInput("2000");
+                setCalError("");
+                setModalNuevo(true);
+              }}
+              className="btn-secondary text-xs px-4 py-2"
+            >
+              + Nuevo plan
+            </button>
+          </div>
         </div>
 
         {/* Loading */}
@@ -249,6 +289,13 @@ export default function PatientPlan() {
         confirmLabel="Eliminar plan"
         variant="danger"
         loading={procesando}
+      />
+
+      {/* ── Modal: cargar plan desde PDF ──────────────────────────────────── */}
+      <ModalParsePdf
+        open={modalPdf}
+        onClose={() => setModalPdf(false)}
+        onConfirmar={handleConfirmarPdf}
       />
     </div>
   );
