@@ -17,26 +17,38 @@ export function useRegistros(pacienteId, fecha) {
     setLoading(true)
     setError(null)
 
-    const [resComidas, resActividades] = await Promise.all([
-      supabase
-        .from('registros_comida')
-        .select('*')
-        .eq('paciente_id', pacienteId)
-        .eq('fecha', fecha)
-        .order('hora', { ascending: true }),
-      supabase
-        .from('registros_actividad')
-        .select('*')
-        .eq('paciente_id', pacienteId)
-        .eq('fecha', fecha)
-        .order('hora', { ascending: true }),
-    ])
+    // Timeout de 10 segundos
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Sin conexion. Verifica tu internet.')), 10000)
+    )
 
-    if (resComidas.error) setError(resComidas.error.message)
-    if (resActividades.error) setError(resActividades.error.message)
+    try {
+      const [resComidas, resActividades] = await Promise.race([
+        Promise.all([
+          supabase
+            .from('registros_comida')
+            .select('*')
+            .eq('paciente_id', pacienteId)
+            .eq('fecha', fecha)
+            .order('hora', { ascending: true }),
+          supabase
+            .from('registros_actividad')
+            .select('*')
+            .eq('paciente_id', pacienteId)
+            .eq('fecha', fecha)
+            .order('hora', { ascending: true }),
+        ]),
+        timeoutPromise,
+      ])
 
-    setComidas(resComidas.data || [])
-    setActividades(resActividades.data || [])
+      if (resComidas.error) setError(resComidas.error.message)
+      if (resActividades.error) setError(resActividades.error.message)
+
+      setComidas(resComidas.data || [])
+      setActividades(resActividades.data || [])
+    } catch (err) {
+      setError(err.message || 'Error de conexion al cargar registros.')
+    }
     setLoading(false)
   }, [pacienteId, fecha])
 
