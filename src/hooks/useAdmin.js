@@ -1,6 +1,6 @@
-﻿// useAdmin.js
+// useAdmin.js
 // Hook para el panel de superadmin.
-// Consulta admin_nutricionistas_view y permite cambiar plan y estado.
+// Consulta admin_nutricionistas_view y permite cambiar plan, estado y crear nuevos nutricionistas.
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 
@@ -46,5 +46,28 @@ export function useAdmin() {
     return { error: null }
   }
 
-  return { nutricionistas, loading, error, cambiarPlan, cambiarEstado, refetch: fetchNutricionistas }
+  // ── Crear nuevo nutricionista via Edge Function ───────────────────────────
+  async function crearNutricionista({ nombre, email, password, plan }) {
+    const { data, error: err } = await supabase.functions.invoke('create-nutricionista', {
+      body: { nombre, email, password, plan },
+    })
+    if (err) {
+      // Intentar extraer el mensaje de error del body de la respuesta
+      const msg = err?.context?.json?.error ?? err.message ?? 'Error al crear el nutricionista.'
+      return { data: null, error: msg }
+    }
+    await fetchNutricionistas()
+    return { data, error: null }
+  }
+
+  return {
+    nutricionistas,
+    loading,
+    error,
+    cambiarPlan,
+    cambiarEstado,
+    crearNutricionista,
+    refetch: fetchNutricionistas,
+  }
 }
+
