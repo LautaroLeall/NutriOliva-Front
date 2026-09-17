@@ -239,7 +239,7 @@ export default function ActivityForm({ open, onClose, onGuardar, pacienteId }) {
               ? <span className="flex items-center justify-center gap-1.5">
                 <Loader2 size={13} className="animate-spin" /> Guardando...
               </span>
-              : 'Registrar actividad'
+              : 'Registrar'
             }
           </button>
         </div>
