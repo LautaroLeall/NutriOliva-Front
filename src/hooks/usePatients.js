@@ -16,54 +16,65 @@ export function usePatients() {
     setLoading(true)
     setError(null)
 
-    // Trae pacientes + última actividad (comida o registro)
-    const { data, error: fetchError } = await supabase
-      .from('pacientes')
-      .select(`
-        id,
-        nombre,
-        email,
-        telefono,
-        fecha_nacimiento,
-        estado,
-        created_at,
-        registros_comida (
-          created_at
-        )
-      `)
-      .order('created_at', { ascending: false })
+    // Timeout de 10 segundos — muestra error si Supabase no responde
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Sin conexion. Verifica tu internet o que Supabase este activo.')), 10000)
+    )
 
-    if (fetchError) {
-      setError(fetchError.message)
-    } else {
-      // Calcular última actividad y flag de 48hs
-      const now = new Date()
-      const enriched = (data || []).map(p => {
-        const registros = p.registros_comida || []
-        const ultimaActividad = registros.length > 0
-          ? new Date(Math.max(...registros.map(r => new Date(r.created_at))))
-          : null
+    try {
+      // Trae pacientes + última actividad (comida o registro)
+      const fetchPromise = supabase
+        .from('pacientes')
+        .select(`
+          id,
+          nombre,
+          email,
+          telefono,
+          fecha_nacimiento,
+          estado,
+          created_at,
+          registros_comida (
+            created_at
+          )
+        `)
+        .order('created_at', { ascending: false })
 
-        const horasSinActividad = ultimaActividad
-          ? (now - ultimaActividad) / (1000 * 60 * 60)
-          : Infinity
+      const { data, error: fetchError } = await Promise.race([fetchPromise, timeoutPromise])
 
-        return {
-          ...p,
-          ultimaActividad,
-          sinActividad48h: horasSinActividad > 48,
-          registros_comida: undefined, // limpiar el array anidado
-        }
-      })
+      if (fetchError) {
+        setError(fetchError.message)
+      } else {
+        // Calcular última actividad y flag de 48hs
+        const now = new Date()
+        const enriched = (data || []).map(p => {
+          const registros = p.registros_comida || []
+          const ultimaActividad = registros.length > 0
+            ? new Date(Math.max(...registros.map(r => new Date(r.created_at))))
+            : null
 
-      // Ordenar: primero los sin actividad reciente
-      enriched.sort((a, b) => {
-        if (a.sinActividad48h && !b.sinActividad48h) return -1
-        if (!a.sinActividad48h && b.sinActividad48h) return 1
-        return 0
-      })
+          const horasSinActividad = ultimaActividad
+            ? (now - ultimaActividad) / (1000 * 60 * 60)
+            : Infinity
 
-      setPacientes(enriched)
+          return {
+            ...p,
+            ultimaActividad,
+            sinActividad48h: horasSinActividad > 48,
+            registros_comida: undefined, // limpiar el array anidado
+          }
+        })
+
+        // Ordenar: primero los sin actividad reciente
+        enriched.sort((a, b) => {
+          if (a.sinActividad48h && !b.sinActividad48h) return -1
+          if (!a.sinActividad48h && b.sinActividad48h) return 1
+          return 0
+        })
+
+        setPacientes(enriched)
+      }
+    } catch (err) {
+      setError(err.message || 'Error de conexion al cargar pacientes.')
     }
     setLoading(false)
   }, [])
