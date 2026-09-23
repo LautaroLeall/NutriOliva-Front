@@ -1,253 +1,84 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Loader2, ArrowLeft } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
-import Logo from "@/components/ui/Logo";
+// Login.jsx — Orquestador del login split-screen
+// Toda la logica de auth esta en useLogin
+// Todos los elementos visuales estan en pages/login/
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useLogin }          from "@/hooks/useLogin";
+import LoginLeftPanel        from "./login/LoginLeftPanel";
+import LoginForm             from "./login/LoginForm";
+import LoginResetForm        from "./login/LoginResetForm";
+import LoginResetSuccess     from "./login/LoginResetSuccess";
 
 export default function Login() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  // Estado para recuperacion de contrasena
-  const [modoReset, setModoReset] = useState(false);
-  const [emailReset, setEmailReset] = useState("");
-  const [resetEnviado, setResetEnviado] = useState(false);
-
-  async function handleLogin(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword(
-        {
-          email,
-          password,
-        },
-      );
-
-      if (authError) throw authError;
-
-      // Obtener el rol del usuario
-      const { data: perfil } = await supabase
-        .from("perfiles")
-        .select("rol")
-        .eq("id", data.user.id)
-        .single();
-
-      // Redirigir segun el rol
-      if (perfil?.rol === "superadmin") navigate("/admin", { replace: true });
-      else if (perfil?.rol === "nutricionista")
-        navigate("/panel", { replace: true });
-      else if (perfil?.rol === "paciente")
-        navigate("/mi-plan", { replace: true });
-      else navigate("/", { replace: true });
-    } catch (err) {
-      setError(
-        err.message === "Invalid login credentials"
-          ? "Mail o contraseña incorrectos."
-          : "Ocurrió un error. Intentá de nuevo.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleReset(e) {
-    e.preventDefault();
-    if (!emailReset.trim()) {
-      setError("Ingresá tu mail para continuar.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    const { error: resetErr } = await supabase.auth.resetPasswordForEmail(
-      emailReset.trim().toLowerCase(),
-      { redirectTo: `${window.location.origin}/set-password` },
-    );
-    setLoading(false);
-    if (resetErr) {
-      setError("No se pudo enviar el mail. Verificá el correo ingresado.");
-    } else {
-      setResetEnviado(true);
-    }
-  }
-
-  function volverAlLogin() {
-    setModoReset(false);
-    setResetEnviado(false);
-    setEmailReset("");
-    setError("");
-  }
+  const {
+    // Estado login
+    email, setEmail,
+    password, setPassword,
+    showPassword, setShowPassword,
+    error, setError,
+    loading,
+    mounted,
+    // Estado reset
+    modoReset, setModoReset,
+    emailReset, setEmailReset,
+    resetEnviado,
+    // Handlers
+    handleLogin,
+    handleReset,
+    volverAlLogin,
+  } = useLogin();
 
   return (
-    <div className="page min-h-screen bg-[#EFEAE0] flex flex-col items-center justify-center px-4 py-12">
-      <div className="bg-white border border-cream-darker rounded-card shadow-card w-full max-w-sm p-10">
-        {/* Logo */}
-        <div className="flex justify-center mb-5">
-          <Logo size={44} />
+    <div className="min-h-screen bg-[#E8E3D8] flex items-center justify-center p-4">
+      {/* Contenedor split-screen */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={mounted ? { opacity: 1, scale: 1 } : {}}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        className="w-full max-w-[860px] flex flex-col lg:flex-row rounded-[28px] overflow-hidden
+                   shadow-[0_32px_80px_rgba(63,74,43,0.22)]"
+      >
+        {/* Panel izquierdo: branding + slides */}
+        <LoginLeftPanel mounted={mounted} />
+
+        {/* Panel derecho: formulario */}
+        <div className="flex-1 bg-white flex flex-col justify-center px-8 py-10 lg:px-12">
+          <AnimatePresence mode="wait">
+            {modoReset && resetEnviado ? (
+              <LoginResetSuccess
+                key="reset-ok"
+                emailReset={emailReset}
+                onVolver={volverAlLogin}
+              />
+            ) : modoReset ? (
+              <LoginResetForm
+                key="reset-form"
+                emailReset={emailReset}
+                setEmailReset={setEmailReset}
+                error={error}
+                setError={setError}
+                loading={loading}
+                onSubmit={handleReset}
+                onVolver={volverAlLogin}
+              />
+            ) : (
+              <LoginForm
+                key="login-form"
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+                error={error}
+                loading={loading}
+                onSubmit={handleLogin}
+                onForgotPassword={() => { setModoReset(true); setError(""); }}
+              />
+            )}
+          </AnimatePresence>
         </div>
-
-        {/* ── Pantalla de confirmacion de reset ── */}
-        {modoReset && resetEnviado ? (
-          <div className="text-center space-y-4">
-            <h1 className="font-display text-lg text-olive-dark">
-              Revisá tu correo
-            </h1>
-            <p className="text-sm text-muted leading-relaxed">
-              Te enviamos un link para restablecer tu contraseña a{" "}
-              <span className="font-medium text-olive-dark">{emailReset}</span>.
-            </p>
-            <p className="text-xs text-muted">
-              Si no lo ves, revisá la carpeta de spam.
-            </p>
-            <button
-              onClick={volverAlLogin}
-              className="btn-ghost w-full py-2.5 flex items-center justify-center gap-2 text-sm mt-2"
-            >
-              <ArrowLeft size={14} />
-              Volver al inicio de sesion
-            </button>
-          </div>
-        ) : modoReset ? (
-          /* ── Formulario de reset ── */
-          <>
-            <h1 className="font-display text-lg text-olive-dark text-center mb-2">
-              Restablecer contraseña
-            </h1>
-            <p className="text-xs text-muted text-center mb-6">
-              Ingresá tu mail y te enviamos un link para crear una contraseña
-              nueva.
-            </p>
-
-            <form onSubmit={handleReset} className="space-y-4">
-              <div>
-                <label htmlFor="emailReset" className="label">
-                  Mail
-                </label>
-                <input
-                  id="emailReset"
-                  type="email"
-                  className="input"
-                  placeholder="vos@mail.com"
-                  value={emailReset}
-                  onChange={(e) => {
-                    setEmailReset(e.target.value);
-                    setError("");
-                  }}
-                  required
-                  autoComplete="email"
-                  autoFocus
-                />
-              </div>
-
-              {error && (
-                <p className="text-xs text-accent bg-accent-bg rounded-lg px-3 py-2">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                className="btn-primary w-full py-3 mt-2"
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 size={14} className="animate-spin" />
-                    Enviando...
-                  </span>
-                ) : (
-                  "Enviar link de recuperacion"
-                )}
-              </button>
-            </form>
-
-            <button
-              onClick={volverAlLogin}
-              className="mt-4 w-full text-center text-xs text-muted hover:text-olive-dark transition-colors flex items-center justify-center gap-1.5"
-            >
-              <ArrowLeft size={12} />
-              Volver al inicio de sesion
-            </button>
-          </>
-        ) : (
-          /* ── Formulario de login principal ── */
-          <>
-            <h1 className="font-display text-lg text-olive-dark text-center mb-6">
-              Iniciar sesion
-            </h1>
-
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label htmlFor="email" className="label">
-                  Mail
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  className="input"
-                  placeholder="vos@mail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="password" className="label">
-                  Contraseña
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  className="input"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
-
-              {error && (
-                <p className="text-xs text-accent bg-accent-bg rounded-lg px-3 py-2">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                className="btn-primary w-full py-3 mt-2"
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 size={14} className="animate-spin" />
-                    Ingresando...
-                  </span>
-                ) : (
-                  "Iniciar sesion"
-                )}
-              </button>
-            </form>
-
-            <button
-              onClick={() => {
-                setModoReset(true);
-                setError("");
-              }}
-              className="mt-5 w-full text-center text-xs text-muted hover:text-olive-dark transition-colors cursor-pointer"
-            >
-              Olvidaste tu contraseña?
-            </button>
-          </>
-        )}
-      </div>
+      </motion.div>
     </div>
   );
 }
