@@ -1,217 +1,71 @@
-﻿import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Loader2, KeyRound, CheckCircle } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
-import Logo from "@/components/ui/Logo";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSetPassword } from "@/hooks/useSetPassword";
+import SetPasswordLeft from "./set-password/SetPasswordLeft";
+import SetPasswordForm from "./set-password/SetPasswordForm";
+import SetPasswordSuccess from "./set-password/SetPasswordSuccess";
 
-/**
- * Pagina que maneja dos flujos:
- * 1. type=invite   — el paciente define su contrasena por primera vez
- * 2. type=recovery — cualquier usuario restablece su contrasena
- *
- * Supabase redirige aqui con el token en el hash de la URL:
- * /set-password#access_token=xxx&refresh_token=xxx&type=invite
- *
- * El SDK de Supabase detecta el hash automaticamente y establece la sesion.
- * Luego llamamos a updateUser({ password }) para guardar la contrasena.
- */
 export default function SetPassword() {
-  const navigate = useNavigate();
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [listo, setListo] = useState(false);
-  const [tipoFlujo, setTipoFlujo] = useState("invite"); // 'invite' | 'recovery'
-  const [sessionLista, setSessionLista] = useState(false);
-
-  // Detectar el tipo de flujo desde el hash de la URL
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery")) setTipoFlujo("recovery");
-    else if (hash.includes("type=invite")) setTipoFlujo("invite");
-  }, []);
-
-  // Esperar a que el SDK de Supabase procese el token del hash
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (
-        (event === "SIGNED_IN" ||
-          event === "USER_UPDATED" ||
-          event === "PASSWORD_RECOVERY") &&
-        session
-      ) {
-        setSessionLista(true);
-      }
-    });
-    // Si ya hay sesion activa por el hash, tambien marcar como lista
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setSessionLista(true);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
-  function validar() {
-    if (!password) return "Ingresa una contrasena.";
-    if (password.length < 6)
-      return "La contrasena debe tener al menos 6 caracteres.";
-    if (password !== confirm) return "Las contraseñas no coinciden.";
-    return null;
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const err = validar();
-    if (err) {
-      setError(err);
-      return;
-    }
-    setError("");
-    setLoading(true);
-
-    const { error: updateErr } = await supabase.auth.updateUser({ password });
-    setLoading(false);
-
-    if (updateErr) {
-      setError(
-        updateErr.message === "Auth session missing!"
-          ? "El link de invitacion expiro. Pedile al nutricionista que te reenvie la invitacion."
-          : updateErr.message,
-      );
-      return;
-    }
-
-    setListo(true);
-
-    // Redirigir segun el rol del usuario
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (session) {
-      const { data: perfil } = await supabase
-        .from("perfiles")
-        .select("rol")
-        .eq("id", session.user.id)
-        .single();
-
-      setTimeout(() => {
-        if (perfil?.rol === "nutricionista")
-          navigate("/panel", { replace: true });
-        else if (perfil?.rol === "superadmin")
-          navigate("/admin", { replace: true });
-        else navigate("/mi-plan", { replace: true });
-      }, 2000);
-    } else {
-      setTimeout(() => navigate("/login", { replace: true }), 2000);
-    }
-  }
-
-  const titulo =
-    tipoFlujo === "invite"
-      ? "Bienvenido a NutriOliva"
-      : "Restablecer contraseña";
-
-  const subtitulo =
-    tipoFlujo === "invite"
-      ? "Crea tu contrasena para acceder a tu plan nutricional."
-      : "Ingresa tu nueva contrasena para continuar.";
+  const {
+    password,
+    setPassword,
+    confirm,
+    setConfirm,
+    showPass,
+    setShowPass,
+    showConf,
+    setShowConf,
+    error,
+    setError,
+    loading,
+    listo,
+    mounted,
+    tipoFlujo,
+    sessionLista,
+    noCoinciden,
+    handleSubmit,
+  } = useSetPassword();
 
   return (
-    <div className="page min-h-screen bg-[#EFEAE0] flex flex-col items-center justify-center px-4 py-12">
-      <div className="bg-white border border-cream-darker rounded-card shadow-card w-full max-w-sm p-10">
-        <div className="flex justify-center mb-5">
-          <Logo size={44} />
-        </div>
+    <div className="min-h-screen bg-[#E8E3D8] flex items-center justify-center p-4">
+      {/* Contenedor split-screen */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={mounted ? { opacity: 1, scale: 1 } : {}}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        className="w-full max-w-[860px] flex flex-col lg:flex-row rounded-[28px] overflow-hidden
+                    shadow-[0_32px_80px_rgba(63,74,43,0.22)]"
+      >
+        {/* Panel izquierdo: branding + contenido segun flujo */}
+        <SetPasswordLeft tipoFlujo={tipoFlujo} mounted={mounted} />
 
-        {listo ? (
-          /* ── Pantalla de exito ── */
-          <div className="text-center space-y-3">
-            <CheckCircle size={36} className="text-success mx-auto" />
-            <h1 className="font-display text-lg text-olive-dark">
-              Contraseña creada
-            </h1>
-            <p className="text-sm text-muted">Ingresando a tu cuenta...</p>
-          </div>
-        ) : (
-          /* ── Formulario de contrasena ── */
-          <>
-            <div className="text-center mb-6">
-              <KeyRound size={28} className="text-olive mx-auto mb-3" />
-              <h1 className="font-display text-lg text-olive-dark mb-1">
-                {titulo}
-              </h1>
-              <p className="text-xs text-muted">{subtitulo}</p>
-            </div>
-
-            {!sessionLista && (
-              <div className="flex items-center justify-center gap-2 py-4 text-muted mb-4">
-                <Loader2 size={14} className="animate-spin" />
-                <span className="text-xs">Verificando el link...</span>
-              </div>
+        {/* Panel derecho: formulario o pantalla de exito */}
+        <div className="flex-1 bg-white flex flex-col justify-center px-8 py-10 lg:px-12">
+          <AnimatePresence mode="wait">
+            {listo ? (
+              <SetPasswordSuccess key="success" tipoFlujo={tipoFlujo} />
+            ) : (
+              <SetPasswordForm
+                key="form"
+                password={password}
+                setPassword={setPassword}
+                confirm={confirm}
+                setConfirm={setConfirm}
+                showPass={showPass}
+                setShowPass={setShowPass}
+                showConf={showConf}
+                setShowConf={setShowConf}
+                error={error}
+                setError={setError}
+                loading={loading}
+                sessionLista={sessionLista}
+                tipoFlujo={tipoFlujo}
+                noCoinciden={noCoinciden}
+                onSubmit={handleSubmit}
+              />
             )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="label">Nueva contraseña</label>
-                <input
-                  type="password"
-                  className={`input ${error && !confirm ? "border-red-400" : ""}`}
-                  placeholder="Minimo 6 caracteres"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError("");
-                  }}
-                  autoFocus
-                  disabled={!sessionLista}
-                  autoComplete="new-password"
-                />
-              </div>
-
-              <div>
-                <label className="label">Confirmar contraseña</label>
-                <input
-                  type="password"
-                  className={`input ${error && confirm && password !== confirm ? "border-red-400" : ""}`}
-                  placeholder="Repetir contraseña"
-                  value={confirm}
-                  onChange={(e) => {
-                    setConfirm(e.target.value);
-                    setError("");
-                  }}
-                  disabled={!sessionLista}
-                  autoComplete="new-password"
-                />
-              </div>
-
-              {error && (
-                <p className="text-xs text-accent bg-accent-bg rounded-lg px-3 py-2">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                className="btn-primary w-full py-3"
-                disabled={loading || !sessionLista}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 size={14} className="animate-spin" />
-                    Guardando...
-                  </span>
-                ) : tipoFlujo === "invite" ? (
-                  "Crear cuenta"
-                ) : (
-                  "Guardar nueva contraseña"
-                )}
-              </button>
-            </form>
-          </>
-        )}
-      </div>
+          </AnimatePresence>
+        </div>
+      </motion.div>
     </div>
   );
 }
