@@ -60,7 +60,7 @@ export function usePatientPanel() {
         .select("id, calorias_objetivo, version, comidas_plan(*)")
         .eq("paciente_id", pac.id)
         .eq("estado", "activo")
-        .single();
+        .maybeSingle();
       setPlanActivo(plan || null);
       setLoadingInf(false);
     }
