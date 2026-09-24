@@ -1,26 +1,31 @@
 // Login.jsx — Orquestador del login split-screen
 // Toda la logica de auth esta en useLogin
-// Todos los elementos visuales estan en pages/login/
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useLogin }          from "@/hooks/useLogin";
-import LoginLeftPanel        from "./login/LoginLeftPanel";
-import LoginForm             from "./login/LoginForm";
-import LoginResetForm        from "./login/LoginResetForm";
-import LoginResetSuccess     from "./login/LoginResetSuccess";
+import { useLogin } from "@/hooks/useLogin";
+import LoginLeftPanel from "./login/LoginLeftPanel";
+import LoginForm from "./login/LoginForm";
+import LoginResetForm from "./login/LoginResetForm";
+import LoginResetSuccess from "./login/LoginResetSuccess";
 
 export default function Login() {
   const {
     // Estado login
-    email, setEmail,
-    password, setPassword,
-    showPassword, setShowPassword,
-    error, setError,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    showPassword,
+    setShowPassword,
+    error,
+    setError,
     loading,
     mounted,
     // Estado reset
-    modoReset, setModoReset,
-    emailReset, setEmailReset,
+    modoReset,
+    setModoReset,
+    emailReset,
+    setEmailReset,
     resetEnviado,
     // Handlers
     handleLogin,
@@ -36,7 +41,7 @@ export default function Login() {
         animate={mounted ? { opacity: 1, scale: 1 } : {}}
         transition={{ duration: 0.55, ease: "easeOut" }}
         className="w-full max-w-[860px] flex flex-col lg:flex-row rounded-[28px] overflow-hidden
-                   shadow-[0_32px_80px_rgba(63,74,43,0.22)]"
+                    shadow-[0_32px_80px_rgba(63,74,43,0.22)]"
       >
         {/* Panel izquierdo: branding + slides */}
         <LoginLeftPanel mounted={mounted} />
@@ -73,7 +78,10 @@ export default function Login() {
                 error={error}
                 loading={loading}
                 onSubmit={handleLogin}
-                onForgotPassword={() => { setModoReset(true); setError(""); }}
+                onForgotPassword={() => {
+                  setModoReset(true);
+                  setError("");
+                }}
               />
             )}
           </AnimatePresence>

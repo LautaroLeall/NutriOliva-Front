@@ -5,6 +5,19 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Mail } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 
+// Mismo helper que en LandingNav
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  else window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+const FOOTER_LINKS = [
+  { label: "Funcionalidades", id: "funcionalidades" },
+  { label: "Precios", id: "precios" },
+  { label: "FAQ", id: "faq" },
+];
+
 export default function LandingCTA() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -118,16 +131,16 @@ export default function LandingCTA() {
             </span>
           </div>
 
-          {/* Links */}
+          {/* Links con smooth scroll */}
           <div className="flex gap-6">
-            {["Funcionalidades", "Precios", "FAQ"].map((l) => (
-              <a
-                key={l}
-                href={`#${l.toLowerCase()}`}
-                className="font-display text-[11px] text-cream/40 hover:text-cream/70 transition-colors"
+            {FOOTER_LINKS.map(({ label, id }) => (
+              <button
+                key={id}
+                onClick={() => scrollToSection(id)}
+                className="font-display text-[11px] text-cream/40 hover:text-cream/70 transition-colors focus:outline-none"
               >
-                {l}
-              </a>
+                {label}
+              </button>
             ))}
           </div>
 
