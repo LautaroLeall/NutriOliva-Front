@@ -1,4 +1,6 @@
-// Landing.jsx
+// Landing.jsx — Orquestador de las 10 secciones
+// Cada sección tiene su id para que el navbar pueda hacer scrollIntoView
+
 import LandingNav from "./landing/LandingNav";
 import LandingHero from "./landing/LandingHero";
 import LandingStats from "./landing/LandingStats";
@@ -16,17 +18,23 @@ export default function Landing() {
       {/* Navbar fija con blur al scroll */}
       <LandingNav />
 
-      {/* Hero — full height con mockup flotante */}
-      <LandingHero />
+      {/* Hero — full height con mockup flotante | id: hero */}
+      <section id="hero">
+        <LandingHero />
+      </section>
 
       {/* 3 stats con contador animado */}
       <LandingStats />
 
-      {/* Como funciona — 3 pasos con linea conectora */}
-      <LandingHowItWorks />
+      {/* Como funciona — 3 pasos con linea conectora | id: como-funciona */}
+      <section id="como-funciona">
+        <LandingHowItWorks />
+      </section>
 
-      {/* 6 feature cards con hover 3D */}
-      <LandingFeatures />
+      {/* 6 feature cards con hover 3D | id: funcionalidades */}
+      <section id="funcionalidades">
+        <LandingFeatures />
+      </section>
 
       {/* Para el nutricionista vs para el paciente */}
       <LandingForWho />
@@ -34,11 +42,15 @@ export default function Landing() {
       {/* Quote editorial en fondo oscuro */}
       <LandingQuote />
 
-      {/* Pricing — 3 planes con precios reales */}
-      <LandingPricing />
+      {/* Pricing — 3 planes con precios reales | id: precios */}
+      <section id="precios">
+        <LandingPricing />
+      </section>
 
-      {/* FAQ — accordion animado */}
-      <LandingFAQ />
+      {/* FAQ — accordion animado | id: faq */}
+      <section id="faq">
+        <LandingFAQ />
+      </section>
 
       {/* CTA final + Footer */}
       <LandingCTA />
