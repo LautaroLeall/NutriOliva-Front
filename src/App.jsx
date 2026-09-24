@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { AuthProvider } from "@/hooks/useAuth";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 import {
   ProtectedRoute,
   RoleRoute,
@@ -21,6 +22,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollToTop />
         <Suspense
           fallback={
             <div className="flex h-screen items-center justify-center">
