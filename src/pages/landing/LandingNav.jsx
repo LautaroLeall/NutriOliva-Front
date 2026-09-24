@@ -1,8 +1,27 @@
-// LandingNav.jsx — Navbar sticky con fondo blur al scroll
+// LandingNav.jsx — Navbar sticky con fondo blur al scroll + smooth scroll por seccion
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import Logo from "@/components/ui/Logo";
+
+// Mapa: texto del link -> id de la seccion en el DOM
+const NAV_LINKS = [
+  { label: "Como funciona", id: "como-funciona" },
+  { label: "Funcionalidades", id: "funcionalidades" },
+  { label: "Precios", id: "precios" },
+];
+
+// Scroll suave a una seccion por su ID
+function scrollToSection(id) {
+  if (!id) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -26,28 +45,35 @@ export default function LandingNav() {
                   }`}
     >
       <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo */}
-        <div className="flex items-center gap-2.5">
+        {/* Logo — click vuelve al tope con smooth */}
+        <button
+          onClick={() => scrollToSection(null)}
+          className="flex items-center gap-2.5 focus:outline-none"
+        >
           <Logo size={26} />
           <span
             className={`font-display font-bold text-[15px] transition-colors duration-300
-                            ${scrolled ? "text-olive-dark" : "text-cream"}`}
+                        ${scrolled ? "text-olive-dark" : "text-cream"}`}
           >
             NutriOliva
           </span>
-        </div>
+        </button>
 
-        {/* Links */}
+        {/* Links con smooth scroll */}
         <div className="hidden md:flex items-center gap-8">
-          {["Como funciona", "Funcionalidades", "Precios"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase().replace(" ", "-")}`}
-              className={`font-display text-[12.5px] transition-colors duration-200
-                          ${scrolled ? "text-muted hover:text-olive-dark" : "text-cream/80 hover:text-cream"}`}
+          {NAV_LINKS.map(({ label, id }) => (
+            <button
+              key={id}
+              onClick={() => scrollToSection(id)}
+              className={`font-display text-[12.5px] transition-colors duration-200 focus:outline-none
+                          ${
+                            scrolled
+                              ? "text-muted hover:text-olive-dark"
+                              : "text-cream/80 hover:text-cream"
+                          }`}
             >
-              {item}
-            </a>
+              {label}
+            </button>
           ))}
         </div>
 
