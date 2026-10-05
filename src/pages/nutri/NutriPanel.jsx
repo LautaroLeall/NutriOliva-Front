@@ -1,14 +1,26 @@
-import { useState } from "react";
+// NutriPanel.jsx — Panel principal del nutricionista
+
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
   LogOut,
   Plus,
   Search,
-  Loader2,
   AlertCircle,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  useSpring,
+} from "framer-motion";
+import CountUp from "react-countup";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePatients } from "@/hooks/usePatients";
 import Logo from "@/components/ui/Logo";
@@ -18,6 +30,98 @@ import PatientForm from "@/components/patients/PatientForm";
 import DatosClinicos from "@/components/nutri/DatosClinicos";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
+// ── Card 3D tilt con Framer Motion ────────────────────────────────────────
+function MetricCard({ label, value, alert, delay, icon: Icon }) {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), {
+    stiffness: 300,
+    damping: 30,
+  });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), {
+    stiffness: 300,
+    damping: 30,
+  });
+
+  function handleMouse(e) {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+    x.set((e.clientX - rect.left) / rect.width - 0.5);
+    y.set((e.clientY - rect.top) / rect.height - 0.5);
+  }
+
+  function handleLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouse}
+      onMouseLeave={handleLeave}
+      style={{ rotateX, rotateY, transformPerspective: 800 }}
+      initial={{ opacity: 0, y: 28, scale: 0.92 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      className={`relative overflow-hidden card-cream px-5 py-4 cursor-default select-none
+                  shadow-sm hover:shadow-card transition-shadow duration-300
+                  ${alert ? "border border-accent/20" : "border border-transparent"}`}
+    >
+      {/* Brillo en hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-card" />
+
+      {/* Numero con countup */}
+      <div
+        className={`font-display text-3xl font-bold leading-none
+                      ${alert ? "text-accent" : "text-olive-dark"}`}
+      >
+        <CountUp end={value} duration={1.4} delay={delay} />
+      </div>
+
+      {/* Label */}
+      <div
+        className={`text-[11px] mt-1.5 font-display tracking-wide
+                      ${alert ? "text-accent/80" : "text-muted"}`}
+      >
+        {label}
+      </div>
+
+      {/* Indicador de alerta */}
+      {alert && (
+        <motion.div
+          animate={{ scale: [1, 1.3, 1] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute top-3 right-3 w-2 h-2 rounded-full bg-accent"
+        />
+      )}
+    </motion.div>
+  );
+}
+
+// ── Skeleton de tabla ──────────────────────────────────────────────────────
+function TableSkeleton() {
+  return (
+    <div className="divide-y divide-cream">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-5 py-4">
+          <div className="w-8 h-8 rounded-full bg-cream-darker animate-pulse flex-shrink-0" />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-2.5 bg-cream-darker rounded-full w-36 animate-pulse" />
+            <div className="h-2 bg-cream-darker rounded-full w-24 animate-pulse" />
+          </div>
+          <div className="h-2.5 bg-cream-darker rounded-full w-14 animate-pulse" />
+          <div className="h-2 bg-cream-darker rounded-full w-16 animate-pulse" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Componente principal ───────────────────────────────────────────────────
 export default function NutriPanel() {
   const navigate = useNavigate();
   const { nombre, signOut } = useAuth();
@@ -37,16 +141,18 @@ export default function NutriPanel() {
   const [confirmDesact, setConfirmDesact] = useState(null);
   const [confirmReact, setConfirmReact] = useState(null);
   const [procesando, setProcesando] = useState(false);
-  // Datos clínicos — se muestra al crear un paciente nuevo
-  const [pacienteCreado, setPacienteCreado] = useState(null); // { id, nombre }
+  const [pacienteCreado, setPacienteCreado] = useState(null);
   const [modalClinicos, setModalClinicos] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  // auto-animate: stagger automatico en el tbody
+  const [tbodyRef] = useAutoAnimate({ duration: 180 });
 
   const filtrados = pacientes.filter(
     (p) =>
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
       p.email.toLowerCase().includes(busqueda.toLowerCase()),
   );
-
   const activos = pacientes.filter((p) => p.estado === "activo").length;
   const sinActiv = pacientes.filter(
     (p) => p.sinActividad48h && p.estado === "activo",
@@ -56,7 +162,6 @@ export default function NutriPanel() {
     setEditando(null);
     setModalAbierto(true);
   }
-
   function abrirEdicion(paciente) {
     setEditando(paciente);
     setModalAbierto(true);
@@ -69,24 +174,20 @@ export default function NutriPanel() {
         toast.success(`${datos.nombre} actualizado correctamente.`);
       return res;
     }
-    // Crear paciente nuevo
     const res = await crearPaciente(datos);
     if (!res.error) {
       if (res.inviteError) {
-        // Alta exitosa pero mail no enviado
         toast.warning(
-          `${datos.nombre} creado, pero no se pudo enviar el mail de invitacion. Podes reintentarlo desde la ficha.`,
+          `${datos.nombre} creado, pero no se pudo enviar el mail de invitacion.`,
         );
       } else {
         toast.success(
           `Paciente ${datos.nombre} creado. Se envio el mail de invitacion.`,
         );
       }
-      // Abrir modal de datos clinicos (opcional al crearlos)
       if (res.data?.id) {
         setPacienteCreado({ id: res.data.id, nombre: datos.nombre });
         setModalAbierto(false);
-        // Pequeno delay para que el PatientForm se cierre primero
         setTimeout(() => setModalClinicos(true), 200);
       }
     }
@@ -117,8 +218,14 @@ export default function NutriPanel() {
     <div className="page min-h-screen bg-[#EFEAE0]">
       <Toaster position="bottom-right" richColors />
 
-      {/* Navbar */}
-      <nav className="flex justify-between items-center px-6 py-3.5 bg-white border-b border-cream-darker">
+      {/* ── Navbar ──────────────────────────────────────────────────────── */}
+      <motion.nav
+        initial={{ y: -48, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        className="flex justify-between items-center px-6 py-3.5 bg-white
+                    border-b border-cream-darker shadow-sm"
+      >
         <div className="flex items-center gap-2 font-display font-bold text-base text-olive-dark">
           <Logo size={22} />
           NutriOliva
@@ -138,106 +245,162 @@ export default function NutriPanel() {
               Cuenta
             </span>
           </div>
-          <button
+          <motion.button
             onClick={signOut}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.95 }}
             className="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5"
           >
             <LogOut size={12} />
             Salir
-          </button>
+          </motion.button>
         </div>
-      </nav>
+      </motion.nav>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-6">
+        {/* ── Header ──────────────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.1 }}
+          className="flex justify-between items-start mb-6"
+        >
           <div>
-            <h2 className="font-display text-xl text-olive-dark">
+            <h2 className="font-display text-xl text-olive-dark font-bold">
               Mis pacientes
             </h2>
-            <p className="text-xs text-muted mt-0.5">Hola, {nombre}</p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35, duration: 0.5 }}
+              className="text-xs text-muted mt-0.5 flex items-center gap-1.5"
+            >
+              <Sparkles size={11} className="text-olive/60" />
+              Hola, {nombre}
+            </motion.p>
           </div>
-          <button
+
+          <motion.button
             onClick={abrirNuevo}
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0 8px 24px rgba(110,122,75,0.35)",
+            }}
+            whileTap={{ scale: 0.94 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
             className="btn-primary text-sm flex items-center gap-2"
           >
             <Plus size={14} />
             Nuevo paciente
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
-        {/* Métricas */}
-        {!loading && pacientes.length > 0 && (
-          <div className="grid grid-cols-3 gap-3 mb-5">
-            {[
-              { label: "Pacientes activos", value: activos },
-              {
-                label: "Sin actividad 48h",
-                value: sinActiv,
-                alert: sinActiv > 0,
-              },
-              { label: "Total registrados", value: pacientes.length },
-            ].map((m) => (
-              <div key={m.label} className="card-cream px-4 py-3.5">
-                <div className="font-display text-2xl font-semibold text-olive-dark">
-                  {m.value}
-                </div>
-                <div
-                  className={`text-[10.5px] mt-0.5 font-display ${m.alert ? "text-red-500" : "text-muted"}`}
-                >
-                  {m.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* ── Métricas con 3D tilt ────────────────────────────────────── */}
+        <AnimatePresence>
+          {!loading && pacientes.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mb-5">
+              <MetricCard
+                label="Pacientes activos"
+                value={activos}
+                delay={0.15}
+              />
+              <MetricCard
+                label="Sin actividad 48h"
+                value={sinActiv}
+                delay={0.25}
+                alert={sinActiv > 0}
+              />
+              <MetricCard
+                label="Total registrados"
+                value={pacientes.length}
+                delay={0.35}
+              />
+            </div>
+          )}
+        </AnimatePresence>
 
-        {/* Tabla */}
-        <div className="card overflow-hidden">
-          {/* Búsqueda */}
-          <div className="flex items-center gap-3 px-5 py-3.5 border-b border-cream-darker bg-cream">
-            <Search size={14} className="text-muted flex-shrink-0" />
+        {/* ── Tabla / Lista ────────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.2 }}
+          className="card overflow-visible"
+        >
+          {/* Búsqueda animada */}
+          <motion.div
+            animate={{ backgroundColor: searchFocused ? "#F6F1E7" : "#F0EDE4" }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-3 px-5 py-3.5 border-b border-cream-darker"
+          >
+            <motion.div
+              animate={{
+                scale: searchFocused ? 1.15 : 1,
+                color: searchFocused ? "#6E7A4B" : "#69644D",
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              <Search size={14} className="flex-shrink-0" />
+            </motion.div>
             <input
               type="text"
               placeholder="Buscar por nombre o mail..."
               className="flex-1 bg-transparent text-sm font-body text-olive-dark placeholder-muted/60 focus:outline-none"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
             />
-          </div>
+            <AnimatePresence>
+              {busqueda && (
+                <motion.button
+                  key="clear"
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  onClick={() => setBusqueda("")}
+                  className="text-muted hover:text-olive-dark transition-colors text-xs"
+                >
+                  Limpiar
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
-          {loading && (
-            <div className="flex items-center justify-center gap-2 py-14 text-muted">
-              <Loader2 size={16} className="animate-spin" />
-              <span className="font-display text-sm">
-                Cargando pacientes...
-              </span>
-            </div>
-          )}
+          {/* Skeleton de carga */}
+          {loading && <TableSkeleton />}
 
+          {/* Error */}
           {!loading && error && (
-            <div className="flex items-center gap-2 px-5 py-4 text-red-500 text-sm">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-2 px-5 py-4 text-red-500 text-sm"
+            >
               <AlertCircle size={14} /> {error}
-            </div>
+            </motion.div>
           )}
 
+          {/* Empty state sin pacientes */}
           {!loading && !error && pacientes.length === 0 && (
             <EmptyState
               icon={Users}
-              title="Todavía no tenés pacientes"
-              description="Creá tu primer paciente y le llegará un mail de invitación."
+              title="Todavia no tenes pacientes"
+              description="Crea tu primer paciente y le llegara un mail de invitacion."
               action={
-                <button
+                <motion.button
                   onClick={abrirNuevo}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.95 }}
                   className="btn-primary text-sm flex items-center gap-2"
                 >
                   <Plus size={14} />
                   Crear primer paciente
-                </button>
+                </motion.button>
               }
             />
           )}
 
+          {/* Empty state sin resultados de busqueda */}
           {!loading &&
             !error &&
             pacientes.length > 0 &&
@@ -249,22 +412,23 @@ export default function NutriPanel() {
               />
             )}
 
+          {/* Tabla con stagger auto-animate */}
           {!loading && !error && filtrados.length > 0 && (
             <table className="w-full border-collapse">
               <thead>
                 <tr>
-                  {["Paciente", "Actividad", "Última vez", ""].map((h) => (
+                  {["Paciente", "Actividad", "Ultima vez", ""].map((h) => (
                     <th
                       key={h}
                       className="bg-white text-muted font-display text-[9.5px] uppercase
-                                tracking-wide text-left px-5 py-2.5 border-b border-cream-dark"
+                                  tracking-wide text-left px-5 py-2.5 border-b border-cream-dark"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody ref={tbodyRef}>
                 {filtrados.map((p) => (
                   <PatientRow
                     key={p.id}
@@ -281,10 +445,10 @@ export default function NutriPanel() {
               </tbody>
             </table>
           )}
-        </div>
+        </motion.div>
       </div>
 
-      {/* Modal alta/edición — el useEffect dentro de PatientForm maneja el pre-llenado */}
+      {/* ── Modales ─────────────────────────────────────────────────────── */}
       <PatientForm
         open={modalAbierto}
         onClose={() => {
@@ -295,31 +459,28 @@ export default function NutriPanel() {
         onGuardar={handleGuardar}
       />
 
-      {/* Confirm desactivar */}
       <ConfirmDialog
         open={!!confirmDesact}
         onClose={() => setConfirmDesact(null)}
         onConfirm={handleDesactivar}
         title="Desactivar paciente"
-        message={`¿Desactivás a ${confirmDesact?.nombre}? No podrá ingresar a la app hasta que lo reactives.`}
+        message={`Desactivas a ${confirmDesact?.nombre}? No podra ingresar a la app hasta que lo reactives.`}
         confirmLabel="Desactivar"
         variant="danger"
         loading={procesando}
       />
 
-      {/* Confirm reactivar */}
       <ConfirmDialog
         open={!!confirmReact}
         onClose={() => setConfirmReact(null)}
         onConfirm={handleReactivar}
         title="Reactivar paciente"
-        message={`¿Reactivás a ${confirmReact?.nombre}? Podrá volver a ingresar con su cuenta.`}
+        message={`Reactivas a ${confirmReact?.nombre}? Podra volver a ingresar con su cuenta.`}
         confirmLabel="Reactivar"
         variant="default"
         loading={procesando}
       />
 
-      {/* Modal de datos clínicos — aparece opcionalmente al crear un paciente */}
       <DatosClinicos
         open={modalClinicos}
         onClose={() => {
@@ -332,7 +493,7 @@ export default function NutriPanel() {
         onGuardado={() => {
           setModalClinicos(false);
           setPacienteCreado(null);
-          toast.success("Datos clínicos guardados correctamente.");
+          toast.success("Datos clinicos guardados correctamente.");
         }}
       />
     </div>
