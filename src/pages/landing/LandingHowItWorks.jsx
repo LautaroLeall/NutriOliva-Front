@@ -1,41 +1,161 @@
-// LandingHowItWorks.jsx — 3 pasos con iconos, numeros y linea conectora animada
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { ClipboardList, Utensils, BarChart2 } from "lucide-react";
+// LandingHowItWorks.jsx — 3 pasos + Demo interactiva (orquestador modular)
 
-const STEPS = [
-  {
-    number: "01",
-    icon: ClipboardList,
-    title: "Creas el plan",
-    desc: "Arma el plan alimenticio en minutos desde el panel del nutricionista. Organizalo por tipo de comida — desayuno, almuerzo, merienda, cena. O importalo con IA: pega el texto de un plan existente y Claude lo estructura automaticamente.",
-    color: "#6E7A4B",
-    bg: "#DCE3C8",
-  },
-  {
-    number: "02",
-    icon: Utensils,
-    title: "Tu paciente lo sigue",
-    desc: "El paciente recibe acceso por email y empieza a registrar cada comida desde su celular. Escribe lo que comio, sube una foto si quiere, y el sistema calcula los macros — sin apps extra, sin instalaciones.",
-    color: "#5C6740",
-    bg: "#E8EDDA",
-  },
-  {
-    number: "03",
-    icon: BarChart2,
-    title: "Ves el progreso",
-    desc: 'El panel del nutricionista muestra el balance calorico en tiempo real, el historial completo de registros y cuanto se esta cumpliendo el plan. Sin llamadas, sin preguntar "como vas". Los datos hablan solos.',
-    color: "#3F4A2B",
-    bg: "#D5DEAD",
-  },
-];
+import { useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import {
+  GOAL,
+  STEPS,
+  INITIAL_REGISTROS,
+  CATALOGO_SUGERENCIAS,
+  getHoraActual,
+} from "./howItWorks/howItWorksData";
+import PhonePatientSimulator from "./howItWorks/PhonePatientSimulator";
+import NutriRealtimeMirror from "./howItWorks/NutriRealtimeMirror";
 
 export default function LandingHowItWorks() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
+  // Estado del simulador
+  const [activeTab, setActiveTab] = useState("hoy");
+  const [activeDay, setActiveDay] = useState(5);
+  const [registros, setRegistros] = useState(INITIAL_REGISTROS);
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [modalActivo, setModalActivo] = useState(null);
+
+  // Estado Modal Comida
+  const [foodTab, setFoodTab] = useState("catalogo");
+  const [busquedaCatalogo, setBusquedaCatalogo] = useState("");
+  const [platoSeleccionado, setPlatoSeleccionado] = useState(null);
+  const [otraDescripcion, setOtraDescripcion] = useState("");
+  const [otraKcal, setOtraKcal] = useState("");
+
+  // Estado Modal Actividad
+  const [actTipo, setActTipo] = useState("");
+  const [actDuracion, setActDuracion] = useState("");
+  const [actIntensidad, setActIntensidad] = useState("Media");
+
+  // Calculos en vivo
+  const consumidas = registros
+    .filter((r) => r.tipo === "comida")
+    .reduce((acc, r) => acc + r.kcal, 0);
+  const gastadas = registros
+    .filter((r) => r.tipo === "actividad")
+    .reduce((acc, r) => acc + r.kcal, 0);
+  const balanceNeto = Math.max(0, consumidas - gastadas);
+  const porcentaje = Math.min(Math.round((balanceNeto / GOAL) * 100), 100);
+  const porcentajeReal = Math.round((balanceNeto / GOAL) * 100);
+  const isOver = balanceNeto > GOAL;
+  const restantes = Math.max(0, GOAL - balanceNeto);
+  const ultimoRegistro = registros[registros.length - 1] || INITIAL_REGISTROS[0];
+
+  function abrirModalComida(preset) {
+    setMenuAbierto(false);
+    setFoodTab("catalogo");
+    if (preset) {
+      setBusquedaCatalogo(preset.nombre);
+      setPlatoSeleccionado(preset);
+    } else {
+      setBusquedaCatalogo("");
+      setPlatoSeleccionado(null);
+    }
+    setOtraDescripcion("");
+    setOtraKcal("");
+    setModalActivo("comida");
+  }
+
+  function abrirModalActividad(preset) {
+    setMenuAbierto(false);
+    if (preset) {
+      setActTipo(preset.nombre);
+      setActDuracion(String(preset.duracion));
+      setActIntensidad(preset.intensidad);
+    } else {
+      setActTipo("");
+      setActDuracion("");
+      setActIntensidad("Media");
+    }
+    setModalActivo("actividad");
+  }
+
+  function handleRegistrarComida(e) {
+    e.preventDefault();
+    let desc = "Omelette de claras y espinaca";
+    let kcal = 290;
+    let fuente = "catalogo";
+
+    if (foodTab === "catalogo") {
+      if (platoSeleccionado) {
+        desc = platoSeleccionado.nombre;
+        kcal = platoSeleccionado.kcal;
+      } else if (busquedaCatalogo.trim()) {
+        desc = busquedaCatalogo.trim();
+        kcal = 350;
+      }
+      fuente = "catalogo";
+    } else {
+      desc = otraDescripcion.trim() || "Colacion saludable";
+      kcal = Number(otraKcal) > 0 ? Number(otraKcal) : 320;
+      fuente = "ia";
+    }
+
+    setRegistros((prev) => [
+      ...prev,
+      {
+        id: "reg-" + Date.now(),
+        tipo: "comida",
+        descripcion: desc,
+        hora: getHoraActual(),
+        kcal,
+        fuente,
+      },
+    ]);
+    setActiveTab("hoy");
+    setModalActivo(null);
+  }
+
+  function handleRegistrarActividad(e) {
+    e.preventDefault();
+    const nombre = actTipo.trim() || "Funcional";
+    const min = Number(actDuracion) > 0 ? Number(actDuracion) : 45;
+    const factor =
+      actIntensidad === "Baja" ? 4 : actIntensidad === "Media" ? 6 : 8;
+    const kcal = Math.round(min * factor);
+
+    setRegistros((prev) => [
+      ...prev,
+      {
+        id: "reg-" + Date.now(),
+        tipo: "actividad",
+        descripcion: nombre,
+        duracion_min: min,
+        intensidad: actIntensidad.toLowerCase(),
+        hora: getHoraActual(),
+        kcal,
+      },
+    ]);
+    setActiveTab("hoy");
+    setModalActivo(null);
+  }
+
+  function handleEliminarRegistro(id) {
+    setRegistros((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  function handleReiniciar() {
+    setRegistros(INITIAL_REGISTROS);
+    setModalActivo(null);
+    setMenuAbierto(false);
+    setActiveTab("hoy");
+    setActiveDay(5);
+  }
+
+  const sugerenciasFiltradas = CATALOGO_SUGERENCIAS.filter((item) =>
+    item.nombre.toLowerCase().includes(busquedaCatalogo.toLowerCase())
+  );
+
   return (
-    <section id="como-funciona" ref={ref} className="py-24 px-6 bg-white">
+    <section id="como-funciona" ref={ref} className="py-24 px-4 sm:px-6 bg-white">
       <div className="max-w-5xl mx-auto">
         {/* Encabezado */}
         <motion.div
@@ -59,12 +179,10 @@ export default function LandingHowItWorks() {
           </p>
         </motion.div>
 
-        {/* Pasos */}
+        {/* Pasos 01, 02, 03 */}
         <div className="relative">
-          {/* Linea conectora de fondo (desktop) */}
           <div className="hidden md:block absolute top-[52px] left-[calc(16.66%-1px)] right-[calc(16.66%-1px)] h-px bg-cream-darker z-0" />
 
-          {/* Linea de progreso animada */}
           <motion.div
             initial={{ scaleX: 0 }}
             animate={inView ? { scaleX: 1 } : {}}
@@ -88,7 +206,6 @@ export default function LandingHowItWorks() {
                   }}
                   className="flex flex-col items-center text-center"
                 >
-                  {/* Icono con numero */}
                   <div className="relative mb-6">
                     <motion.div
                       whileHover={{ scale: 1.08, rotate: 3 }}
@@ -117,6 +234,91 @@ export default function LandingHowItWorks() {
             })}
           </div>
         </div>
+
+        {/* Demo en vivo: Celular a la izquierda + Info a la derecha */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="mt-20 pt-16 border-t border-cream-darker"
+        >
+          <div className="text-center mb-12">
+            <span className="inline-flex items-center bg-olive/10 text-olive font-display text-[11px] px-4 py-1.5 rounded-full uppercase tracking-widest mb-3">
+              Demo interactiva en vivo
+            </span>
+            <h3 className="font-display font-bold text-olive-dark text-[22px] sm:text-[24px] leading-tight">
+              Probalo ahora: asi usa el panel tu paciente desde el celular
+            </h3>
+            <p className="text-muted text-[13.5px] mt-2 max-w-lg mx-auto">
+              Toca el boton <strong className="text-olive-dark">+</strong> en el
+              celular o usa las opciones de la derecha para registrar una comida
+              o una actividad fisica.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            <div className="lg:col-span-6 flex justify-center w-full">
+              <PhonePatientSimulator
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                activeDay={activeDay}
+                setActiveDay={setActiveDay}
+                registros={registros}
+                setRegistros={setRegistros}
+                consumidas={consumidas}
+                gastadas={gastadas}
+                balanceNeto={balanceNeto}
+                porcentaje={porcentaje}
+                porcentajeReal={porcentajeReal}
+                restantes={restantes}
+                menuAbierto={menuAbierto}
+                setMenuAbierto={setMenuAbierto}
+                modalActivo={modalActivo}
+                setModalActivo={setModalActivo}
+                abrirModalComida={abrirModalComida}
+                abrirModalActividad={abrirModalActividad}
+                handleEliminarRegistro={handleEliminarRegistro}
+                modalProps={{
+                  foodTab,
+                  setFoodTab,
+                  busquedaCatalogo,
+                  setBusquedaCatalogo,
+                  platoSeleccionado,
+                  setPlatoSeleccionado,
+                  sugerenciasFiltradas,
+                  otraDescripcion,
+                  setOtraDescripcion,
+                  otraKcal,
+                  setOtraKcal,
+                  handleRegistrarComida,
+                  actTipo,
+                  setActTipo,
+                  actDuracion,
+                  setActDuracion,
+                  actIntensidad,
+                  setActIntensidad,
+                  handleRegistrarActividad,
+                }}
+              />
+            </div>
+
+            <div className="lg:col-span-6 w-full min-w-0">
+              <NutriRealtimeMirror
+                tieneCambios={registros.length !== INITIAL_REGISTROS.length}
+                handleReiniciar={handleReiniciar}
+                abrirModalComida={abrirModalComida}
+                abrirModalActividad={abrirModalActividad}
+                ultimoRegistro={ultimoRegistro}
+                isOver={isOver}
+                porcentaje={porcentaje}
+                porcentajeReal={porcentajeReal}
+                balanceNeto={balanceNeto}
+                consumidas={consumidas}
+                gastadas={gastadas}
+              />
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
