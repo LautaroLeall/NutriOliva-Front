@@ -3,8 +3,8 @@
 // Incluye: indicador de fortaleza, feedback en tiempo real, error animado, submit
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import LoginField from "@/pages/login/LoginField";
 import PasswordStrength from "./PasswordStrength";
 
@@ -21,10 +21,12 @@ export default function SetPasswordForm({
   setError,
   loading,
   sessionLista,
+  linkInvalido,
   tipoFlujo,
   noCoinciden,
   onSubmit,
 }) {
+  const navigate = useNavigate();
   const isInvite = tipoFlujo === "invite";
 
   return (
@@ -45,15 +47,38 @@ export default function SetPasswordForm({
           : "Ingresa y confirma tu nueva contrasena."}
       </p>
 
-      {/* Verificando sesion */}
+      {/* Verificando sesion o enlace expirado */}
       {!sessionLista && (
-        <div
-          className="flex items-center gap-2 text-muted text-[12px] mb-5
-                        bg-cream/60 rounded-xl px-4 py-3"
-        >
-          <Loader2 size={13} className="animate-spin flex-shrink-0" />
-          Verificando el link de acceso...
-        </div>
+        linkInvalido ? (
+          <div className="bg-accent-bg border border-accent/25 rounded-xl p-4 mb-5 space-y-3">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle size={16} className="text-accent flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-display font-semibold text-[12.5px] text-accent">
+                  El enlace de acceso expiro o ya fue utilizado
+                </p>
+                <p className="text-[11.5px] text-muted mt-1 leading-relaxed">
+                  Por seguridad, los enlaces de invitacion y recuperacion tienen validez limitada. Solicita un nuevo enlace o regresa al inicio de sesion.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="w-full py-2.5 px-4 rounded-xl bg-olive-dark text-cream font-display font-semibold text-[12px] hover:bg-olive transition-colors cursor-pointer"
+            >
+              Ir a iniciar sesion
+            </button>
+          </div>
+        ) : (
+          <div
+            className="flex items-center gap-2 text-muted text-[12px] mb-5
+                          bg-cream/60 rounded-xl px-4 py-3"
+          >
+            <Loader2 size={13} className="animate-spin flex-shrink-0" />
+            Verificando el link de acceso...
+          </div>
+        )
       )}
 
       <form onSubmit={onSubmit} className="space-y-4">

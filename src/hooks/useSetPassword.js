@@ -18,6 +18,7 @@ export function useSetPassword() {
   const [mounted, setMounted]       = useState(false);
   const [tipoFlujo, setTipoFlujo]   = useState("invite"); // 'invite' | 'recovery'
   const [sessionLista, setSessionLista] = useState(false);
+  const [linkInvalido, setLinkInvalido] = useState(false);
 
   // Animacion de entrada
   useEffect(() => {
@@ -31,10 +32,19 @@ export function useSetPassword() {
     const hash = window.location.hash;
     if (hash.includes("type=recovery")) setTipoFlujo("recovery");
     else if (hash.includes("type=invite")) setTipoFlujo("invite");
+    if (hash.includes("error=")) setLinkInvalido(true);
   }, []);
 
   // Esperar a que el SDK de Supabase procese el token del hash
   useEffect(() => {
+    let sesionEstablecida = false;
+
+    const timer = setTimeout(() => {
+      if (!sesionEstablecida) {
+        setLinkInvalido(true);
+      }
+    }, 5000);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (
@@ -43,15 +53,26 @@ export function useSetPassword() {
            event === "PASSWORD_RECOVERY") &&
           session
         ) {
+          sesionEstablecida = true;
+          clearTimeout(timer);
           setSessionLista(true);
+          setLinkInvalido(false);
         }
       }
     );
     // Si ya hay sesion activa (recarga), marcarla de inmediato
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setSessionLista(true);
+      if (session) {
+        sesionEstablecida = true;
+        clearTimeout(timer);
+        setSessionLista(true);
+        setLinkInvalido(false);
+      }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Validaciones
@@ -119,6 +140,7 @@ export function useSetPassword() {
     mounted,
     tipoFlujo,
     sessionLista,
+    linkInvalido,
     noCoinciden,
     handleSubmit,
   };

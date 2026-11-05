@@ -2,6 +2,7 @@
 // Toda la logica de auth esta en useLogin
 
 import { motion, AnimatePresence } from "framer-motion";
+import { Toaster } from "sonner";
 import { useLogin } from "@/hooks/useLogin";
 import LoginLeftPanel from "./login/LoginLeftPanel";
 import LoginForm from "./login/LoginForm";
@@ -35,6 +36,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#E8E3D8] flex items-center justify-center p-4">
+      <Toaster position="bottom-right" richColors />
       {/* Contenedor split-screen */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}

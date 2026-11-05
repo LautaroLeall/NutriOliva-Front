@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { Toaster } from "sonner";
 import { useSetPassword } from "@/hooks/useSetPassword";
 import SetPasswordLeft from "./set-password/SetPasswordLeft";
 import SetPasswordForm from "./set-password/SetPasswordForm";
@@ -21,12 +22,14 @@ export default function SetPassword() {
     mounted,
     tipoFlujo,
     sessionLista,
+    linkInvalido,
     noCoinciden,
     handleSubmit,
   } = useSetPassword();
 
   return (
     <div className="min-h-screen bg-[#E8E3D8] flex items-center justify-center p-4">
+      <Toaster position="bottom-right" richColors />
       {/* Contenedor split-screen */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
@@ -58,6 +61,7 @@ export default function SetPassword() {
                 setError={setError}
                 loading={loading}
                 sessionLista={sessionLista}
+                linkInvalido={linkInvalido}
                 tipoFlujo={tipoFlujo}
                 noCoinciden={noCoinciden}
                 onSubmit={handleSubmit}
