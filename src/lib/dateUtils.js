@@ -1,4 +1,4 @@
-﻿/**
+/**
  * dateUtils.js - Utilidades de fecha centralizadas para toda la app.
  * Evita duplicar estas funciones en cada modulo que las necesite.
  */
@@ -69,4 +69,29 @@ export function formatFechaLegible(iso) {
   return new Date(iso + 'T12:00:00').toLocaleDateString('es-AR', {
     weekday: 'long', day: 'numeric', month: 'long',
   })
+}
+
+const DIAS_CORTO = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
+
+/**
+ * Genera los 7 dias (lunes a domingo) de la semana que contiene `fechaBase` ('YYYY-MM-DD').
+ */
+export function generarSemana(fechaBase) {
+  const dias = []
+  const base = new Date(fechaBase + 'T12:00:00')
+  const dow = base.getDay()
+  const diff = dow === 0 ? -6 : 1 - dow
+  const inicio = new Date(base)
+  inicio.setDate(base.getDate() + diff)
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(inicio)
+    d.setDate(inicio.getDate() + i)
+    dias.push({
+      fecha: toLocalISO(d),
+      diaNro: d.getDate(),
+      diaLabel: DIAS_CORTO[d.getDay()],
+    })
+  }
+  return dias
 }
