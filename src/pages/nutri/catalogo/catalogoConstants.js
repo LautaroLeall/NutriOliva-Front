@@ -15,8 +15,8 @@ export const POR_PAGINA = 12;
 
 export const FILTROS_KCAL = [
   { label: "Todos", min: 0, max: Infinity },
-  { label: "< 50 kcal", min: 0, max: 49 },
+  { label: "< 50 kcal", min: 0, max: 50 },
   { label: "50–150", min: 50, max: 150 },
-  { label: "150–300", min: 151, max: 300 },
-  { label: "> 300", min: 301, max: Infinity },
+  { label: "150–300", min: 150, max: 300 },
+  { label: "> 300", min: 300, max: Infinity },
 ];

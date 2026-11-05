@@ -37,6 +37,7 @@ export function useCatalogo() {
     const { data, error } = await supabase
       .from('catalogo_alimentos')
       .insert({
+        nutricionista_id: session?.user?.id || null,
         nombre: datos.nombre.trim(),
         calorias_por_unidad: Number(datos.calorias_por_unidad),
         proteinas_g: datos.proteinas_g ? Number(datos.proteinas_g) : null,

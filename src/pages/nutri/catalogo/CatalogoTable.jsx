@@ -1,6 +1,6 @@
 // CatalogoTable.jsx — Tabla de alimentos con skeleton, filas animadas y paginación
 
-import { Pencil, Trash2, Loader2, AlertCircle, ChevronLeft, ChevronRight, UtensilsCrossed, Plus } from "lucide-react";
+import { Pencil, Trash2, AlertCircle, ChevronLeft, ChevronRight, UtensilsCrossed, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import EmptyState from "@/components/ui/EmptyState";
 import { POR_PAGINA } from "./catalogoConstants";
@@ -54,7 +54,7 @@ function AlimentoRow({ alimento, onEditar, onEliminar, index }) {
         </span>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center gap-0.5 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <div className="flex items-center gap-0.5 justify-end opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
           <motion.button
             onClick={() => onEditar(a)}
             whileHover={{ scale: 1.15, backgroundColor: "#F0EDE4" }}
@@ -155,7 +155,7 @@ function Paginacion({ paginaActual, totalPaginas, filtrados, setPagina }) {
 export default function CatalogoTable({
   loading, error, alimentos, filtrados, visibles,
   paginaActual, totalPaginas, setPagina,
-  busqueda, onBusqueda, onFiltroKcal,
+  onBusqueda, onFiltroKcal,
   abrirNuevo, abrirEdicion, setConfirmEliminar,
 }) {
   return (
@@ -206,32 +206,34 @@ export default function CatalogoTable({
       {/* Tabla */}
       {!loading && !error && visibles.length > 0 && (
         <>
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                {["Alimento", "Kcal", "Prot.", "Carbos", "Grasas", "Unidad", ""].map((h) => (
-                  <th key={h}
-                    className="bg-white text-muted font-display text-[9.5px] uppercase
-                                tracking-wide text-left px-5 py-2.5 border-b border-cream-dark">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <AnimatePresence mode="popLayout">
-                {visibles.map((a, i) => (
-                  <AlimentoRow
-                    key={a.id}
-                    alimento={a}
-                    index={i}
-                    onEditar={abrirEdicion}
-                    onEliminar={setConfirmEliminar}
-                  />
-                ))}
-              </AnimatePresence>
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  {["Alimento", "Kcal", "Prot.", "Carbos", "Grasas", "Unidad", ""].map((h) => (
+                    <th key={h}
+                      className="bg-white text-muted font-display text-[9.5px] uppercase
+                                  tracking-wide text-left px-4 sm:px-5 py-2.5 border-b border-cream-dark whitespace-nowrap">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <AnimatePresence mode="popLayout">
+                  {visibles.map((a, i) => (
+                    <AlimentoRow
+                      key={a.id}
+                      alimento={a}
+                      index={i}
+                      onEditar={abrirEdicion}
+                      onEliminar={setConfirmEliminar}
+                    />
+                  ))}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
 
           <Paginacion
             paginaActual={paginaActual}

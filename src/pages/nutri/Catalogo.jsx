@@ -6,9 +6,9 @@
 // Confirm → ConfirmDialog
 
 import { Toaster } from "sonner";
-import { ArrowLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
-import Logo from "@/components/ui/Logo";
+import NutriNavbar from "@/components/nutri/NutriNavbar";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useCatalogoPage } from "./catalogo/useCatalogoPage";
 import CatalogoFiltros from "./catalogo/CatalogoFiltros";
@@ -18,7 +18,7 @@ import CatalogoModal from "./catalogo/CatalogoModal";
 export default function Catalogo() {
   const {
     alimentos, loading, error,
-    busqueda, filtroKcal, pagina, setPagina,
+    busqueda, filtroKcal, setPagina,
     filtrados, visibles, totalPaginas, paginaActual,
     hayFiltros, searchFocused, setSearchFocused,
     onBusqueda, onFiltroKcal,
@@ -27,43 +27,22 @@ export default function Catalogo() {
     abrirNuevo, abrirEdicion, handleChange, handleGuardar,
     confirmEliminar, setConfirmEliminar,
     eliminando, handleEliminar,
-    navigate,
   } = useCatalogoPage();
 
   return (
     <div className="page min-h-screen bg-[#EFEAE0]">
       <Toaster position="bottom-right" richColors />
 
-      {/* ── Navbar ──────────────────────────────────────────────────────── */}
-      <motion.nav
-        initial={{ y: -48, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex justify-between items-center px-6 py-3.5 bg-white
-                    border-b border-cream-darker shadow-sm"
-      >
-        <div className="flex items-center gap-2 font-display font-bold text-base text-olive-dark">
-          <Logo size={22} />
-          NutriOliva
-        </div>
-        <motion.button
-          onClick={() => navigate("/panel")}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.96 }}
-          className="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5"
-        >
-          <ArrowLeft size={12} />
-          Volver a pacientes
-        </motion.button>
-      </motion.nav>
+      {/* ── Navbar unificado y 100% responsive ───────────────────────── */}
+      <NutriNavbar subtitulo="Catalogo de alimentos" />
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* ── Header ──────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex justify-between items-start mb-6"
+          className="flex flex-wrap justify-between items-start gap-3 mb-6"
         >
           <div>
             <h2 className="font-display text-xl font-bold text-olive-dark">
@@ -114,7 +93,6 @@ export default function Catalogo() {
             paginaActual={paginaActual}
             totalPaginas={totalPaginas}
             setPagina={setPagina}
-            busqueda={busqueda}
             onBusqueda={onBusqueda}
             onFiltroKcal={onFiltroKcal}
             abrirNuevo={abrirNuevo}
