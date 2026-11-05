@@ -23,7 +23,18 @@ export function useFoodForm({ open, comidasPlan, pacienteId, modoEdicion, datosI
   const [buscando, setBuscando] = useState(false)
 
   // ── Estado del modo otra comida ───────────────────────────────────────────
-  const [formOtra, setFormOtra] = useState({ descripcion: '', calorias_estimadas: '' })
+  const [formOtra, setFormOtraState] = useState({ descripcion: '', calorias_estimadas: '' })
+  const [fuenteOtra, setFuenteOtra] = useState('manual')
+
+  const setFormOtra = useCallback((updater) => {
+    setFormOtraState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      if (next.calorias_estimadas !== prev.calorias_estimadas) {
+        setFuenteOtra('manual')
+      }
+      return next
+    })
+  }, [])
 
   // ── Estado del modo plan ──────────────────────────────────────────────────
   const [planSeleccionada, setPlanSel] = useState(null)
@@ -49,15 +60,17 @@ export function useFoodForm({ open, comidasPlan, pacienteId, modoEdicion, datosI
     if (modoEdicion && datosIniciales) {
       // Modo edicion: siempre modo "otra" con datos pre-cargados
       setModo('otra')
-      setFormOtra({
+      setFormOtraState({
         descripcion: datosIniciales.descripcion || '',
         calorias_estimadas: datosIniciales.calorias_estimadas != null
           ? String(datosIniciales.calorias_estimadas)
           : '',
       })
+      setFuenteOtra(datosIniciales.fuente_estimacion || 'manual')
     } else {
       setModo(comidasPlan.length > 0 ? 'plan' : 'catalogo')
-      setFormOtra({ descripcion: '', calorias_estimadas: '' })
+      setFormOtraState({ descripcion: '', calorias_estimadas: '' })
+      setFuenteOtra('manual')
     }
 
     setQuery('')
@@ -111,7 +124,8 @@ export function useFoodForm({ open, comidasPlan, pacienteId, modoEdicion, datosI
     setQuery('')
     setItemSel(null)
     setSugs([])
-    setFormOtra({ descripcion: '', calorias_estimadas: '' })
+    setFormOtraState({ descripcion: '', calorias_estimadas: '' })
+    setFuenteOtra('manual')
     setPlanSel(null)
     setErrors({})
   }, [])
@@ -133,7 +147,8 @@ export function useFoodForm({ open, comidasPlan, pacienteId, modoEdicion, datosI
       }
 
       if (data?.calorias != null) {
-        setFormOtra((f) => ({ ...f, calorias_estimadas: String(data.calorias) }))
+        setFormOtraState((f) => ({ ...f, calorias_estimadas: String(data.calorias) }))
+        setFuenteOtra(data.fuente === 'catalogo' ? 'catalogo' : 'ia')
         setErrors((er) => ({ ...er, calorias: undefined }))
         toast.success(`Se estimaron ${data.calorias} kcal`)
       } else {
@@ -183,7 +198,7 @@ export function useFoodForm({ open, comidasPlan, pacienteId, modoEdicion, datosI
       calorias_estimadas = formOtra.calorias_estimadas !== ''
         ? Number(formOtra.calorias_estimadas)
         : null
-      fuente_estimacion = 'manual'
+      fuente_estimacion = fuenteOtra
     }
 
     setErrors({})
@@ -209,18 +224,18 @@ export function useFoodForm({ open, comidasPlan, pacienteId, modoEdicion, datosI
       return
     }
     onClose()
-  }, [modo, planSeleccionada, itemSeleccionado, formOtra, foto, pacienteId, onGuardar, onClose])
+  }, [modo, planSeleccionada, itemSeleccionado, formOtra, fuenteOtra, foto, pacienteId, onGuardar, onClose])
 
   return {
     // Estado
     modo, query, itemSeleccionado, sugs, buscando,
-    formOtra, planSeleccionada, foto, errors, loading, estimandoCal,
+    formOtra, fuenteOtra, planSeleccionada, foto, errors, loading, estimandoCal,
     // Datos derivados
     tipoActual, comidasDelMomento, otrasComidasPlan,
     // Ref
     inputRef,
     // Setters directos
-    setQuery, setFormOtra, setErrors, setPlanSel, setFoto,
+    setQuery, setFormOtra, setFuenteOtra, setErrors, setPlanSel, setFoto,
     // Acciones
     seleccionarItem, limpiarSeleccion, cambiarModo,
     estimarCalorias, handleSubmit,
