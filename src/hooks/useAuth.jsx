@@ -44,6 +44,17 @@ export function AuthProvider({ children }) {
     setLoading(false)
   }
 
+  async function refreshPerfil() {
+    if (session?.user?.id) {
+      const { data } = await supabase
+        .from('perfiles')
+        .select('rol, nombre')
+        .eq('id', session.user.id)
+        .single()
+      if (data) setPerfil(data)
+    }
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
@@ -53,9 +64,11 @@ export function AuthProvider({ children }) {
     perfil,
     loading,
     signOut,
+    refreshPerfil,
     isAuthenticated: !!session,
     rol: perfil?.rol ?? null,
     nombre: perfil?.nombre ?? session?.user?.email ?? '',
+    email: session?.user?.email ?? '',
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
