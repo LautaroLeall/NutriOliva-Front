@@ -1,4 +1,5 @@
 // LandingFAQ.jsx — Accordion de preguntas frecuentes con animacion de expand/collapse
+
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
@@ -10,27 +11,27 @@ const FAQS = [
   },
   {
     q: "¿Como invito a un paciente al sistema?",
-    a: 'Desde el panel del nutricionista, vas a la ficha del paciente y hacés click en "Invitar por email". El sistema manda automaticamente un mail con el link de acceso y el paciente puede entrar de inmediato.',
+    a: 'Desde el panel del nutricionista, al dar de alta al paciente o desde su ficha haces clic en "Invitar por email". El sistema envia automaticamente un correo con el enlace de acceso para que configure su clave e ingrese de inmediato.',
   },
   {
     q: "¿Puedo importar un plan que ya tengo hecho?",
-    a: 'Si. Si tenes un plan en Word, Google Docs, PDF o cualquier formato de texto, podes pegarlo en el campo de texto de "Importar con IA" y Claude lo estructura automaticamente en el sistema, dividido por tipo de comida y con macros estimados.',
+    a: 'Si. Si tenes un plan en PDF, Excel, Word o texto, podes importarlo en el constructor de planes y el sistema lo estructura automaticamente dividido por tipo de comida y con calorias y macronutrientes.',
   },
   {
     q: "¿Los datos de mis pacientes son privados?",
-    a: "Si. Cada nutricionista solo puede ver y modificar los datos de sus propios pacientes. Esto esta garantizado a nivel base de datos — ningun otro nutricionista puede acceder a tu informacion aunque intente modificar la URL. Se usa Row Level Security de Supabase.",
+    a: "Si. Cada nutricionista solo puede ver y modificar los datos clinicos y planes de sus propios pacientes. Esto esta garantizado a nivel base de datos mediante Row Level Security (RLS) en Supabase.",
   },
   {
-    q: "¿Puedo cambiar de plan en cualquier momento?",
-    a: "Si. Podes subir o bajar de plan cuando quieras desde el panel de administracion. El cambio se aplica de inmediato. No hay contratos anuales ni penalidades por cambio.",
+    q: "¿Como solicito el alta de mi cuenta profesional?",
+    a: "Podes comunicarte directamente con nosotros por WhatsApp al +549 381 339 9463 o por correo a lautaroleal4@gmail.com. Coordinamos el alta de tu cuenta segun la cantidad de pacientes que manejes en tu consultorio.",
   },
   {
-    q: "¿Hay un periodo de prueba gratuito?",
-    a: "Actualmente estamos en fase de piloto. Si queres acceso gratuito para probar la plataforma con tus primeros pacientes, escribinos y te damos acceso al plan Pro sin costo por 30 dias.",
+    q: "¿Puedo ampliar mi cupo de pacientes mas adelante?",
+    a: "Si. A medida que tu cartera de pacientes crece, podemos ampliar tu cupo o actualizar tu nivel de cuenta de forma inmediata sin perder ningun dato ni historial.",
   },
   {
     q: "¿La estimacion con IA es precisa?",
-    a: "Es una estimacion razonablemente precisa para el seguimiento de tendencias. Usa Claude de Anthropic con informacion nutricional de referencia. Para casos donde la precision exacta importa (competencias, condiciones medicas especificas), recomendamos complementarla con valores de las etiquetas nutricionales.",
+    a: "Es una estimacion muy util y agil para el seguimiento diario de adherencia y tendencias caloricas. Combina la base nutricional SARA con inteligencia artificial para que el paciente nunca deje de registrar por no saber las calorias exactas.",
   },
 ];
 
@@ -40,7 +41,7 @@ function FAQItem({ faq, isOpen, onToggle }) {
       <button
         onClick={onToggle}
         className="w-full flex justify-between items-center px-5 py-4 bg-white
-                    hover:bg-cream/40 transition-colors duration-150 text-left"
+                    hover:bg-cream/40 transition-colors duration-150 text-left cursor-pointer"
       >
         <span className="font-display font-semibold text-olive-dark text-[13.5px] pr-4">
           {faq.q}
