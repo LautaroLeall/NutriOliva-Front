@@ -1,9 +1,16 @@
-// ComidaSeleccionadaCard.jsx — Tarjeta de comida seleccionada del catalogo (estado bloqueado)
+// ComidaSeleccionadaCard.jsx — Tarjeta de comida seleccionada del catálogo con animación spring
+
 import { CheckCircle, X } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function ComidaSeleccionadaCard({ item, onLimpiar }) {
   return (
-    <div className="rounded-xl border-2 border-olive/40 bg-olive/5 px-4 py-3">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 360, damping: 24 }}
+      className="rounded-xl border-2 border-olive/40 bg-olive/8 px-4 py-3"
+    >
       <div className="flex items-start gap-3">
         <CheckCircle size={16} className="text-olive flex-shrink-0 mt-0.5" />
 
@@ -42,8 +49,10 @@ export default function ComidaSeleccionadaCard({ item, onLimpiar }) {
           )}
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.9 }}
           onClick={onLimpiar}
           title="Cambiar comida"
           className="flex-shrink-0 w-7 h-7 rounded-full bg-white border border-cream-darker
@@ -51,8 +60,8 @@ export default function ComidaSeleccionadaCard({ item, onLimpiar }) {
                     hover:border-olive/50 transition-colors"
         >
           <X size={13} />
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }

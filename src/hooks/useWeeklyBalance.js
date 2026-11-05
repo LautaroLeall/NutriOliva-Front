@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { toLocalISO } from '@/lib/dateUtils'
 
 /**
  * Calcula los últimos N días de balance calórico para un paciente dado.
@@ -13,6 +14,7 @@ export function useWeeklyBalance(pacienteId, caloriasObjetivo = 0, dias = 7) {
   const [puntos, setPuntos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [reloadKey, setReloadKey] = useState(0)
 
   const fetchSemana = useCallback(async () => {
     if (!pacienteId) return
@@ -89,19 +91,14 @@ export function useWeeklyBalance(pacienteId, caloriasObjetivo = 0, dias = 7) {
     setLoading(false)
   }, [pacienteId, caloriasObjetivo, dias])
 
-  useEffect(() => { fetchSemana() }, [fetchSemana])
+  useEffect(() => { fetchSemana() }, [fetchSemana, reloadKey])
 
-  return { puntos, loading, error, refetch: fetchSemana }
+  const refetchWeekly = useCallback(() => setReloadKey((k) => k + 1), [])
+
+  return { puntos, loading, error, refetch: fetchSemana, refetchWeekly }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function toLocalISO(date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
 
 const DIAS_LABEL = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
