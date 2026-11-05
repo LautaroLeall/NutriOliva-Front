@@ -1,4 +1,5 @@
-// ResultItem.jsx — Resultado individual del dropdown de busqueda del catalogo
+// ResultItem.jsx — Resultado individual del dropdown de búsqueda del catálogo
+
 import { tipoLabel } from "@/lib/foodFormUtils";
 
 export default function ResultItem({ item, onSelect }) {
@@ -13,7 +14,7 @@ export default function ResultItem({ item, onSelect }) {
         <div className="min-w-0 flex-1">
           <p
             className="font-display text-[12px] text-olive-dark font-medium leading-snug
-                        group-hover:text-olive transition-colors"
+                      group-hover:text-olive transition-colors"
           >
             {item.nombre}
           </p>
