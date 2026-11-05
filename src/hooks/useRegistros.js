@@ -55,7 +55,7 @@ export function useRegistros(pacienteId, fecha) {
   useEffect(() => { fetchRegistros() }, [fetchRegistros])
 
   // ── Comidas ────────────────────────────────────────────────────────────────
-  async function agregarComida({ descripcion, calorias_estimadas, fuente_estimacion }) {
+  async function agregarComida({ descripcion, calorias_estimadas, fuente_estimacion, foto_path }) {
     if (!descripcion?.trim()) return { error: 'La descripción es obligatoria.' }
 
     const ahora = new Date()
@@ -70,6 +70,7 @@ export function useRegistros(pacienteId, fecha) {
         descripcion: descripcion.trim(),
         calorias_estimadas: calorias_estimadas ? Number(calorias_estimadas) : null,
         fuente_estimacion: fuente_estimacion || 'manual',
+        foto_url: foto_path || null,
       })
       .select()
       .single()
@@ -78,7 +79,7 @@ export function useRegistros(pacienteId, fecha) {
     return { data, error: e?.message || null }
   }
 
-  async function editarComida(id, { descripcion, calorias_estimadas }) {
+  async function editarComida(id, { descripcion, calorias_estimadas, fuente_estimacion, foto_path }) {
     if (!descripcion?.trim()) return { error: 'La descripción es obligatoria.' }
 
     const { error: e } = await supabase
@@ -86,6 +87,8 @@ export function useRegistros(pacienteId, fecha) {
       .update({
         descripcion: descripcion.trim(),
         calorias_estimadas: calorias_estimadas ? Number(calorias_estimadas) : null,
+        ...(fuente_estimacion ? { fuente_estimacion } : {}),
+        ...(foto_path !== undefined ? { foto_url: foto_path } : {}),
       })
       .eq('id', id)
 
