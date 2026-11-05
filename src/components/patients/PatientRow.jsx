@@ -1,5 +1,6 @@
 // PatientRow.jsx — Fila de paciente
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle, Clock, ChevronRight,
@@ -20,9 +21,11 @@ function formatFecha(fecha) {
   return `Hace ${Math.floor(diff / 24)} dias`;
 }
 
-// ── Botón de acción con tooltip ───────────────────────────────────────────
-function ActionBtn({ onClick, title, color, hoverBg, icon: Icon }) {
+// ── Botón de acción con tooltip en Portal ─────────────────────────────────
+function ActionBtn({ onClick, title, color, icon: Icon }) {
   const [hovered, setHovered] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
 
   const colorMap = {
     olive: { base: "#69644D", hover: "#3F4A2B", bg: "#F0EDE4" },
@@ -31,20 +34,37 @@ function ActionBtn({ onClick, title, color, hoverBg, icon: Icon }) {
   };
   const c = colorMap[color] ?? colorMap.olive;
 
+  function handleMouseEnter() {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      const rawLeft = rect.left + rect.width / 2;
+      const clampedLeft =
+        typeof window !== "undefined"
+          ? Math.min(window.innerWidth - 64, Math.max(64, rawLeft))
+          : rawLeft;
+      setCoords({
+        top: rect.top - 7,
+        left: clampedLeft,
+      });
+    }
+    setHovered(true);
+  }
+
   return (
     <div className="relative">
       <motion.button
+        ref={btnRef}
         onClick={onClick}
-        onHoverStart={() => setHovered(true)}
-        onHoverEnd={() => setHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={() => setHovered(false)}
         animate={{
           color: hovered ? c.hover : c.base,
           backgroundColor: hovered ? c.bg : "transparent",
         }}
         whileTap={{ scale: 0.82 }}
         transition={{ duration: 0.15 }}
-        className="p-2 rounded-xl focus:outline-none"
-        title={title}
+        className="p-2 rounded-xl focus:outline-none cursor-pointer"
+        aria-label={title}
       >
         <motion.div
           animate={{ scale: hovered ? 1.18 : 1, rotate: hovered ? (color === "danger" ? -8 : color === "success" ? 8 : 0) : 0 }}
@@ -54,23 +74,29 @@ function ActionBtn({ onClick, title, color, hoverBg, icon: Icon }) {
         </motion.div>
       </motion.button>
 
-      {/* Tooltip */}
-      <AnimatePresence>
-        {hovered && (
-          <motion.div
-            initial={{ opacity: 0, y: 4, scale: 0.92 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.92 }}
-            transition={{ duration: 0.14 }}
-            className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1
-                      bg-olive-dark text-cream text-[9.5px] font-display
-                        rounded-lg whitespace-nowrap pointer-events-none z-50
-                        shadow-lg"
-          >
-            {title}
-          </motion.div>
+      {/* Tooltip en Portal */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {hovered && title && (
+              <div
+                style={{ top: coords.top, left: coords.left }}
+                className="fixed -translate-x-1/2 -translate-y-full pointer-events-none z-[9999]"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 4, scale: 0.92 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.92 }}
+                  transition={{ duration: 0.14 }}
+                  className="px-2.5 py-1 bg-olive-dark text-cream text-[9.5px] font-display rounded-md whitespace-nowrap shadow-lg"
+                >
+                  {title}
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </div>
   );
 }
@@ -88,7 +114,7 @@ export default function PatientRow({ paciente, onEditar, onDesactivar, onReactiv
       exit={{ opacity: 0, x: 14 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       className={`border-b border-cream last:border-0 group relative
-                  ${activo ? "cursor-pointer" : "opacity-50 pointer-events-none"}`}
+                  ${activo ? "cursor-pointer" : "opacity-60"}`}
       onClick={() => activo && navigate(`/panel/pacientes/${paciente.id}`)}
     >
       {/* Paciente — avatar + nombre + mail */}
@@ -111,7 +137,7 @@ export default function PatientRow({ paciente, onEditar, onDesactivar, onReactiv
       </td>
 
       {/* Estado de actividad */}
-      <td className="px-5 py-3.5 group-hover:bg-cream/60 transition-colors duration-150">
+      <td className="px-4 sm:px-5 py-3.5 group-hover:bg-cream/60 transition-colors duration-150 whitespace-nowrap">
         {!activo ? (
           <span className="badge bg-cream-darker text-muted">Inactivo</span>
         ) : paciente.sinActividad48h ? (
@@ -139,7 +165,7 @@ export default function PatientRow({ paciente, onEditar, onDesactivar, onReactiv
       </td>
 
       {/* Última actividad */}
-      <td className="px-5 py-3.5 text-[11px] text-muted group-hover:bg-cream/60 transition-colors duration-150">
+      <td className="px-4 sm:px-5 py-3.5 text-[11px] text-muted group-hover:bg-cream/60 transition-colors duration-150 whitespace-nowrap">
         {formatFecha(paciente.ultimaActividad)}
       </td>
 

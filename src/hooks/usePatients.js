@@ -3,8 +3,9 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/hooks/useAuth'
 
 /**
- * Hook para gestión completa de pacientes.
+ * Hook para gestion completa de pacientes.
  * Solo accede a los pacientes del nutricionista autenticado (RLS garantiza el aislamiento).
+ * Verifica ademas el cupo maximo de pacientes activos segun plan_suscripcion + cupo_extra.
  */
 export function usePatients() {
   const { session } = useAuth()
@@ -16,13 +17,11 @@ export function usePatients() {
     setLoading(true)
     setError(null)
 
-    // Timeout de 10 segundos — muestra error si Supabase no responde
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Sin conexion. Verifica tu internet o que Supabase este activo.')), 10000)
     )
 
     try {
-      // Trae pacientes + última actividad (comida o registro)
       const fetchPromise = supabase
         .from('pacientes')
         .select(`
@@ -44,7 +43,6 @@ export function usePatients() {
       if (fetchError) {
         setError(fetchError.message)
       } else {
-        // Calcular última actividad y flag de 48hs
         const now = new Date()
         const enriched = (data || []).map(p => {
           const registros = p.registros_comida || []
@@ -60,11 +58,10 @@ export function usePatients() {
             ...p,
             ultimaActividad,
             sinActividad48h: horasSinActividad > 48,
-            registros_comida: undefined, // limpiar el array anidado
+            registros_comida: undefined,
           }
         })
 
-        // Ordenar: primero los sin actividad reciente
         enriched.sort((a, b) => {
           if (a.sinActividad48h && !b.sinActividad48h) return -1
           if (!a.sinActividad48h && b.sinActividad48h) return 1
@@ -83,19 +80,45 @@ export function usePatients() {
     if (session) fetchPacientes()
   }, [session, fetchPacientes])
 
-  /**
-   * Crear un nuevo paciente.
-   * {{ nombre, email, telefono, fecha_nacimiento }} datos
-   * {{ data, error }}
-   */
-  async function crearPaciente(datos) {
+  async function verificarCupoDisponible() {
     const { data: nutri } = await supabase
       .from('nutricionistas')
-      .select('id')
+      .select('id, plan_suscripcion, cupo_extra')
       .eq('id', session.user.id)
       .single()
 
-    if (!nutri) return { error: 'No se encontró el perfil del nutricionista.' }
+    if (!nutri) return { ok: false, error: 'No se encontro el perfil del nutricionista.' }
+
+    const planId = (nutri.plan_suscripcion || 'starter').toLowerCase()
+    const { data: planRow } = await supabase
+      .from('planes_suscripcion')
+      .select('cupo_pacientes, nombre')
+      .eq('id', planId)
+      .maybeSingle()
+
+    const cupoBase = planRow?.cupo_pacientes ?? (planId === 'clinic' ? 9999 : planId === 'pro' ? 50 : 15)
+    const cupoTotal = cupoBase >= 9999 ? 9999 : cupoBase + (nutri.cupo_extra || 0)
+
+    if (cupoTotal < 9999) {
+      const activosActuales = pacientes.filter(p => p.estado === 'activo').length
+      if (activosActuales >= cupoTotal) {
+        return {
+          ok: false,
+          nutri,
+          error: `Alcanzaste el limite de ${cupoTotal} pacientes activos de tu plan (${planRow?.nombre || planId}). Solicita ampliar tu cupo o cambiar de plan.`,
+        }
+      }
+    }
+
+    return { ok: true, nutri, error: null }
+  }
+
+  async function crearPaciente(datos) {
+    const validacionCupo = await verificarCupoDisponible()
+    if (!validacionCupo.ok) {
+      return { data: null, error: { message: validacionCupo.error }, inviteError: null }
+    }
+    const nutri = validacionCupo.nutri
 
     const { data, error } = await supabase
       .from('pacientes')
@@ -112,7 +135,6 @@ export function usePatients() {
 
     if (error) return { data: null, error, inviteError: null }
 
-    // Enviar invitacion por mail — si falla, NO revertir el alta
     let inviteError = null
     try {
       const { error: invErr } = await supabase.functions.invoke('invite-patient', {
@@ -135,7 +157,6 @@ export function usePatients() {
     return { data, error: null, inviteError }
   }
 
-  //  Actualizar datos de un paciente.
   async function actualizarPaciente(id, datos) {
     const { data, error } = await supabase
       .from('pacientes')
@@ -153,7 +174,6 @@ export function usePatients() {
     return { data, error }
   }
 
-  //  Desactivar un paciente (no eliminar).
   async function desactivarPaciente(id) {
     const { error } = await supabase
       .from('pacientes')
@@ -164,8 +184,12 @@ export function usePatients() {
     return { error }
   }
 
-  //  Reactivar un paciente.
   async function reactivarPaciente(id) {
+    const validacionCupo = await verificarCupoDisponible()
+    if (!validacionCupo.ok) {
+      return { error: { message: validacionCupo.error } }
+    }
+
     const { error } = await supabase
       .from('pacientes')
       .update({ estado: 'activo' })

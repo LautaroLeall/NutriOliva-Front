@@ -1,14 +1,11 @@
 // NutriPanel.jsx — Panel principal del nutricionista
 
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Users,
-  LogOut,
   Plus,
   Search,
   AlertCircle,
-  ChevronRight,
   Sparkles,
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
@@ -23,7 +20,7 @@ import CountUp from "react-countup";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePatients } from "@/hooks/usePatients";
-import Logo from "@/components/ui/Logo";
+import NutriNavbar from "@/components/nutri/NutriNavbar";
 import EmptyState from "@/components/ui/EmptyState";
 import PatientRow from "@/components/patients/PatientRow";
 import PatientForm from "@/components/patients/PatientForm";
@@ -123,8 +120,7 @@ function TableSkeleton() {
 
 // ── Componente principal ───────────────────────────────────────────────────
 export default function NutriPanel() {
-  const navigate = useNavigate();
-  const { nombre, signOut } = useAuth();
+  const { nombre } = useAuth();
   const {
     pacientes,
     loading,
@@ -218,52 +214,16 @@ export default function NutriPanel() {
     <div className="page min-h-screen bg-[#EFEAE0]">
       <Toaster position="bottom-right" richColors />
 
-      {/* ── Navbar ──────────────────────────────────────────────────────── */}
-      <motion.nav
-        initial={{ y: -48, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
-        className="flex justify-between items-center px-6 py-3.5 bg-white
-                    border-b border-cream-darker shadow-sm"
-      >
-        <div className="flex items-center gap-2 font-display font-bold text-base text-olive-dark">
-          <Logo size={22} />
-          NutriOliva
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="flex gap-5 text-sm font-display text-muted">
-            <span className="text-olive-dark font-semibold cursor-pointer">
-              Pacientes
-            </span>
-            <span
-              onClick={() => navigate("/panel/catalogo")}
-              className="cursor-pointer hover:text-olive-dark transition-colors"
-            >
-              Catalogo
-            </span>
-            <span className="cursor-pointer hover:text-olive-dark transition-colors">
-              Cuenta
-            </span>
-          </div>
-          <motion.button
-            onClick={signOut}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5"
-          >
-            <LogOut size={12} />
-            Salir
-          </motion.button>
-        </div>
-      </motion.nav>
+      {/* ── Navbar unificado y 100% responsive ───────────────────────── */}
+      <NutriNavbar />
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* ── Header ──────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.1 }}
-          className="flex justify-between items-start mb-6"
+          className="flex flex-wrap justify-between items-start gap-3 mb-6"
         >
           <div>
             <h2 className="font-display text-xl text-olive-dark font-bold">
@@ -298,7 +258,7 @@ export default function NutriPanel() {
         {/* ── Métricas con 3D tilt ────────────────────────────────────── */}
         <AnimatePresence>
           {!loading && pacientes.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
               <MetricCard
                 label="Pacientes activos"
                 value={activos}
@@ -324,13 +284,13 @@ export default function NutriPanel() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.2 }}
-          className="card overflow-visible"
+          className="card overflow-hidden"
         >
           {/* Búsqueda animada */}
           <motion.div
             animate={{ backgroundColor: searchFocused ? "#F6F1E7" : "#F0EDE4" }}
             transition={{ duration: 0.2 }}
-            className="flex items-center gap-3 px-5 py-3.5 border-b border-cream-darker"
+            className="flex items-center gap-3 px-4 sm:px-5 py-3.5 border-b border-cream-darker"
           >
             <motion.div
               animate={{
@@ -344,7 +304,7 @@ export default function NutriPanel() {
             <input
               type="text"
               placeholder="Buscar por nombre o mail..."
-              className="flex-1 bg-transparent text-sm font-body text-olive-dark placeholder-muted/60 focus:outline-none"
+              className="flex-1 bg-transparent text-sm font-body text-olive-dark placeholder-muted/60 focus:outline-none min-w-0"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               onFocus={() => setSearchFocused(true)}
@@ -414,36 +374,38 @@ export default function NutriPanel() {
 
           {/* Tabla con stagger auto-animate */}
           {!loading && !error && filtrados.length > 0 && (
-            <table className="w-full border-collapse">
-              <thead>
-                <tr>
-                  {["Paciente", "Actividad", "Ultima vez", ""].map((h) => (
-                    <th
-                      key={h}
-                      className="bg-white text-muted font-display text-[9.5px] uppercase
-                                  tracking-wide text-left px-5 py-2.5 border-b border-cream-dark"
-                    >
-                      {h}
-                    </th>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    {["Paciente", "Actividad", "Ultima vez", ""].map((h) => (
+                      <th
+                        key={h}
+                        className="bg-white text-muted font-display text-[9.5px] uppercase
+                                    tracking-wide text-left px-4 sm:px-5 py-2.5 border-b border-cream-dark whitespace-nowrap"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody ref={tbodyRef}>
+                  {filtrados.map((p) => (
+                    <PatientRow
+                      key={p.id}
+                      paciente={p}
+                      onEditar={abrirEdicion}
+                      onDesactivar={(pac) =>
+                        setConfirmDesact({ id: pac, nombre: p.nombre })
+                      }
+                      onReactivar={(pac) =>
+                        setConfirmReact({ id: pac, nombre: p.nombre })
+                      }
+                    />
                   ))}
-                </tr>
-              </thead>
-              <tbody ref={tbodyRef}>
-                {filtrados.map((p) => (
-                  <PatientRow
-                    key={p.id}
-                    paciente={p}
-                    onEditar={abrirEdicion}
-                    onDesactivar={(pac) =>
-                      setConfirmDesact({ id: pac, nombre: p.nombre })
-                    }
-                    onReactivar={(pac) =>
-                      setConfirmReact({ id: pac, nombre: p.nombre })
-                    }
-                  />
-                ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           )}
         </motion.div>
       </div>
@@ -493,7 +455,6 @@ export default function NutriPanel() {
         onGuardado={() => {
           setModalClinicos(false);
           setPacienteCreado(null);
-          toast.success("Datos clinicos guardados correctamente.");
         }}
       />
     </div>
