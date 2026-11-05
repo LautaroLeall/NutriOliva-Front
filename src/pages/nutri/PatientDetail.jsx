@@ -1,6 +1,9 @@
+// PatientDetail.jsx — Orquestador de la ficha del paciente (/panel/pacientes/:id)
+
 import { Toaster } from "sonner";
-import { Loader2, AlertCircle, ArrowLeft } from "lucide-react";
-import Logo from "@/components/ui/Logo";
+import { Loader2, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import NutriNavbar from "@/components/nutri/NutriNavbar";
 import PatientForm from "@/components/patients/PatientForm";
 import DatosClinicos from "@/components/nutri/DatosClinicos";
 
@@ -36,14 +39,12 @@ export default function PatientDetail() {
     datosClinicos,
     planActivo,
     caloriasObjetivo,
-    registrosHoy,
     caloriasHoy,
     activo,
     fetchPaciente,
     handleGuardar,
     handleGuardarClinicos,
     navigate,
-    signOut,
     desactivarPaciente,
     reactivarPaciente,
   } = usePatientDetail();
@@ -51,10 +52,21 @@ export default function PatientDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#EFEAE0] flex items-center justify-center">
-        <div className="flex items-center gap-2 text-muted">
-          <Loader2 size={16} className="animate-spin" />
-          <span className="font-display text-sm">Cargando ficha...</span>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-3 text-muted"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.1, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 size={24} className="text-olive/70" />
+          </motion.div>
+          <span className="font-display text-xs tracking-wide">
+            Cargando ficha del paciente...
+          </span>
+        </motion.div>
       </div>
     );
   }
@@ -62,40 +74,32 @@ export default function PatientDetail() {
   if (error || !paciente) {
     return (
       <div className="min-h-screen bg-[#EFEAE0] flex items-center justify-center">
-        <div className="flex items-center gap-2 text-danger">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card px-6 py-5 flex items-center gap-2.5 text-danger"
+        >
           <AlertCircle size={16} />
           <span className="font-display text-sm">
             {error || "Paciente no encontrado."}
           </span>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <div className="page min-h-screen bg-[#EFEAE0]">
-      <Toaster position="top-center" richColors />
+      <Toaster position="bottom-right" richColors />
 
-      {/* Navbar */}
-      <nav className="flex justify-between items-center px-6 py-3.5 bg-white border-b border-cream-darker">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate("/panel")}
-            className="text-muted hover:text-olive-dark transition-colors"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div className="flex items-center gap-2 font-display font-bold text-base text-olive-dark">
-            <Logo size={20} />
-            NutriOliva
-          </div>
-        </div>
-        <button onClick={signOut} className="btn-ghost text-xs px-3 py-1.5">
-          Salir
-        </button>
-      </nav>
+      {/* Navbar unificado */}
+      <NutriNavbar
+        backTo="/panel"
+        backLabel="Volver a pacientes"
+        subtitulo={paciente.nombre}
+      />
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <PatientHeader
           paciente={paciente}
           activo={activo}
@@ -115,37 +119,68 @@ export default function PatientDetail() {
           datosClinicos={datosClinicos}
         />
 
-        <div className="card overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.28 }}
+          className="card overflow-hidden"
+        >
           <TabBar tab={tab} setTab={setTab} />
 
-          {tab === "ficha" && (
-            <TabFicha registros_comida={paciente.registros_comida} />
-          )}
+          <AnimatePresence mode="wait">
+            {tab === "ficha" && (
+              <motion.div
+                key="ficha"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <TabFicha registros_comida={paciente.registros_comida} />
+              </motion.div>
+            )}
 
-          {tab === "diario" && (
-            <TabDiario
-              fechaDiario={fechaDiario}
-              setFechaDiario={setFechaDiario}
-              loadingDiario={loadingDiario}
-              comidasNutri={comidasNutri}
-              actividadesNutri={actividadesNutri}
-              totalConsumidas={totalConsumidas}
-              totalGastadas={totalGastadas}
-              caloriasObjetivo={caloriasObjetivo}
-              puntosSemanales={puntosSemanales}
-              loadingTendencia={loadingTendencia}
-              nombrePaciente={paciente.nombre}
-            />
-          )}
+            {tab === "diario" && (
+              <motion.div
+                key="diario"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <TabDiario
+                  fechaDiario={fechaDiario}
+                  setFechaDiario={setFechaDiario}
+                  loadingDiario={loadingDiario}
+                  comidasNutri={comidasNutri}
+                  actividadesNutri={actividadesNutri}
+                  totalConsumidas={totalConsumidas}
+                  totalGastadas={totalGastadas}
+                  caloriasObjetivo={caloriasObjetivo}
+                  puntosSemanales={puntosSemanales}
+                  loadingTendencia={loadingTendencia}
+                  nombrePaciente={paciente.nombre}
+                />
+              </motion.div>
+            )}
 
-          {tab === "clinica" && (
-            <TabClinica
-              datosClinicos={datosClinicos}
-              paciente={paciente}
-              setEditandoClinicos={setEditandoClinicos}
-            />
-          )}
-        </div>
+            {tab === "clinica" && (
+              <motion.div
+                key="clinica"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <TabClinica
+                  datosClinicos={datosClinicos}
+                  paciente={paciente}
+                  setEditandoClinicos={setEditandoClinicos}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
 
       <PatientForm

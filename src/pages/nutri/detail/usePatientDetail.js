@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
-import { toast } from 'sonner'
-import { useAuth } from '@/hooks/useAuth'
 import { usePatients } from '@/hooks/usePatients'
 import { useRegistrosNutri } from '@/hooks/useRegistrosNutri'
 import { useWeeklyBalance } from '@/hooks/useWeeklyBalance'
@@ -11,7 +9,6 @@ import { toLocalISO } from './patientDetailUtils'
 export function usePatientDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { signOut } = useAuth()
   const { actualizarPaciente, desactivarPaciente, reactivarPaciente } = usePatients()
 
   const [paciente, setPaciente] = useState(null)
@@ -44,9 +41,7 @@ export function usePatientDetail() {
       .from('pacientes')
       .select(`
         *,
-        datos_clinicos (
-          id, peso, altura, edad, sexo, objetivo, observaciones, fecha_registro, created_at
-        ),
+        datos_clinicos (*),
         planes (
           id, calorias_objetivo, version, estado, created_at
         ),
@@ -78,7 +73,6 @@ export function usePatientDetail() {
 
   async function handleGuardarClinicos() {
     await fetchPaciente()
-    toast.success('Datos clínicos actualizados.')
   }
 
   const datosClinicos = paciente?.datos_clinicos?.[0]
@@ -97,7 +91,7 @@ export function usePatientDetail() {
     comidasNutri, actividadesNutri, totalConsumidas, totalGastadas, loadingDiario,
     puntosSemanales, loadingTendencia,
     datosClinicos, planActivo, caloriasObjetivo, registrosHoy, caloriasHoy, activo,
-    fetchPaciente, handleGuardar, handleGuardarClinicos, navigate, signOut,
+    fetchPaciente, handleGuardar, handleGuardarClinicos, navigate,
     desactivarPaciente, reactivarPaciente
   }
 }
