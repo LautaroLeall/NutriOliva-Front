@@ -3,7 +3,6 @@ import { Suspense, lazy } from "react";
 import { AuthProvider } from "@/hooks/useAuth";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import {
-  ProtectedRoute,
   RoleRoute,
   PublicRoute,
 } from "@/components/layout/ProtectedRoute";
@@ -15,6 +14,7 @@ const NutriPanel = lazy(() => import("@/pages/nutri/NutriPanel"));
 const PatientDetail = lazy(() => import("@/pages/nutri/PatientDetail"));
 const PatientPlan = lazy(() => import("@/pages/nutri/PatientPlan"));
 const Catalogo = lazy(() => import("@/pages/nutri/Catalogo"));
+const NutriCuenta = lazy(() => import("@/pages/nutri/NutriCuenta"));
 const PatientPanel = lazy(() => import("@/pages/patient/PatientPanel"));
 const AdminPanel = lazy(() => import("@/pages/admin/AdminPanel"));
 
@@ -78,12 +78,19 @@ export default function App() {
                 </RoleRoute>
               }
             />
-
             <Route
               path="/panel/catalogo"
               element={
                 <RoleRoute allowedRoles="nutricionista">
                   <Catalogo />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/panel/cuenta"
+              element={
+                <RoleRoute allowedRoles="nutricionista">
+                  <NutriCuenta />
                 </RoleRoute>
               }
             />
