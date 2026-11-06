@@ -1,7 +1,15 @@
+// PatientPlan.jsx — Orquestador de planes alimenticios (/panel/pacientes/:id/plan)
+
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
-import { ArrowLeft, Loader2, AlertCircle, ClipboardList, ClipboardPaste } from "lucide-react";
-import Logo from "@/components/ui/Logo";
+import {
+  AlertCircle,
+  ClipboardList,
+  ClipboardPaste,
+  Plus,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import NutriNavbar from "@/components/nutri/NutriNavbar";
 import PlanBuilder from "@/components/plans/PlanBuilder";
 import EmptyState from "@/components/ui/EmptyState";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -13,18 +21,46 @@ import NotasEditor from "./plan/NotasEditor";
 import ModalNuevoPlan from "./plan/ModalNuevoPlan";
 import ModalParsePdf from "./plan/ModalParsePdf";
 
+function PlanSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="card p-5 space-y-2.5">
+        <div className="h-4 w-36 bg-cream-darker rounded-full animate-pulse" />
+        <div className="h-3 w-48 bg-cream-darker rounded-full animate-pulse" />
+      </div>
+      <div className="card p-4 space-y-2">
+        <div className="h-2.5 w-24 bg-cream-darker rounded-full animate-pulse" />
+        <div className="h-4 w-56 bg-cream-darker rounded-full animate-pulse" />
+      </div>
+      <div className="card p-4 flex justify-between items-center">
+        <div className="space-y-2">
+          <div className="h-2.5 w-32 bg-cream-darker rounded-full animate-pulse" />
+          <div className="h-6 w-28 bg-cream-darker rounded-lg animate-pulse" />
+        </div>
+        <div className="h-8 w-24 bg-cream-darker rounded-lg animate-pulse" />
+      </div>
+      {[...Array(3)].map((_, i) => (
+        <div
+          key={i}
+          className="border border-cream-darker rounded-xl p-4 bg-white space-y-2"
+        >
+          <div className="h-3.5 w-28 bg-cream-darker rounded-full animate-pulse" />
+          <div className="h-8 w-full bg-cream rounded-lg animate-pulse" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function PatientPlan() {
   const {
     id,
-    navigate,
-    signOut,
     planes,
     planActivo,
     loading,
     error,
     planVisible,
     readonly,
-    planVisibleId,
     setPlanVisibleId,
     modalNuevo,
     setModalNuevo,
@@ -32,8 +68,6 @@ export default function PatientPlan() {
     setCaloriaInput,
     calError,
     setCalError,
-    publicando,
-    setPublicando,
     editandoCal,
     setEditandoCal,
     nuevasCal,
@@ -51,7 +85,6 @@ export default function PatientPlan() {
     confirmVersion,
     setConfirmVersion,
     procesando,
-    setProcesando,
     handleCrearPlan,
     handlePublicar,
     handleNuevaVersion,
@@ -59,32 +92,22 @@ export default function PatientPlan() {
     handleGuardarCalorias,
     handleGuardarNotas,
     agregarComida,
+    agregarComidasLote,
     editarComida,
     eliminarComida,
   } = usePatientPlan();
 
-  // ── Estado del modal de carga desde PDF ────────────────────────────────────
   const [modalPdf, setModalPdf] = useState(false);
 
-  // Inserta en el plan activo todas las comidas extraidas del PDF
   async function handleConfirmarPdf(comidas) {
-    if (!planVisible) return;
-    let errores = 0;
-    for (const comida of comidas) {
-      const { error } = await agregarComida(planVisible.id, {
-        tipo_comida:   comida.tipo_comida,
-        descripcion:   comida.descripcion,
-        calorias_aprox: comida.calorias_aprox ?? null,
-        proteinas_g:   comida.proteinas_g ?? null,
-        carbos_g:      comida.carbos_g ?? null,
-        grasas_g:      comida.grasas_g ?? null,
-      });
-      if (error) errores++;
-    }
-    if (errores === 0) {
-      toast.success(`${comidas.length} comida${comidas.length !== 1 ? 's' : ''} agregada${comidas.length !== 1 ? 's' : ''} al plan.`);
+    if (!planVisible || !comidas?.length) return;
+    const { error: err } = await agregarComidasLote(planVisible.id, comidas);
+    if (!err) {
+      toast.success(
+        `${comidas.length} comida${comidas.length !== 1 ? "s" : ""} agregada${comidas.length !== 1 ? "s" : ""} al plan.`
+      );
     } else {
-      toast.warning(`Se agregaron ${comidas.length - errores} de ${comidas.length} comidas. ${errores} fallaron.`);
+      toast.error("Error al agregar las comidas al plan.");
     }
   }
 
@@ -92,159 +115,180 @@ export default function PatientPlan() {
     <div className="page min-h-screen bg-[#EFEAE0]">
       <Toaster position="bottom-right" richColors />
 
-      {/* Navbar */}
-      <nav className="flex justify-between items-center px-6 py-3.5 bg-white border-b border-cream-darker">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(`/panel/pacientes/${id}`)}
-            className="text-muted hover:text-olive-dark transition-colors"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div className="flex items-center gap-2 font-display font-bold text-base text-olive-dark">
-            <Logo size={20} />
-            NutriOliva
-          </div>
-        </div>
-        <button onClick={signOut} className="btn-ghost text-xs px-3 py-1.5">
-          Salir
-        </button>
-      </nav>
+      {/* Navbar unificado */}
+      <NutriNavbar
+        backTo={`/panel/pacientes/${id}`}
+        backLabel="Volver a la ficha"
+        subtitulo="Plan alimenticio"
+      />
 
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-5">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.05 }}
+          className="flex flex-wrap justify-between items-center gap-3 mb-5"
+        >
           <div>
-            <h2 className="font-display text-xl text-olive-dark">
+            <h2 className="font-display font-semibold text-xl text-olive-dark">
               Plan alimenticio
             </h2>
             {planes.length > 0 && (
-              <p className="text-xs text-muted mt-0.5">
-                {planes.length} {planes.length === 1 ? "versión" : "versiones"}
+              <p className="text-xs text-muted mt-0.5 font-display">
+                {planes.length} {planes.length === 1 ? "version" : "versiones"}
               </p>
             )}
           </div>
           <div className="flex gap-2 items-center">
-            {/* Boton cargar desde PDF — solo disponible cuando hay un plan editable */}
             {planVisible && !readonly && (
-              <button
+              <motion.button
+                type="button"
                 onClick={() => setModalPdf(true)}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.94 }}
                 className="btn-ghost text-xs px-3 py-2 flex items-center gap-1.5"
                 title="Importar comidas pegando el texto del plan (Word, Google Docs, email)"
               >
                 <ClipboardPaste size={13} />
                 Importar con IA
-              </button>
+              </motion.button>
             )}
-            <button
+            <motion.button
+              type="button"
               onClick={() => {
                 setCaloriaInput("2000");
                 setCalError("");
                 setModalNuevo(true);
               }}
-              className="btn-secondary text-xs px-4 py-2"
+              whileHover={{ scale: 1.04, boxShadow: "0 6px 20px rgba(110,122,75,0.25)" }}
+              whileTap={{ scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
+              className="btn-secondary text-xs px-4 py-2 flex items-center gap-1.5"
             >
-              + Nuevo plan
-            </button>
+              <Plus size={13} />
+              Nuevo plan
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="flex items-center justify-center gap-2 py-20 text-muted">
-            <Loader2 size={16} className="animate-spin" />
-            <span className="font-display text-sm">Cargando plan...</span>
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {/* Loading */}
+          {loading && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <PlanSkeleton />
+            </motion.div>
+          )}
 
-        {/* Error */}
-        {!loading && error && (
-          <div className="card p-5 flex items-center gap-2 text-red-500">
-            <AlertCircle size={15} /> {error}
-          </div>
-        )}
+          {/* Error */}
+          {!loading && error && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="card p-5 flex items-center gap-2 text-accent"
+            >
+              <AlertCircle size={15} /> {error}
+            </motion.div>
+          )}
 
-        {/* Sin planes */}
-        {!loading && !error && planes.length === 0 && (
-          <div className="card">
-            <EmptyState
-              icon={ClipboardList}
-              title="Este paciente no tiene plan todavía"
-              description="Creá el primer plan alimenticio, agregá las comidas y publicalo."
-              action={
-                <button
-                  onClick={() => setModalNuevo(true)}
-                  className="btn-primary text-sm"
-                >
-                  Crear primer plan
-                </button>
-              }
-            />
-          </div>
-        )}
+          {/* Sin planes */}
+          {!loading && !error && planes.length === 0 && (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="card"
+            >
+              <EmptyState
+                icon={ClipboardList}
+                title="Este paciente no tiene plan todavia"
+                description="Crea el primer plan alimenticio, agrega las comidas y publicalo."
+                action={
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setModalNuevo(true)}
+                    className="btn-primary text-sm"
+                  >
+                    Crear primer plan
+                  </motion.button>
+                }
+              />
+            </motion.div>
+          )}
 
-        {/* Plan visible */}
-        {!loading && planVisible && (
-          <>
-            {/* Selector de versiones (dropdown) */}
-            <VersionSelector
-              planes={planes}
-              planVisibleId={planVisible.id}
-              onSelect={(p) => setPlanVisibleId(p.id)}
-            />
+          {/* Plan visible */}
+          {!loading && planVisible && (
+            <motion.div
+              key={planVisible.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22 }}
+            >
+              <VersionSelector
+                planes={planes}
+                planVisibleId={planVisible.id}
+                onSelect={(p) => setPlanVisibleId(p.id)}
+              />
 
-            {/* Header del plan seleccionado */}
-            <PlanHeader
-              plan={planVisible}
-              onPublicar={() => setConfirmPublicar(true)}
-              onNuevaVersion={() => setConfirmVersion(true)}
-              onEliminar={() => setConfirmEliminar(planVisible.id)}
-              publicando={publicando}
-            />
+              <PlanHeader
+                plan={planVisible}
+                onPublicar={() => setConfirmPublicar(true)}
+                onNuevaVersion={() => setConfirmVersion(true)}
+                onEliminar={() => setConfirmEliminar(planVisible.id)}
+                publicando={procesando}
+              />
 
-            {/* Notas del plan */}
-            <NotasEditor
-              planVisible={planVisible}
-              readonly={readonly}
-              editandoNotas={editandoNotas}
-              setEditandoNotas={setEditandoNotas}
-              notasInput={notasInput}
-              setNotasInput={setNotasInput}
-              handleGuardarNotas={handleGuardarNotas}
-            />
+              <NotasEditor
+                planVisible={planVisible}
+                readonly={readonly}
+                editandoNotas={editandoNotas}
+                setEditandoNotas={setEditandoNotas}
+                notasInput={notasInput}
+                setNotasInput={setNotasInput}
+                handleGuardarNotas={handleGuardarNotas}
+              />
 
-            {/* Objetivo calórico */}
-            <CaloriasEditor
-              planVisible={planVisible}
-              readonly={readonly}
-              editandoCal={editandoCal}
-              setEditandoCal={setEditandoCal}
-              nuevasCal={nuevasCal}
-              setNuevasCal={setNuevasCal}
-              calEditError={calEditError}
-              setCalEditError={setCalEditError}
-              handleGuardarCalorias={handleGuardarCalorias}
-            />
+              <CaloriasEditor
+                planVisible={planVisible}
+                readonly={readonly}
+                editandoCal={editandoCal}
+                setEditandoCal={setEditandoCal}
+                nuevasCal={nuevasCal}
+                setNuevasCal={setNuevasCal}
+                calEditError={calEditError}
+                setCalEditError={setCalEditError}
+                handleGuardarCalorias={handleGuardarCalorias}
+              />
 
-            {/* Constructor de comidas */}
-            <PlanBuilder
-              plan={planVisible}
-              onAgregar={(comida) => agregarComida(planVisible.id, comida)}
-              onEditar={editarComida}
-              onEliminar={eliminarComida}
-              readonly={readonly}
-            />
+              <PlanBuilder
+                plan={planVisible}
+                onAgregar={(comida) => agregarComida(planVisible.id, comida)}
+                onAgregarLote={(comidas) => agregarComidasLote(planVisible.id, comidas)}
+                onEditar={editarComida}
+                onEliminar={eliminarComida}
+                readonly={readonly}
+              />
 
-            {readonly && (
-              <p className="text-center text-[11px] text-muted italic mt-5">
-                Plan archivado — solo lectura.
-              </p>
-            )}
-          </>
-        )}
+              {readonly && (
+                <p className="text-center text-[11px] text-muted italic mt-5">
+                  Plan archivado — solo lectura.
+                </p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* ── Modal: crear nuevo plan ─────────────────────────────────────────── */}
+      {/* Modal: crear nuevo plan */}
       <ModalNuevoPlan
         open={modalNuevo}
         onClose={() => setModalNuevo(false)}
@@ -255,43 +299,43 @@ export default function PatientPlan() {
         onCrear={handleCrearPlan}
       />
 
-      {/* ── Confirm: publicar ───────────────────────────────────────────────── */}
+      {/* Confirm: publicar */}
       <ConfirmDialog
         open={confirmPublicar}
         onClose={() => setConfirmPublicar(false)}
         onConfirm={handlePublicar}
         title="Publicar plan"
-        message={`El plan v${planVisible?.version} pasará a estar Activo. ${planActivo && planActivo.id !== planVisible?.id ? "El plan activo actual quedará archivado." : ""}`}
+        message={`El plan v${planVisible?.version} pasara a estar Activo. ${planActivo && planActivo.id !== planVisible?.id ? "El plan activo actual quedara archivado." : ""}`}
         confirmLabel="Publicar"
         variant="default"
         loading={procesando}
       />
 
-      {/* ── Confirm: nueva versión ──────────────────────────────────────────── */}
+      {/* Confirm: nueva version */}
       <ConfirmDialog
         open={confirmVersion}
         onClose={() => setConfirmVersion(false)}
         onConfirm={handleNuevaVersion}
-        title="Crear nueva versión"
-        message={`Se copiará el plan v${planActivo?.version} con todas sus comidas como borrador. El plan activo seguirá vigente hasta que publiques la nueva versión.`}
-        confirmLabel="Crear nueva versión"
+        title="Crear nueva version"
+        message={`Se copiara el plan v${planActivo?.version} con todas sus comidas como borrador. El plan activo seguira vigente hasta que publiques la nueva version.`}
+        confirmLabel="Crear nueva version"
         variant="warning"
         loading={procesando}
       />
 
-      {/* ── Confirm: eliminar plan ──────────────────────────────────────────── */}
+      {/* Confirm: eliminar plan */}
       <ConfirmDialog
         open={!!confirmEliminar}
         onClose={() => setConfirmEliminar(null)}
         onConfirm={handleEliminar}
         title="Eliminar plan"
-        message="Esta acción es irreversible. Se eliminará el plan y todas sus comidas. No podés eliminar el plan activo."
+        message="Esta accion es irreversible. Se eliminara el plan y todas sus comidas. No podes eliminar el plan activo."
         confirmLabel="Eliminar plan"
         variant="danger"
         loading={procesando}
       />
 
-      {/* ── Modal: cargar plan desde PDF ──────────────────────────────────── */}
+      {/* Modal: cargar plan con IA */}
       <ModalParsePdf
         open={modalPdf}
         onClose={() => setModalPdf(false)}
