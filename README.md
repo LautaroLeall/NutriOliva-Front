@@ -1,133 +1,206 @@
-# NutriOliva — Frontend
+# NutriOliva — Frontend (Web SaaS Multi-Rol)
 
-Plataforma web para gestión nutricional, diseño de planes alimenticios y seguimiento diario de pacientes en tiempo real.
+Aplicacion web SPA construida en **React + Vite + Tailwind CSS** para gestion clinica nutricional, armado inteligente de planes alimenticios, seguimiento diario de pacientes en tiempo real y administracion comercial SaaS.
 
-## Descripcion General
+---
 
-NutriOliva conecta a nutricionistas con sus pacientes en una interfaz unificada:
+## 1. Descripcion General por Rol
 
-- **Nutricionistas**: Gestionan su nómina de pacientes, crean y editan planes de alimentación personalizados con calculo automático de macronutrientes, administran versiones de planes y realizan seguimiento de los registros diarios.
-- **Pacientes**: Acceden a su plan asignado, registran sus comidas diarias (usando el catálogo global o personalizado), computan actividad física y visualizan su línea de tiempo nutricional.
+NutriOliva unifica cuatro experiencias adaptadas a cada dispositivo dentro de una arquitectura modular (**141 archivos en `src/`**):
 
-## Tecnologias Utilizadas
+1. **Landing Comercial Interactiva (`/`)**:
+   - Tour interactivo guiado en el mockup del Hero (`HeroAppMockup`).
+   - Simulador en vivo **Celular del Paciente + Espejo del Nutricionista en Tiempo Real** (`PhonePatientSimulator` + `NutriRealtimeMirror`).
+   - Tabla de planes sincronizada con tarifas dinamicas desde Supabase (`planes_suscripcion`), FAQ desplegable y canales directos de contacto (`contactLinks.js`).
+2. **Panel del Nutricionista (`/panel/*`)**:
+   - Barra superior unificada y 100% responsive (`<NutriNavbar />`) con buscador global instantaneo de pacientes (`Ctrl+K`) y menu movil adaptable.
+   - Nomina de pacientes con control real de cupo segun suscripcion, reactivacion en un clic, invitacion por email y alertas de inactividad (+48h sin registros).
+   - **Ficha Clinica Integral (`/panel/pacientes/:id`)**: Diario por fecha con fotos firmadas, grafica semanal de adherencia, wizard clinico de 3 pasos (antropometria, composicion corporal, patologias, alergias, medicacion, 5 niveles de actividad y 7 objetivos) e historial de evolucion.
+   - **Constructor de Planes (`/panel/pacientes/:id/plan`)**: Versionado (`borrador`, `activo`, `archivado`), 7 tiempos de comida, autocompletado desde el catalogo, **importacion asistida con IA** (`ModalParsePdf`) e **importador directo de Excel/CSV** (`ExcelImporter`).
+   - **Catalogo Nutricional (`/panel/catalogo`)**: +205 alimentos y preparaciones clinicas globales mas creacion de alimentos propios del consultorio.
+   - **Mi Cuenta (`/panel/cuenta`)**: Perfil del consultorio, metricas de uso, estado de suscripcion/cupo y seguridad.
+3. **App Web Mobile-First del Paciente (`/mi-plan/*`)**:
+   - Navegacion inferior de 4 pestañas: **Hoy**, **Plan**, **Tendencia** y **Mi Cuenta**.
+   - Carga diaria de comidas en **3 modos** (`Del plan` con sugerencia segun horario, `Catalogo` con buscador instantaneo y `Otra comida` con estimacion calorica por IA y adjunto de foto validada hasta 5 MB).
+   - Registro de actividad fisica con calculo de gasto calorico, calendario semanal local sin desfase de zona horaria y linea de tiempo editable en movil y escritorio.
+   - Visualizacion de notas generales del plan, evolucion antropometrica propia y contacto directo con su nutricionista asignado.
+4. **Suite Super Admin Full-Screen (`/admin/*`)**:
+   - Layout de pantalla completa (`h-screen`) con sidebar fijo a la izquierda y panel derecho desplazable 100% responsive.
+   - **Nutricionistas**: Alta directa via Edge Function, edicion de plan/estado, gestion de `cupo_extra` y pacientes por profesional, indicadores cromaticos de estado (`StatusColorDot`) y tooltips renderizados en portal (`createPortal`).
+   - **Facturacion**: Control de cobros mensuales, MRR e ingresos proyectados segun estado comercial.
+   - **Metricas y Consumo IA**: KPIs del negocio y modulo `AdminConsumoIA` con desglose real de llamadas y costo estimado de IA (ARS y USD) global, por nutricionista y por paciente.
+   - **Ajustes**: Edicion en vivo de precios y cupos de `planes_suscripcion` y perfil del Super Admin.
 
-| Componente        | Tecnologia                   |
-| ----------------- | ---------------------------- |
-| Framework         | React 18 (Vite 5)            |
-| Estilos           | Vanilla CSS + Tailwind CSS 3 |
-| Iconos            | Lucide React                 |
-| Notificaciones    | Sonner (Toasts)              |
-| Cliente DB / Auth | `@supabase/supabase-js` v2   |
-| Enrutamiento      | React Router DOM v6          |
+---
 
-## Estructura del Proyecto
+## 2. Stack Tecnologico
+
+| Categoria              | Tecnologia                                                       |
+| ---------------------- | ---------------------------------------------------------------- |
+| Framework UI           | React `18.3` + Vite `5.4`                                        |
+| Estilos y Diseno       | Tailwind CSS `3.4` + CSS Custom Tokens                           |
+| Animaciones            | Framer Motion `13.4` + `@formkit/auto-animate`                   |
+| Graficos y Metricas    | Recharts `3.10` + `react-countup`                                |
+| Importacion Planillas  | SheetJS (`xlsx` `0.18`)                                          |
+| Backend / Auth / DB    | `@supabase/supabase-js` `2.45`                                   |
+| Enrutamiento           | `react-router-dom` `6.27` (`React.lazy` + `Suspense`)            |
+| Iconografia y Feedback | `lucide-react` + `sonner` (notificaciones toast)                 |
+| Despliegue             | Vercel (`vercel.json` con cabeceras de seguridad y SPA rewrites) |
+
+---
+
+## 3. Mapa de Rutas (`src/App.jsx`)
+
+| Ruta                        | Acceso / Guard                   | Vista Principal | Descripcion                                                   |
+| --------------------------- | -------------------------------- | --------------- | ------------------------------------------------------------- |
+| `/`                         | `PublicRoute`                    | `Landing`       | Landing comercial con simulador en tiempo real y precios      |
+| `/login`                    | `PublicRoute`                    | `Login`         | Acceso unificado por rol y recuperacion de contraseña         |
+| `/set-password`             | Publica (token hash de Supabase) | `SetPassword`   | Activacion de invitacion o restablecimiento de clave          |
+| `/panel`                    | `RoleRoute` (`nutricionista`)    | `NutriPanel`    | Listado de pacientes, buscador, filtros y alta                |
+| `/panel/pacientes/:id`      | `RoleRoute` (`nutricionista`)    | `PatientDetail` | Ficha del paciente: Diario, Clinica y Datos personales        |
+| `/panel/pacientes/:id/plan` | `RoleRoute` (`nutricionista`)    | `PatientPlan`   | Constructor de planes, versiones, IA y Excel                  |
+| `/panel/catalogo`           | `RoleRoute` (`nutricionista`)    | `Catalogo`      | Gestion del catalogo global y propio de alimentos             |
+| `/panel/cuenta`             | `RoleRoute` (`nutricionista`)    | `NutriCuenta`   | Perfil profesional, cupo de suscripcion y seguridad           |
+| `/mi-plan/*`                | `RoleRoute` (`paciente`)         | `PatientPanel`  | Diario Hoy, Plan activo, Tendencia semanal y Mi Cuenta        |
+| `/admin/*`                  | `RoleRoute` (`superadmin`)       | `AdminPanel`    | Suite SaaS: Nutricionistas, Facturacion, Metricas/IA, Ajustes |
+
+---
+
+## 4. Estructura del Proyecto
 
 ```text
 Frontend/
-├── public/                     # Archivos estaticos y favicon
+├── public/                              # Favicon, iconos, robots.txt y sitemap.xml
 ├── src/
-│   ├── components/             # Componentes modulares
-│   │   ├── layout/             # Componentes de estructura (ProtectedRoute)
-│   │   ├── patient/            # Formularios y timeline para paciente (FoodForm, ActivityForm, Timeline, DayCalendar)
-│   │   ├── patients/           # Administracion de pacientes (PatientForm, PatientRow)
-│   │   ├── plans/              # Constructor de planes (PlanBuilder)
-│   │   └── ui/                 # Componentes UI reutilizables (ConfirmDialog, Modal, EmptyState, Logo)
-│   ├── hooks/                  # Hooks personalizados de logica y datos
-│   │   ├── useAuth.jsx         # Contexto y estado de autenticacion
-│   │   ├── useBalance.js       # Calculos de balance calorico
-│   │   ├── usePatients.js      # CRUD de pacientes
-│   │   ├── usePlans.js         # Gestion y versiones de planes
-│   │   └── useRegistros.js     # Registros diarios de comida y ejercicio
+│   ├── components/
+│   │   ├── layout/
+│   │   │   └── ProtectedRoute.jsx       # Guards RoleRoute y PublicRoute con redireccion por rol
+│   │   ├── nutri/
+│   │   │   ├── NutriNavbar.jsx          # Navbar unificado responsive + buscador Ctrl+K
+│   │   │   ├── DatosClinicos.jsx        # Orquestador del wizard clinico
+│   │   │   └── datosClinicos/           # Pasos, calculos IMC/cintura y subcomponentes UI
+│   │   ├── patient/
+│   │   │   ├── DayCalendar.jsx          # Selector semanal local (Lunes a Domingo)
+│   │   │   ├── Timeline.jsx             # Linea de tiempo combinada (comidas + actividad)
+│   │   │   ├── TimelineEntry.jsx        # Item con foto firmada y acciones en portal
+│   │   │   ├── ActivityForm.jsx         # Carga de ejercicio fisico y gasto calorico
+│   │   │   ├── FoodForm.jsx             # Modal de registro de comidas en 3 modos
+│   │   │   └── foodForm/                # ModoPlan, ModoCatalogo, ModoOtra, FotoInput, pills
+│   │   ├── patients/
+│   │   │   ├── PatientForm.jsx          # Modal de alta/edicion de paciente e invitacion
+│   │   │   └── PatientRow.jsx           # Fila con estado, alerta 48h y tooltips en portal
+│   │   ├── plans/
+│   │   │   ├── PlanBuilder.jsx          # Constructor interactivo de comidas y macros
+│   │   │   └── builder/                 # AddMealForm, ExcelImporter, MealGroup, MealRow
+│   │   └── ui/                          # Modal, ConfirmDialog, EmptyState, FloatingDropdown,
+│   │                                    # Logo, ScrollToTop, WeeklyCaloriesChart
+│   ├── hooks/
+│   │   ├── useAuth.jsx                  # Sesion, rol, perfil y refreshPerfil
+│   │   ├── useAdmin.js                  # Operaciones reales del Super Admin en Supabase
+│   │   ├── usePatients.js               # CRUD de pacientes, cupo e invitaciones
+│   │   ├── usePlans.js                  # Versiones de planes, carga individual y por lote
+│   │   ├── useCatalogo.js               # Consulta y CRUD del catalogo nutricional
+│   │   ├── useRegistros.js              # Registros diarios del paciente + fotos Storage
+│   │   ├── useRegistrosNutri.js         # Lectura de registros del paciente para el nutri
+│   │   ├── useFoodForm.js               # Logica de los 3 modos de comida + llamada a IA
+│   │   ├── useBalance.js                # Calculo de balance calorico diario
+│   │   ├── useWeeklyBalance.js          # Balance de los ultimos 7 dias para graficas
+│   │   ├── useLogin.js                  # Autenticacion y envio de recuperacion
+│   │   └── useSetPassword.js            # Validacion de sesion temporal y timeout de enlace
 │   ├── lib/
-│   │   └── supabaseClient.js   # Inicializacion del cliente de Supabase
-│   ├── pages/                  # Vistas principales de la aplicacion
-│   │   ├── admin/              # Panel de administracion
-│   │   ├── nutri/              # Paneles del nutricionista (NutriPanel, PatientDetail, PatientPlan)
-│   │   ├── patient/            # Panel del paciente (PatientPanel)
-│   │   ├── Landing.jsx         # Pagina principal pública
-│   │   └── Login.jsx           # Formulario de inicio de sesion
+│   │   ├── supabaseClient.js            # Inicializacion del cliente Supabase
+│   │   ├── storage.js                   # Subida, borrado y URLs firmadas en Storage
+│   │   ├── dateUtils.js                 # Fechas locales YYYY-MM-DD y generacion de semana
+│   │   └── foodFormUtils.js             # Helpers de sugerencia horaria y tipos de comida
+│   ├── pages/
+│   │   ├── Landing.jsx & landing/       # Hero tour, simulador movil + espejo nutri, precios, FAQ
+│   │   ├── Login.jsx & login/           # Formulario de ingreso y showcase animado de 4 vistas
+│   │   ├── SetPassword.jsx & set-password/ # Definicion de clave y aviso de link expirado
+│   │   ├── nutri/                       # NutriPanel, PatientDetail, PatientPlan, Catalogo, NutriCuenta
+│   │   │   ├── catalogo/                # Filtros, tabla, modal y constantes del catalogo
+│   │   │   ├── cuenta/                  # Perfil de consultorio, suscripcion/cupo y seguridad
+│   │   │   ├── detail/                  # Diario, Clinica, Ficha, metricas y balance diario
+│   │   │   └── plan/                    # Versiones, calorias, notas, ModalNuevoPlan, ModalParsePdf
+│   │   ├── patient/
+│   │   │   ├── PatientPanel.jsx         # Contenedor mobile-first del paciente
+│   │   │   └── panel/                   # TabHoy, TabPlan, TabTendencia, TabCuenta, TabCuentaClinica
+│   │   └── admin/
+│   │       ├── AdminPanel.jsx           # Layout full-screen con sidebar fijo
+│   │       └── panel/                   # Nutricionistas, Tabla, Facturacion, Metricas, ConsumoIA, Ajustes, Modales
 │   ├── styles/
-│   │   └── index.css           # Estilos globales y utilidades CSS
-│   ├── App.jsx                 # Router centralizado
-│   └── main.jsx                # Punto de entrada de React
-├── .env.example                # Plantilla de variables de entorno
-├── package.json                # Dependencias y scripts de Node
-├── tailwind.config.js          # Configuracion de Tailwind CSS
-└── vite.config.js              # Configuracion de Vite
+│   │   └── index.css                    # Estilos base, tipografias y utilidades globales
+│   ├── utils/
+│   │   └── contactLinks.js              # Enlaces centralizados de WhatsApp y correo comercial
+│   ├── App.jsx                          # Enrutador principal con carga diferida (lazy)
+│   └── main.jsx                         # Punto de entrada React + Toaster de Sonner
+├── .env.example                         # Plantilla de variables de entorno
+├── package.json                         # Dependencias y scripts
+├── tailwind.config.js                   # Paleta NutriOliva (olive, cream, accent) y tokens
+├── vercel.json                          # Rewrites SPA y cabeceras HTTP de seguridad
+└── vite.config.js                       # Alias '@' -> './src' y configuracion de build
 ```
 
-## Modulos y Funcionalidades
+---
 
-### 1. Autenticacion y Roles (E0)
+## 5. Requisitos e Instalacion Local
 
-- Inicio de sesión unificado en `/login` para Nutricionistas, Pacientes y Administradores.
-- Control de acceso por rol mediante `ProtectedRoute`.
-- Persistencia de sesión con almacenamiento seguro en Supabase Auth.
+### Requisitos Previos
 
-### 2. Gestion de Pacientes (E1)
+- **Node.js** `18+` y **npm** `9+`.
+- Proyecto Supabase con las 17 migraciones y 4 Edge Functions desplegadas (ver `../Backend/README.md`).
 
-- Creación, actualización y eliminación de pacientes.
-- Formulario de edición con precargado automático de datos clínicos y personales.
-- Validaciones estrictas en formato de correo electrónico, campos obligatorios y tipos numéricos.
-- Diálogos de doble confirmación (`ConfirmDialog`) previos a cualquier modificación o borrado.
+### Pasos de Configuracion
 
-### 3. Constructor de Planes Alimenticios (E2)
-
-- Creación de versiones de planes alimenticios por paciente.
-- Cálculo dinámico de calorías y distribución de macronutrientes (proteínas, carbohidratos, grasas).
-- Organización por tomas diarias (desayuno, almuerzo, merienda, cena, colaciones).
-- Activación, desactivación y edición del plan vigente.
-
-### 4. Diario del Paciente y Timeline (E3)
-
-- Registro fácil de alimentos desde el catálogo global o ingresos manuales.
-- Registro de actividades físicas realizadas.
-- Calendario diario (`DayCalendar`) y línea de tiempo interactiva (`Timeline`).
-- Notificaciones breves y claras mediante la librería Sonner.
-
-## Requisitos Previos
-
-- Node.js versión 18 o superior.
-- npm o yarn como gestor de paquetes.
-
-## Instalacion y Configuracion
-
-1. Clonar el repositorio e ingresar al directorio:
+1. Ingresar a la carpeta `Frontend` e instalar dependencias:
 
 ```bash
 cd Frontend
-```
-
-2. Instalar dependencias:
-
-```bash
 npm install
 ```
 
-3. Crear el archivo de entorno `.env` basándose en `.env.example`:
+2. Crear el archivo `.env.local` (o `.env`) a partir de `.env.example`:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-4. Configurar las credenciales de Supabase en `.env`:
+3. Completar las variables de entorno de Supabase:
 
 ```env
-VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_tu_key_aqui
+VITE_SUPABASE_URL=https://cvrgckctgtgcpdtjzxjp.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_tu_clave_publica
 ```
 
-5. Iniciar el servidor de desarrollo:
+4. Iniciar el entorno de desarrollo:
 
 ```bash
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`.
+La aplicacion estara disponible en `http://localhost:5173`.
 
-## Scripts Disponibles
+---
 
-- `npm run dev`: Inicia el servidor de desarrollo Vite.
-- `npm run build`: Compila la aplicación para producción.
-- `npm run preview`: Sirve la build de producción localmente.
-- `npm run lint`: Ejecuta ESLint para verificar calidad de código.
+## 6. Scripts Disponibles
+
+| Comando           | Descripcion                                                              |
+| ----------------- | ------------------------------------------------------------------------ |
+| `npm run dev`     | Inicia el servidor de desarrollo Vite con HMR en `http://localhost:5173` |
+| `npm run build`   | Genera el bundle optimizado de produccion en `dist/`                     |
+| `npm run preview` | Sirve localmente la compilacion de produccion para verificacion          |
+| `npm run lint`    | Ejecuta ESLint sobre `src/**/*.{js,jsx}` (`--max-warnings 0`)            |
+
+---
+
+## 7. Despliegue en Produccion (Vercel)
+
+El repositorio incluye `vercel.json` preconfigurado con:
+
+- **SPA Fallback Rewrite**: Todas las rutas profundas (`/panel/*`, `/mi-plan/*`, `/admin/*`, `/set-password`) resuelven a `/index.html`.
+- **Cache Inmutable de Assets**: `Cache-Control: public, max-age=31536000, immutable` para `/assets/*`.
+- **Cabeceras de Seguridad**: `X-Content-Type-Options`, `X-XSS-Protection`, `Referrer-Policy` y `Permissions-Policy`.
+
+Variables requeridas en el panel de **Vercel -> Settings -> Environment Variables**:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
