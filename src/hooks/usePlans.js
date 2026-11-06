@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 
 /**
- * Hook para gestión de planes alimenticios y sus comidas.
+ * Hook para gestion de planes alimenticios y sus comidas.
  * {string} pacienteId
  */
 export function usePlans(pacienteId) {
@@ -10,9 +10,10 @@ export function usePlans(pacienteId) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchPlanes = useCallback(async () => {
+  const fetchPlanes = useCallback(async (silent = false) => {
     if (!pacienteId) return
-    setLoading(true)
+    const isSilent = silent === true || silent?.silent === true
+    if (!isSilent) setLoading(true)
     setError(null)
 
     const { data, error: err } = await supabase
@@ -30,16 +31,24 @@ export function usePlans(pacienteId) {
     if (err) setError(err.message)
     else {
       // Ordenar comidas dentro de cada plan por tipo y luego por orden
-      const ORDEN_TIPO = { desayuno: 1, almuerzo: 2, merienda: 3, cena: 4, snack: 5 }
+      const ORDEN_TIPO = {
+        desayuno: 1,
+        colacion: 2,
+        almuerzo: 3,
+        merienda: 4,
+        cena: 5,
+        colacion_nocturna: 6,
+        snack: 7,
+      }
       const enriched = (data || []).map(p => ({
         ...p,
         comidas_plan: (p.comidas_plan || []).sort((a, b) =>
-          (ORDEN_TIPO[a.tipo_comida] - ORDEN_TIPO[b.tipo_comida]) || (a.orden - b.orden)
+          ((ORDEN_TIPO[a.tipo_comida] ?? 99) - (ORDEN_TIPO[b.tipo_comida] ?? 99)) || ((a.orden ?? 0) - (b.orden ?? 0))
         )
       }))
       setPlanes(enriched)
     }
-    setLoading(false)
+    if (!isSilent) setLoading(false)
   }, [pacienteId])
 
   useEffect(() => { fetchPlanes() }, [fetchPlanes])
@@ -47,9 +56,10 @@ export function usePlans(pacienteId) {
   const planActivo = planes.find(p => p.estado === 'activo')
   const historial = planes.filter(p => p.estado === 'archivado')
 
-  //  Crear un nuevo plan (borrador).
+  // Crear un nuevo plan (borrador).
   async function crearPlan(caloriasObjetivo) {
-    const version = planes.length > 0 ? Math.max(...planes.map(p => p.version)) + 1 : 1
+    const maxVersion = planes.reduce((max, p) => Math.max(max, p.version || 0), 0)
+    const version = maxVersion + 1
 
     const { data, error } = await supabase
       .from('planes')
@@ -66,7 +76,7 @@ export function usePlans(pacienteId) {
     return { data, error }
   }
 
-  //  Agregar una comida a un plan.
+  // Agregar una comida a un plan.
   async function agregarComida(planId, comida) {
     const { data, error } = await supabase
       .from('comidas_plan')
@@ -83,11 +93,37 @@ export function usePlans(pacienteId) {
       .select()
       .single()
 
-    if (!error) await fetchPlanes()
+    if (!error) await fetchPlanes(true)
     return { data, error }
   }
 
-  //  Editar una comida existente.
+  // Agregar multiples comidas a un plan en un solo insert (sin parpadeo de skeleton).
+  async function agregarComidasLote(planId, comidasArray) {
+    if (!Array.isArray(comidasArray) || comidasArray.length === 0) {
+      return { data: [], error: null }
+    }
+
+    const rows = comidasArray.map((comida, index) => ({
+      plan_id: planId,
+      tipo_comida: comida.tipo_comida,
+      descripcion: (comida.descripcion || '').trim(),
+      calorias_aprox: comida.calorias_aprox ? Number(comida.calorias_aprox) : null,
+      proteinas_g: comida.proteinas_g ? Number(comida.proteinas_g) : null,
+      carbos_g: comida.carbos_g ? Number(comida.carbos_g) : null,
+      grasas_g: comida.grasas_g ? Number(comida.grasas_g) : null,
+      orden: comida.orden ?? index,
+    }))
+
+    const { data, error } = await supabase
+      .from('comidas_plan')
+      .insert(rows)
+      .select()
+
+    if (!error) await fetchPlanes(true)
+    return { data, error }
+  }
+
+  // Editar una comida existente.
   async function editarComida(comidaId, datos) {
     const { data, error } = await supabase
       .from('comidas_plan')
@@ -103,35 +139,35 @@ export function usePlans(pacienteId) {
       .select()
       .single()
 
-    if (!error) await fetchPlanes()
+    if (!error) await fetchPlanes(true)
     return { data, error }
   }
 
-  //  Eliminar una comida del plan.
+  // Eliminar una comida del plan.
   async function eliminarComida(comidaId) {
     const { error } = await supabase
       .from('comidas_plan')
       .delete()
       .eq('id', comidaId)
 
-    if (!error) await fetchPlanes()
+    if (!error) await fetchPlanes(true)
     return { error }
   }
 
-  //  Actualizar el objetivo calórico de un plan.
+  // Actualizar el objetivo calorico de un plan.
   async function actualizarCalorias(planId, calorias) {
     const { error } = await supabase
       .from('planes')
       .update({ calorias_objetivo: Number(calorias) })
       .eq('id', planId)
 
-    if (!error) await fetchPlanes()
+    if (!error) await fetchPlanes(true)
     return { error }
   }
 
   /**
-   * Publicar un plan (borrador → activo).
-   * Archiva automáticamente el plan activo anterior.
+   * Publicar un plan (borrador -> activo).
+   * Archiva automaticamente el plan activo anterior.
    */
   async function publicarPlan(planId) {
     // Archivar el activo actual si existe
@@ -147,24 +183,27 @@ export function usePlans(pacienteId) {
       .update({ estado: 'activo' })
       .eq('id', planId)
 
-    if (!error) await fetchPlanes()
+    if (!error) await fetchPlanes(true)
     return { error }
   }
 
   /**
-   * Editar un plan activo → crear nueva versión borrador.
+   * Editar un plan activo -> crear nueva version borrador.
    */
   async function crearNuevaVersion(planActivoId) {
     const base = planes.find(p => p.id === planActivoId)
     if (!base) return { error: 'Plan no encontrado.' }
 
-    // Crear nueva versión
+    const maxVersion = planes.reduce((max, p) => Math.max(max, p.version || 0), 0)
+    const nuevaVersion = maxVersion + 1
+
+    // Crear nueva version
     const { data: nuevoPlan, error: errPlan } = await supabase
       .from('planes')
       .insert({
         paciente_id: pacienteId,
         calorias_objetivo: base.calorias_objetivo,
-        version: base.version + 1,
+        version: nuevaVersion,
         estado: 'borrador',
         notas: base.notas,
       })
@@ -188,7 +227,7 @@ export function usePlans(pacienteId) {
       await supabase.from('comidas_plan').insert(comidas)
     }
 
-    await fetchPlanes()
+    await fetchPlanes(true)
     return { data: nuevoPlan, error: null }
   }
 
@@ -199,14 +238,14 @@ export function usePlans(pacienteId) {
   async function eliminarPlan(planId) {
     const plan = planes.find(p => p.id === planId)
     if (plan?.estado === 'activo') {
-      return { error: 'No podés eliminar el plan activo. Publicá una nueva versión primero.' }
+      return { error: 'No podes eliminar el plan activo. Publica una nueva version primero.' }
     }
     const { error } = await supabase
       .from('planes')
       .delete()
       .eq('id', planId)
 
-    if (!error) await fetchPlanes()
+    if (!error) await fetchPlanes(true)
     return { error }
   }
 
@@ -219,7 +258,7 @@ export function usePlans(pacienteId) {
       .update({ notas: notas.trim() || null })
       .eq('id', planId)
 
-    if (!error) await fetchPlanes()
+    if (!error) await fetchPlanes(true)
     return { error }
   }
 
@@ -232,6 +271,7 @@ export function usePlans(pacienteId) {
     refetch: fetchPlanes,
     crearPlan,
     agregarComida,
+    agregarComidasLote,
     editarComida,
     eliminarComida,
     actualizarCalorias,

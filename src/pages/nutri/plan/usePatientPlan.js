@@ -1,18 +1,15 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useAuth } from '@/hooks/useAuth'
 import { usePlans } from '@/hooks/usePlans'
 import { validarCalorias } from './patientPlanUtils'
 
 export function usePatientPlan() {
   const { id } = useParams()
-  const navigate = useNavigate()
-  const { signOut } = useAuth()
 
   const {
     planes, planActivo, loading, error,
-    crearPlan, agregarComida, editarComida, eliminarComida,
+    crearPlan, agregarComida, agregarComidasLote, editarComida, eliminarComida,
     actualizarCalorias, publicarPlan, crearNuevaVersion,
     eliminarPlan, actualizarNotas,
   } = usePlans(id)
@@ -21,7 +18,6 @@ export function usePatientPlan() {
   const [modalNuevo, setModalNuevo] = useState(false)
   const [caloriaInput, setCaloriaInput] = useState('2000')
   const [calError, setCalError] = useState('')
-  const [publicando, setPublicando] = useState(false)
 
   const [editandoCal, setEditandoCal] = useState(false)
   const [nuevasCal, setNuevasCal] = useState('')
@@ -84,7 +80,7 @@ export function usePatientPlan() {
     const { error: e } = await eliminarPlan(confirmEliminar)
     setProcesando(false)
     if (e) {
-      toast.error(e)
+      toast.error(typeof e === 'string' ? e : (e?.message || 'Error al eliminar el plan.'))
     } else {
       toast.success('Plan eliminado.')
       setPlanVisibleId(null)
@@ -116,15 +112,15 @@ export function usePatientPlan() {
   }
 
   return {
-    id, navigate, signOut, planes, planActivo, loading, error,
+    id, planes, planActivo, loading, error,
     planVisible, readonly, planVisibleId, setPlanVisibleId,
     modalNuevo, setModalNuevo, caloriaInput, setCaloriaInput, calError, setCalError,
-    publicando, setPublicando, editandoCal, setEditandoCal, nuevasCal, setNuevasCal,
+    editandoCal, setEditandoCal, nuevasCal, setNuevasCal,
     calEditError, setCalEditError, editandoNotas, setEditandoNotas, notasInput, setNotasInput,
     confirmEliminar, setConfirmEliminar, confirmPublicar, setConfirmPublicar,
     confirmVersion, setConfirmVersion, procesando, setProcesando,
     handleCrearPlan, handlePublicar, handleNuevaVersion, handleEliminar,
     handleGuardarCalorias, handleGuardarNotas,
-    agregarComida, editarComida, eliminarComida
+    agregarComida, agregarComidasLote, editarComida, eliminarComida
   }
 }
