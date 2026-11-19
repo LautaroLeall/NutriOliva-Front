@@ -1,4 +1,13 @@
+# NutriOliva — robots.txt generado automaticamente
 User-agent: *
 Allow: /
+Allow: /login
+Disallow: /panel
+Disallow: /panel/
+Disallow: /mi-plan
+Disallow: /mi-plan/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /set-password
 
 Sitemap: https://nutri-oliva.vercel.app/sitemap.xml
