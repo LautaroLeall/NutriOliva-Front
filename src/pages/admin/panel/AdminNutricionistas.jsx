@@ -14,6 +14,7 @@ import {
 import { motion } from "framer-motion";
 import CountUp from "react-countup";
 import { toast } from "sonner";
+import { filtrarYOrdenarBusqueda } from "@/lib/fuzzySearch";
 import {
   DEFAULT_PLANS,
   STATUS_CONFIG,
@@ -71,20 +72,22 @@ export default function AdminNutricionistas({
     return counts;
   }, [activos]);
 
-  // ── Filtrado combinando busqueda + plan + estado ──────────────────────────
+  // ── Filtrado combinando busqueda difusa (tolera acentos y typos) + plan + estado
   const filtrados = useMemo(() => {
-    const q = busqueda.trim().toLowerCase();
-    return nutricionistas.filter((n) => {
-      const matchTexto =
-        !q ||
-        (n.nombre || "").toLowerCase().includes(q) ||
-        (n.email || "").toLowerCase().includes(q);
+    const porPlanYEstado = nutricionistas.filter((n) => {
       const pKey = (n.plan_suscripcion || "starter").toLowerCase();
       const estKey = normalizarEstado(n.estado);
       const matchPlan = filtroPlan === "todos" || pKey === filtroPlan;
       const matchEstado = filtroEstado === "todos" || estKey === filtroEstado;
-      return matchTexto && matchPlan && matchEstado;
+      return matchPlan && matchEstado;
     });
+
+    return filtrarYOrdenarBusqueda(porPlanYEstado, busqueda, (n) => [
+      n.nombre,
+      n.email,
+      n.plan_suscripcion,
+      n.estado,
+    ]);
   }, [nutricionistas, busqueda, filtroPlan, filtroEstado]);
 
   async function handleCambioRapidoEstado(n, nuevoEstadoKey) {
@@ -255,11 +258,10 @@ export default function AdminNutricionistas({
                 key={p.id}
                 type="button"
                 onClick={() => setFiltroPlan(p.id)}
-                className={`px-2.5 py-1 rounded-md font-display text-[10px] transition-all cursor-pointer ${
-                  filtroPlan === p.id
-                    ? "bg-olive text-cream shadow-sm"
-                    : "text-muted hover:text-olive-dark"
-                }`}
+                className={`px-2.5 py-1 rounded-md font-display text-[10px] transition-all cursor-pointer ${filtroPlan === p.id
+                  ? "bg-olive text-cream shadow-sm"
+                  : "text-muted hover:text-olive-dark"
+                  }`}
               >
                 {p.label}
               </button>
@@ -278,11 +280,10 @@ export default function AdminNutricionistas({
                 key={st.id}
                 type="button"
                 onClick={() => setFiltroEstado(st.id)}
-                className={`px-2.5 py-1 rounded-md font-display text-[10px] flex items-center gap-1.5 transition-all cursor-pointer ${
-                  filtroEstado === st.id
-                    ? "bg-olive-dark text-cream shadow-sm"
-                    : "text-muted hover:text-olive-dark"
-                }`}
+                className={`px-2.5 py-1 rounded-md font-display text-[10px] flex items-center gap-1.5 transition-all cursor-pointer ${filtroEstado === st.id
+                  ? "bg-olive-dark text-cream shadow-sm"
+                  : "text-muted hover:text-olive-dark"
+                  }`}
               >
                 {st.dot && (
                   <span
