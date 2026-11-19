@@ -142,7 +142,7 @@ export default function HeroAppMockup() {
           animate={{ opacity: 1, x: 0, y: 0 }}
           exit={{ opacity: 0, x: 10, y: -4 }}
           transition={{ duration: 0.3 }}
-          className="absolute -top-3 -right-3 bg-white border border-cream-darker rounded-xl px-3 py-2 shadow-card z-20"
+          className="absolute -top-3 right-1 sm:-right-3 bg-white border border-cream-darker rounded-xl px-3 py-2 shadow-card z-20"
         >
           <p className="font-display text-[9px] text-olive-dark font-semibold">
             {currentStep.topBadgeTitle}
@@ -161,7 +161,7 @@ export default function HeroAppMockup() {
           animate={{ opacity: 1, x: 0, y: 0 }}
           exit={{ opacity: 0, x: -10, y: 4 }}
           transition={{ duration: 0.3 }}
-          className="absolute -bottom-3 -left-4 bg-olive-dark text-cream rounded-xl px-3 py-2 shadow-modal z-20"
+          className="absolute -bottom-3 left-1 sm:-left-4 bg-olive-dark text-cream rounded-xl px-3 py-2 shadow-modal z-20"
         >
           <p className="font-display text-[9px] font-semibold">
             {currentStep.bottomBadgeTitle}
