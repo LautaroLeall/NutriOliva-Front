@@ -13,8 +13,8 @@ import {
 import {
   ADMIN_EMAIL,
   ADMIN_WHATSAPP,
-  buildEmailUrl,
   buildWhatsAppUrl,
+  getEmailLinkProps,
 } from "@/utils/contactLinks";
 
 const FUNCIONES_INCLUIDAS = [
@@ -270,13 +270,11 @@ export default function TabSuscripcionCupo({
             <ExternalLink size={11} className="opacity-80" />
           </a>
           <a
-            href={buildEmailUrl(
+            {...getEmailLinkProps(
               ADMIN_EMAIL,
               "Ampliacion de plan o cupo - NutriOliva",
               "Hola! Quiero consultar para ampliar el cupo o cambiar el plan de mi cuenta de nutricionista en NutriOliva."
             )}
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cream hover:bg-cream-darker text-olive-dark font-display text-[11.5px] font-medium transition-colors"
           >
             <Mail size={13} />
