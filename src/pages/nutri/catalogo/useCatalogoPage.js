@@ -6,6 +6,8 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCatalogo } from "@/hooks/useCatalogo";
+import { filtrarYOrdenarBusqueda } from "@/lib/fuzzySearch";
+import { invalidarCacheCatalogo } from "@/lib/foodFormUtils";
 import { FORM_VACIO, FILTROS_KCAL, POR_PAGINA } from "./catalogoConstants";
 import { validar } from "./catalogoUtils";
 
@@ -20,14 +22,20 @@ export function useCatalogoPage() {
   const [searchFocused, setSearchFocused] = useState(false);
 
   const rango = FILTROS_KCAL[filtroKcal];
-  const filtrados = useMemo(() =>
-    alimentos.filter((a) => {
-      const matchBusqueda = a.nombre.toLowerCase().includes(busqueda.toLowerCase());
-      const matchKcal = a.calorias_por_unidad >= rango.min && a.calorias_por_unidad <= rango.max;
-      return matchBusqueda && matchKcal;
-    }),
-    [alimentos, busqueda, filtroKcal]
-  );
+  const filtrados = useMemo(() => {
+    const porKcal = alimentos.filter(
+      (a) =>
+        a.calorias_por_unidad >= rango.min && a.calorias_por_unidad <= rango.max
+    );
+    return filtrarYOrdenarBusqueda(porKcal, busqueda, (a) => [
+      a.nombre,
+      a.descripcion_completa,
+      a.tipo_comida,
+      a.objetivo_ideal,
+      a.perfil_paciente,
+      a.unidad,
+    ]);
+  }, [alimentos, busqueda, filtroKcal]);
 
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginaActual = Math.min(pagina, totalPaginas);
@@ -84,6 +92,7 @@ export function useCatalogoPage() {
     if (res.error) {
       setErrors({ _server: res.error.message || "Error al guardar." });
     } else {
+      invalidarCacheCatalogo();
       toast.success(editando ? "Alimento actualizado." : "Alimento agregado al catalogo.");
       setModalAbierto(false);
     }
@@ -99,7 +108,10 @@ export function useCatalogoPage() {
     const { error: e } = await eliminarAlimento(confirmEliminar.id);
     setEliminando(false);
     if (e) toast.error("Error al eliminar el alimento.");
-    else toast.success(`"${confirmEliminar.nombre}" eliminado del catalogo.`);
+    else {
+      invalidarCacheCatalogo();
+      toast.success(`"${confirmEliminar.nombre}" eliminado del catalogo.`);
+    }
     setConfirmEliminar(null);
   }
 
