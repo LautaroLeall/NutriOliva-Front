@@ -1,7 +1,8 @@
 // LandingHowItWorks.jsx — 3 pasos + Demo interactiva (orquestador modular)
 
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
+import { filtrarYOrdenarBusqueda } from "@/lib/fuzzySearch";
 import {
   GOAL,
   STEPS,
@@ -150,8 +151,14 @@ export default function LandingHowItWorks() {
     setActiveDay(5);
   }
 
-  const sugerenciasFiltradas = CATALOGO_SUGERENCIAS.filter((item) =>
-    item.nombre.toLowerCase().includes(busquedaCatalogo.toLowerCase())
+  const sugerenciasFiltradas = useMemo(
+    () =>
+      filtrarYOrdenarBusqueda(
+        CATALOGO_SUGERENCIAS,
+        busquedaCatalogo,
+        (item) => [item.nombre, item.categoria, item.macros]
+      ),
+    [busquedaCatalogo]
   );
 
   return (

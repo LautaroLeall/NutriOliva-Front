@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
+import { filtrarYOrdenarBusqueda } from "@/lib/fuzzySearch";
 import Logo from "@/components/ui/Logo";
 
 const NAV_LINKS = [
@@ -149,16 +150,11 @@ export default function NutriNavbar({
     (p) => p.estado === "activo"
   ).length;
 
-  const pacientesFiltrados = quickData.pacientes
-    .filter((p) => {
-      const q = queryPac.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        (p.nombre || "").toLowerCase().includes(q) ||
-        (p.email || "").toLowerCase().includes(q)
-      );
-    })
-    .slice(0, 8);
+  const pacientesFiltrados = filtrarYOrdenarBusqueda(
+    quickData.pacientes,
+    queryPac,
+    (p) => [p.nombre, p.email, p.estado]
+  ).slice(0, 8);
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-cream-darker shadow-sm">
@@ -212,8 +208,8 @@ export default function NutriNavbar({
                 type="button"
                 onClick={() => navigate(item.path)}
                 className={`relative px-3.5 py-1.5 rounded-lg font-display text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${active
-                    ? "text-olive-dark font-semibold"
-                    : "text-muted hover:text-olive-dark"
+                  ? "text-olive-dark font-semibold"
+                  : "text-muted hover:text-olive-dark"
                   }`}
               >
                 {active && (
@@ -245,8 +241,8 @@ export default function NutriNavbar({
             onClick={() => setBuscadorAbierto((o) => !o)}
             title="Buscar e ir a un paciente (Ctrl+K)"
             className={`h-9 px-2.5 sm:px-3 rounded-xl border text-xs font-display flex items-center gap-2 transition-colors cursor-pointer ${buscadorAbierto
-                ? "bg-olive text-cream border-olive"
-                : "bg-[#FAF8F3] hover:bg-cream text-muted hover:text-olive-dark border-cream-darker"
+              ? "bg-olive text-cream border-olive"
+              : "bg-[#FAF8F3] hover:bg-cream text-muted hover:text-olive-dark border-cream-darker"
               }`}
           >
             <Search size={13} className="flex-shrink-0" />
@@ -255,8 +251,8 @@ export default function NutriNavbar({
             </span>
             <kbd
               className={`hidden sm:inline-block text-[9.5px] px-1.5 py-0.5 rounded font-mono ${buscadorAbierto
-                  ? "bg-white/20 text-cream"
-                  : "bg-cream-darker/60 text-muted"
+                ? "bg-white/20 text-cream"
+                : "bg-cream-darker/60 text-muted"
                 }`}
             >
               Ctrl+K
@@ -269,8 +265,8 @@ export default function NutriNavbar({
             onClick={() => navigate("/panel/cuenta")}
             title="Ir a Mi cuenta"
             className={`h-9 pl-1.5 pr-2 sm:pr-2.5 rounded-xl border flex items-center gap-2 transition-colors cursor-pointer ${activeKey === "cuenta"
-                ? "bg-olive/12 border-olive/35 text-olive-dark"
-                : "bg-white hover:bg-cream border-cream-darker text-olive-dark"
+              ? "bg-olive/12 border-olive/35 text-olive-dark"
+              : "bg-white hover:bg-cream border-cream-darker text-olive-dark"
               }`}
           >
             <span className="w-6 h-6 rounded-lg bg-olive text-cream font-display font-bold text-[10px] flex items-center justify-center flex-shrink-0">
@@ -431,8 +427,8 @@ export default function NutriNavbar({
                 type="button"
                 onClick={() => navigate(item.path)}
                 className={`relative flex-1 py-1.5 px-2 rounded-lg font-display text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer min-w-0 ${active
-                    ? "text-olive-dark font-semibold"
-                    : "text-muted hover:text-olive-dark"
+                  ? "text-olive-dark font-semibold"
+                  : "text-muted hover:text-olive-dark"
                   }`}
               >
                 {active && (
