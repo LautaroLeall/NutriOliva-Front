@@ -3,6 +3,11 @@
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import {
+  ADMIN_EMAIL,
+  ADMIN_INSTAGRAM_HANDLE,
+  ADMIN_TELEFONO_DISPLAY,
+} from "@/utils/contactLinks";
 
 const FAQS = [
   {
@@ -15,7 +20,7 @@ const FAQS = [
   },
   {
     q: "¿Puedo importar un plan que ya tengo hecho?",
-    a: 'Si. Si tenes un plan en PDF, Excel, Word o texto, podes importarlo en el constructor de planes y el sistema lo estructura automaticamente dividido por tipo de comida y con calorias y macronutrientes.',
+    a: "Si. Si tenes un plan en PDF, Excel, Word o texto, podes importarlo en el constructor de planes y el sistema lo estructura automaticamente dividido por tipo de comida y con calorias y macronutrientes.",
   },
   {
     q: "¿Los datos de mis pacientes son privados?",
@@ -23,7 +28,7 @@ const FAQS = [
   },
   {
     q: "¿Como solicito el alta de mi cuenta profesional?",
-    a: "Podes comunicarte directamente con nosotros por WhatsApp al +549 381 339 9463 o por correo a lautaroleal4@gmail.com. Coordinamos el alta de tu cuenta segun la cantidad de pacientes que manejes en tu consultorio.",
+    a: `Podes comunicarte directamente con nosotros por WhatsApp al ${ADMIN_TELEFONO_DISPLAY}, por correo a ${ADMIN_EMAIL} o por mensaje directo en Instagram (${ADMIN_INSTAGRAM_HANDLE}). Coordinamos el alta de tu cuenta segun la cantidad de pacientes que manejes en tu consultorio.`,
   },
   {
     q: "¿Puedo ampliar mi cupo de pacientes mas adelante?",
@@ -39,6 +44,7 @@ function FAQItem({ faq, isOpen, onToggle }) {
   return (
     <div className="border border-cream-darker rounded-xl overflow-hidden">
       <button
+        type="button"
         onClick={onToggle}
         className="w-full flex justify-between items-center px-5 py-4 bg-white
                     hover:bg-cream/40 transition-colors duration-150 text-left cursor-pointer"

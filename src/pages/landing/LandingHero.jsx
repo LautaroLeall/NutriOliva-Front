@@ -6,6 +6,13 @@ import { ArrowRight, Play } from "lucide-react";
 import { fadeUp, HERO_FEATURE_PILLS } from "./hero/heroTourData";
 import HeroAppMockup from "./hero/HeroAppMockup";
 
+function scrollToHowItWorks() {
+  const el = document.getElementById("como-funciona");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 export default function LandingHero() {
   return (
     <section
@@ -23,15 +30,15 @@ export default function LandingHero() {
       />
 
       <div
-        className="relative z-10 max-w-6xl mx-auto px-6 pt-24 pb-16
-                      grid grid-cols-1 lg:grid-cols-2 gap-14 items-center"
+        className="relative z-10 max-w-6xl mx-auto px-5 sm:px-6 pt-28 sm:pt-24 pb-16
+                      grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 items-center"
       >
         {/* Texto e indicadores */}
         <div>
           <motion.h1
             {...fadeUp(0.2)}
             className="font-display font-bold text-cream leading-[1.12] mb-6"
-            style={{ fontSize: "clamp(2.2rem, 4.5vw, 3.6rem)" }}
+            style={{ fontSize: "clamp(2.1rem, 4.5vw, 3.6rem)" }}
           >
             El acompanamiento que tus pacientes necesitan —{" "}
             <span className="text-[#C5D48A]">cada dia</span>
@@ -39,40 +46,42 @@ export default function LandingHero() {
 
           <motion.p
             {...fadeUp(0.32)}
-            className="text-cream/75 text-[17px] leading-relaxed mb-10 max-w-lg"
+            className="text-cream/75 text-[16px] sm:text-[17px] leading-relaxed mb-9 max-w-lg"
           >
             Plan alimenticio, datos clinicos, registro diario y seguimiento en
             tiempo real. Para nutricionistas que buscan resultados reales — sin
             planillas, sin WhatsApp.
           </motion.p>
 
-          <motion.div {...fadeUp(0.44)} className="flex flex-wrap gap-4 mb-12">
+          <motion.div {...fadeUp(0.44)} className="flex flex-wrap gap-3.5 sm:gap-4 mb-10 sm:mb-12">
             <Link to="/login">
               <motion.button
+                type="button"
                 whileHover={{
                   scale: 1.04,
                   boxShadow: "0 12px 36px rgba(246,241,231,0.25)",
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="bg-cream text-olive-dark font-display font-bold px-8 py-3.5 rounded-pill
+                className="bg-cream text-olive-dark font-display font-bold px-7 sm:px-8 py-3.5 rounded-pill
                             text-[14px] flex items-center gap-2 transition-all cursor-pointer"
               >
                 Ingresar al panel
                 <ArrowRight size={16} />
               </motion.button>
             </Link>
-            <a href="#como-funciona">
-              <motion.button
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-                className="border border-cream/30 text-cream font-display font-medium px-7 py-3.5
-                            rounded-pill text-[14px] flex items-center gap-2
-                          hover:bg-cream/10 transition-all backdrop-blur-sm cursor-pointer"
-              >
-                <Play size={13} className="fill-cream" />
-                Probar demo interactiva
-              </motion.button>
-            </a>
+
+            <motion.button
+              type="button"
+              onClick={scrollToHowItWorks}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              className="border border-cream/30 text-cream font-display font-medium px-6 sm:px-7 py-3.5
+                          rounded-pill text-[14px] flex items-center gap-2
+                        hover:bg-cream/10 transition-all backdrop-blur-sm cursor-pointer"
+            >
+              <Play size={13} className="fill-cream" />
+              Probar demo interactiva
+            </motion.button>
           </motion.div>
 
           <motion.div {...fadeUp(0.56)} className="flex flex-wrap gap-3">
