@@ -12,7 +12,7 @@ import {
   UserX,
   UserCheck,
 } from "lucide-react";
-import { buildEmailUrl, buildWhatsAppUrl } from "@/utils/contactLinks";
+import { buildWhatsAppUrl, getEmailLinkProps } from "@/utils/contactLinks";
 import { formatFecha, calcularEdad, initials } from "./patientDetailUtils";
 
 export default function PatientHeader({
@@ -91,14 +91,12 @@ export default function PatientHeader({
             <div className="flex flex-wrap gap-4 mt-2">
               {paciente.email && (
                 <a
-                  href={buildEmailUrl(
+                  {...getEmailLinkProps(
                     paciente.email,
                     `Seguimiento nutricional — NutriOliva`,
                     `Hola ${paciente.nombre}, te escribo desde NutriOliva:`
                   )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Enviar correo al paciente en nueva pestaña"
+                  title="Enviar correo al paciente"
                   className="flex items-center gap-1.5 text-[11px] text-muted hover:text-olive transition-colors"
                 >
                   <Mail size={11} /> {paciente.email}
