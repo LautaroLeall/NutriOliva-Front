@@ -124,7 +124,7 @@ export default function AdminAjustes({
                 Cuenta de Super Administrador
               </h3>
               <p className="text-[10.5px] text-muted">
-                Sesion activa: {session?.user?.email || "admin@nutrioliva.com"}
+                Sesion activa: {session?.user?.email || "nutriolivaa@gmail.com"}
               </p>
             </div>
           </div>
