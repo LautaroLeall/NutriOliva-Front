@@ -20,6 +20,7 @@ import CountUp from "react-countup";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePatients } from "@/hooks/usePatients";
+import { filtrarYOrdenarBusqueda } from "@/lib/fuzzySearch";
 import NutriNavbar from "@/components/nutri/NutriNavbar";
 import EmptyState from "@/components/ui/EmptyState";
 import PatientRow from "@/components/patients/PatientRow";
@@ -144,11 +145,12 @@ export default function NutriPanel() {
   // auto-animate: stagger automatico en el tbody
   const [tbodyRef] = useAutoAnimate({ duration: 180 });
 
-  const filtrados = pacientes.filter(
-    (p) =>
-      p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      p.email.toLowerCase().includes(busqueda.toLowerCase()),
-  );
+  const filtrados = filtrarYOrdenarBusqueda(pacientes, busqueda, (p) => [
+    p.nombre,
+    p.email,
+    p.telefono,
+    p.estado,
+  ]);
   const activos = pacientes.filter((p) => p.estado === "activo").length;
   const sinActiv = pacientes.filter(
     (p) => p.sinActividad48h && p.estado === "activo",
