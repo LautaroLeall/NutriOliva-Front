@@ -80,7 +80,7 @@ export default function AddMealForm({ tipo, onAgregar, onCancel, nutricionistaId
       const results = await buscarEnCatalogoMultiword(query, tipo.value, mostrarTodo);
       setSugs(results);
       setBuscando(false);
-    }, 300);
+    }, 80);
     return () => clearTimeout(t);
   }, [query, mode, itemSel, mostrarTodo, tipo.value]);
 
