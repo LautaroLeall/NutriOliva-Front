@@ -15,7 +15,7 @@ import {
   ClipboardCheck,
   ExternalLink,
 } from "lucide-react";
-import { buildEmailUrl } from "@/utils/contactLinks";
+import { getEmailLinkProps } from "@/utils/contactLinks";
 import TabCuentaClinica from "./TabCuentaClinica";
 
 function obtenerIniciales(nombreStr) {
@@ -201,13 +201,11 @@ export default function TabCuenta({
 
           {emailNutri && (
             <a
-              href={buildEmailUrl(
+              {...getEmailLinkProps(
                 emailNutri,
                 `Consulta de ${nombrePaciente} — NutriOliva`,
                 `Hola Lic. ${nombreNutri}, te escribo desde mi cuenta de NutriOliva:`
               )}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-olive text-cream font-display font-semibold text-[11.5px] hover:bg-olive-dark transition-colors whitespace-nowrap flex-shrink-0 shadow-sm"
             >
               <Mail size={13} />
