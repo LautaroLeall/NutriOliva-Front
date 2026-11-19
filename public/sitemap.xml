@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
   <url>
     <loc>https://nutri-oliva.vercel.app/</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2026-11-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="https://nutri-oliva.vercel.app/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://nutri-oliva.vercel.app/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nutri-oliva.vercel.app/" />
+    <image:image>
+      <image:loc>https://nutri-oliva.vercel.app/icon-fondo_blanco.png</image:loc>
+      <image:title>NutriOliva — Software para Nutricionistas y Seguimiento de Pacientes</image:title>
+      <image:caption>Plataforma de planes alimenticios con IA, datos clinicos y seguimiento nutricional en tiempo real en Tucuman y Argentina.</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://nutri-oliva.vercel.app/login</loc>
-    <lastmod>2024-03-20</lastmod>
+    <lastmod>2026-11-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="https://nutri-oliva.vercel.app/login" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://nutri-oliva.vercel.app/login" />
   </url>
 </urlset>
