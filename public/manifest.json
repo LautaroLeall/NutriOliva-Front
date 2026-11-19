@@ -1,0 +1,32 @@
+{
+  "name": "NutriOliva — Seguimiento Nutricional en Tiempo Real",
+  "short_name": "NutriOliva",
+  "description": "Software para nutricionistas y pacientes: planes alimenticios con IA, datos clinicos, bajar de peso y balance calorico diario.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFEAE0",
+  "theme_color": "#3F4A2B",
+  "lang": "es-AR",
+  "categories": [
+    "health",
+    "medical",
+    "fitness",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-fondo_blanco.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
