@@ -61,6 +61,9 @@ export function usePatientDetail() {
         data.registros_comida.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       }
       setPaciente(data)
+      if (data?.nombre && typeof document !== 'undefined') {
+        document.title = `Ficha de ${data.nombre} — Datos Clinicos y Seguimiento | NutriOliva`
+      }
     }
     setLoading(false)
   }
