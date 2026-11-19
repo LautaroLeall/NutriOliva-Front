@@ -1,7 +1,8 @@
-// planBuilderUtils.js — Constantes, búsqueda en catálogo y parser Excel para PlanBuilder
+// planBuilderUtils.js — Constantes, busqueda difusa ultrarrapida en catalogo y parser Excel para PlanBuilder
 
 import * as XLSX from "xlsx";
-import { supabase } from "@/lib/supabaseClient";
+import { obtenerCatalogoMemoria } from "@/lib/foodFormUtils";
+import { filtrarYOrdenarBusqueda } from "@/lib/fuzzySearch";
 
 export const TIPOS = [
   { value: "desayuno", label: "Desayuno" },
@@ -32,36 +33,32 @@ export const FORM_VACIO = {
   grasas_g: "",
 };
 
-// ── Búsqueda multi-palabra en catálogo ───────────────────────────────────────
+// ── Busqueda multi-palabra en catalogo tolerante a acentos y errores de tipeo ──
 export async function buscarEnCatalogoMultiword(
   query,
   tipoComida = null,
   mostrarTodo = false
 ) {
-  const words = query
-    .trim()
-    .split(/\s+/)
-    .filter((w) => w.length >= 2);
-  if (!words.length) return [];
+  const q = String(query ?? "").trim();
+  if (q.length < 2) return [];
 
-  let q = supabase
-    .from("catalogo_alimentos")
-    .select(
-      "nombre, calorias_por_unidad, proteinas_g, carbos_g, grasas_g, tipo_comida"
-    )
-    .order("es_comida_completa", { ascending: false })
-    .limit(10);
+  const todos = await obtenerCatalogoMemoria();
+  const base =
+    !mostrarTodo && tipoComida && TIPOS_COMPATIBLES[tipoComida]
+      ? todos.filter(
+        (item) =>
+          !item.tipo_comida ||
+          TIPOS_COMPATIBLES[tipoComida].includes(item.tipo_comida)
+      )
+      : todos;
 
-  if (!mostrarTodo && tipoComida && TIPOS_COMPATIBLES[tipoComida]) {
-    q = q.in("tipo_comida", TIPOS_COMPATIBLES[tipoComida]);
-  }
-
-  for (const word of words) {
-    q = q.or(`nombre.ilike.%${word}%,descripcion_completa.ilike.%${word}%`);
-  }
-
-  const { data } = await q;
-  return data || [];
+  return filtrarYOrdenarBusqueda(base, q, (item) => [
+    item.nombre,
+    item.descripcion_completa,
+    item.tipo_comida,
+    item.objetivo_ideal,
+    item.perfil_paciente,
+  ]).slice(0, 10);
 }
 
 // ── Parser de archivos Excel / CSV ───────────────────────────────────────────
@@ -103,12 +100,15 @@ export function parsearExcel(file) {
         const comidas = rows
           .filter((r) => col(r, "descripcion", "nombre", "comida", "alimento"))
           .map((r) => {
-            const tipo_raw = norm(col(r, "tipo_comida", "tipo", "momento", "toma"));
+            const tipo_raw = norm(
+              col(r, "tipo_comida", "tipo", "momento", "toma")
+            );
             const tipo =
               TIPO_MAP[tipo_raw] ||
               (TIPO_VALIDOS.has(tipo_raw) ? tipo_raw : "snack");
             const calorias =
-              Number(col(r, "calorias_aprox", "calorias", "kcal", "cal")) || null;
+              Number(col(r, "calorias_aprox", "calorias", "kcal", "cal")) ||
+              null;
             return {
               tipo_comida: tipo,
               descripcion: String(

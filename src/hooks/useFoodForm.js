@@ -97,7 +97,7 @@ export function useFoodForm({ open, comidasPlan, pacienteId, modoEdicion, datosI
       const results = await buscarEnCatalogo(query)
       setSugs(results)
       setBuscando(false)
-    }, 300)
+    }, 80)
 
     return () => clearTimeout(t)
   }, [query, modo, itemSeleccionado])
