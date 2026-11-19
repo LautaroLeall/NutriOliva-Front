@@ -1,37 +1,153 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-AR">
 
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" href="/icon.png" />
   <link rel="apple-touch-icon" href="/icon-fondo_blanco.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="NutriOliva — Seguimiento nutricional diario para nutricionistas y pacientes. Plan alimenticio, registro de comidas y balance calórico en tiempo real." />
-  <meta name="keywords"
-    content="nutricion, salud, plan alimenticio, seguimiento nutricional, nutricionistas, dietas, vida sana, NutriOliva" />
-  <meta name="author" content="NutriOliva" />
-  <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#6E7A4B" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="canonical" href="https://nutri-oliva.vercel.app/" />
+  <link rel="alternate" hreflang="es-AR" href="https://nutri-oliva.vercel.app/" />
+  <link rel="alternate" hreflang="es" href="https://nutri-oliva.vercel.app/" />
+  <link rel="alternate" hreflang="x-default" href="https://nutri-oliva.vercel.app/" />
 
-  <!-- Open Graph (Facebook / WhatsApp / LinkedIn) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriOliva — Software para Nutricionistas, Planes Alimenticios y Seguimiento de Pacientes | Tucuman y Argentina
+  </title>
+  <meta name="description"
+    content="Plataforma profesional para nutricionistas y pacientes en Tucuman y toda Argentina. Crea planes alimenticios con IA, registra datos clinicos, antropometria, descenso de peso y controla el balance calorico diario en tiempo real." />
+  <meta name="keywords"
+    content="nutricionista, nutricionistas, software para nutricionistas, app para nutricionistas, sistema para consultorio nutricional, gestion de pacientes nutricion, plan alimenticio personalizado, seguimiento de pacientes en tiempo real, datos clinicos nutricion, historia clinica nutricional, antropometria, IMC, bajar de peso, descenso de peso, aumentar masa muscular, recomposicion corporal, nutricionista Tucuman, nutricionistas en Tucuman, San Miguel de Tucuman, nutricionista Argentina, catalogo nutricional SARA, calcular calorias con IA, NutriOliva, Nutri Oliva, nutriolia, nutriholiva, @nutri_olivaa" />
+  <meta name="author" content="NutriOliva" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#3F4A2B" />
+  <meta name="application-name" content="NutriOliva" />
+  <meta name="apple-mobile-web-app-title" content="NutriOliva" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <!-- Geo-SEO Local y Regional (Tucuman, Argentina) -->
+  <meta name="geo.region" content="AR-T" />
+  <meta name="geo.placename" content="San Miguel de Tucuman, Tucuman, Argentina" />
+  <meta name="geo.position" content="-26.8083;-65.2176" />
+  <meta name="ICBM" content="-26.8083, -65.2176" />
+
+  <!-- Open Graph (Instagram / WhatsApp / Facebook / LinkedIn) -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="NutriOliva - Seguimiento Nutricional" />
-  <meta property="og:description"
-    content="Seguimiento nutricional diario para nutricionistas y pacientes. Plan alimenticio y balance calórico en tiempo real." />
-  <meta property="og:image" content="https://nutri-oliva.vercel.app/icon.png" />
-  <meta property="og:url" content="https://nutri-oliva.vercel.app" />
+  <meta property="og:locale" content="es_AR" />
   <meta property="og:site_name" content="NutriOliva" />
+  <meta property="og:title"
+    content="NutriOliva — Software para Nutricionistas y Seguimiento de Pacientes en Tiempo Real" />
+  <meta property="og:description"
+    content="Planes alimenticios con IA, datos clinicos, evolucion para bajar de peso o ganar masa muscular y diario del paciente en vivo. Hecho para consultorios de Tucuman y toda Argentina." />
+  <meta property="og:image" content="https://nutri-oliva.vercel.app/icon-fondo_blanco.png" />
+  <meta property="og:image:alt" content="NutriOliva — Plataforma de Gestion y Seguimiento Nutricional" />
+  <meta property="og:url" content="https://nutri-oliva.vercel.app/" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="NutriOliva - Seguimiento Nutricional" />
+  <meta name="twitter:title" content="NutriOliva — Software para Nutricionistas y Seguimiento de Pacientes" />
   <meta name="twitter:description"
-    content="Seguimiento nutricional diario para nutricionistas y pacientes. Plan alimenticio y balance calórico en tiempo real." />
-  <meta name="twitter:image" content="https://nutri-oliva.vercel.app/icon.png" />
+    content="Planes alimenticios con IA, datos clinicos, antropometria y seguimiento diario de pacientes en tiempo real." />
+  <meta name="twitter:image" content="https://nutri-oliva.vercel.app/icon-fondo_blanco.png" />
 
-  <title>NutriOliva</title>
+  <!-- Datos Estructurados Schema.org JSON-LD (SoftwareApplication + Organization + WebSite + FAQPage) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://nutri-oliva.vercel.app/#software",
+        "name": "NutriOliva",
+        "alternateName": ["Nutri Oliva", "NutriOliva App", "Plataforma NutriOliva"],
+        "url": "https://nutri-oliva.vercel.app/",
+        "image": "https://nutri-oliva.vercel.app/icon-fondo_blanco.png",
+        "applicationCategory": "HealthApplication, BusinessApplication",
+        "operatingSystem": "Web, Android, iOS, Windows, macOS",
+        "inLanguage": "es-AR",
+        "description": "Plataforma web SaaS para nutricionistas y pacientes en Tucuman y Argentina. Permite gestionar pacientes, cargar datos clinicos y antropometricos, crear e importar planes alimenticios con IA o Excel y realizar seguimiento diario de comidas y actividad fisica en tiempo real.",
+        "featureList": [
+          "Gestion integral de pacientes y consultorio nutricional",
+          "Constructor de planes alimenticios personalizados con IA y Excel",
+          "Ficha clinica evolutiva: peso, IMC, porcentaje de grasa, masa muscular y cintura",
+          "Seguimiento para objetivos de bajar de peso, mantenimiento y masa muscular",
+          "Catalogo nutricional SARA con mas de 205 alimentos y preparaciones argentinas",
+          "Registro diario del paciente en 3 modos con fotos y estimacion calorica por IA"
+        ],
+        "offers": {
+          "@type": "AggregateOffer",
+          "priceCurrency": "ARS",
+          "lowPrice": "75000",
+          "highPrice": "150000",
+          "offerCount": "3"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://nutri-oliva.vercel.app/#organization",
+        "name": "NutriOliva",
+        "url": "https://nutri-oliva.vercel.app/",
+        "logo": "https://nutri-oliva.vercel.app/icon-fondo_blanco.png",
+        "email": "nutriolivaa@gmail.com",
+        "telephone": "+5493813399463",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "San Miguel de Tucuman",
+          "addressRegion": "Tucuman",
+          "addressCountry": "AR"
+        },
+        "areaServed": [
+          { "@type": "AdministrativeArea", "name": "Tucuman" },
+          { "@type": "Country", "name": "Argentina" }
+        ],
+        "sameAs": [
+          "https://www.instagram.com/nutri_olivaa/"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://nutri-oliva.vercel.app/#website",
+        "url": "https://nutri-oliva.vercel.app/",
+        "name": "NutriOliva",
+        "inLanguage": "es-AR",
+        "publisher": {
+          "@id": "https://nutri-oliva.vercel.app/#organization"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://nutri-oliva.vercel.app/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Mis pacientes necesitan instalar alguna aplicacion?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. NutriOliva funciona 100% desde el navegador web en celular o computadora. El paciente recibe una invitacion por correo y registra sus comidas y actividad fisica sin descargar ninguna app."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Puedo importar un plan alimenticio que ya tengo armado?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Si. Podes importar planes en texto, PDF, Word o Excel y el sistema los estructura automaticamente por tiempo de comida con calorias y macronutrientes."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Que datos clinicos y objetivos soporta la plataforma?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Incluye ficha clinica con peso, altura, IMC automatico, porcentaje de grasa, masa muscular, perimetro de cintura, patologias, alergias, medicacion y objetivos como bajar de peso, recomposicion corporal, mantenimiento y rendimiento deportivo."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- Fonts & API Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
