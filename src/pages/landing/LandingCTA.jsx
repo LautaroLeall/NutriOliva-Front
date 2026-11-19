@@ -1,4 +1,4 @@
-// LandingCTA.jsx — Seccion CTA final con circulos animados y botones en triangulo + Footer
+// LandingCTA.jsx — Seccion CTA final con circulos animados, canales oficiales + Footer
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
@@ -7,10 +7,12 @@ import { ArrowRight, Mail, Phone, ExternalLink } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import {
   ADMIN_EMAIL,
+  ADMIN_INSTAGRAM_HANDLE,
+  ADMIN_INSTAGRAM_URL,
   ADMIN_TELEFONO_DISPLAY,
   ADMIN_WHATSAPP,
-  buildEmailUrl,
   buildWhatsAppUrl,
+  getEmailLinkProps,
 } from "@/utils/contactLinks";
 
 // Mismo helper que en LandingNav
@@ -18,6 +20,28 @@ function scrollToSection(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   else window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function InstagramIcon({ size = 14, className = "" }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
 }
 
 const FOOTER_LINKS = [
@@ -31,12 +55,23 @@ export default function LandingCTA() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
+  const ctaEmailProps = getEmailLinkProps(
+    ADMIN_EMAIL,
+    "Consulta sobre NutriOliva",
+    "Hola equipo de NutriOliva, quiero consultar sobre la plataforma para mi consultorio."
+  );
+
+  const footerEmailProps = getEmailLinkProps(
+    ADMIN_EMAIL,
+    "Consulta sobre NutriOliva"
+  );
+
   return (
     <>
       {/* ── CTA Final ───────────────────────────────────────────────────────── */}
       <section
         ref={ref}
-        className="relative py-28 px-6 overflow-hidden
+        className="relative py-28 px-5 sm:px-6 overflow-hidden
                     bg-gradient-to-br from-olive-dark via-olive-deep to-olive"
       >
         {/* Patron de puntos con pulso suave */}
@@ -72,7 +107,6 @@ export default function LandingCTA() {
 
         {/* Anillos concentricos animados con rotacion y respiracion */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-          {/* Anillo interior con satelite en orbita */}
           <motion.div
             animate={{
               rotate: 360,
@@ -88,7 +122,6 @@ export default function LandingCTA() {
             <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-cream/40" />
           </motion.div>
 
-          {/* Anillo medio discontinuo girando en sentido inverso */}
           <motion.div
             animate={{
               rotate: -360,
@@ -103,7 +136,6 @@ export default function LandingCTA() {
             <span className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#C5D48A]/50 shadow-[0_0_12px_#C5D48A]" />
           </motion.div>
 
-          {/* Anillo exterior expansivo */}
           <motion.div
             animate={{
               rotate: 360,
@@ -145,18 +177,19 @@ export default function LandingCTA() {
             comenzar a acompanar a tus pacientes en tiempo real.
           </motion.p>
 
-          {/* Disposicion en TRIANGULO:
+          {/* Disposicion piramidal:
               Fila 1 (Arriba al centro): Ingresar a la plataforma
-              Fila 2 (Abajo a la par): WhatsApp a la izquierda + Email a la derecha */}
+              Fila 2 (Abajo): WhatsApp, Email oficial e Instagram */}
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.55, delay: 0.3 }}
-            className="flex flex-col items-center gap-4 max-w-xl mx-auto"
+            className="flex flex-col items-center gap-4 max-w-2xl mx-auto"
           >
-            {/* Vertice superior del triangulo: Ingresar a la plataforma */}
+            {/* Vertice superior: Ingresar a la plataforma */}
             <Link to="/login" className="inline-block">
               <motion.button
+                type="button"
                 whileHover={{
                   scale: 1.05,
                   y: -2,
@@ -185,12 +218,12 @@ export default function LandingCTA() {
               </motion.button>
             </Link>
 
-            {/* Base del triangulo: Los dos botones de contacto uno a la par del otro */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full pt-1">
+            {/* Base: WhatsApp + Email + Instagram */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full pt-1">
               <motion.a
                 href={buildWhatsAppUrl(
                   ADMIN_WHATSAPP,
-                  "Hola Lautaro, quiero consultar por NutriOliva"
+                  "Hola! Quiero consultar por NutriOliva para mi consultorio."
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -200,8 +233,8 @@ export default function LandingCTA() {
                   backgroundColor: "rgba(246, 241, 231, 0.14)",
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="border border-cream/30 text-cream font-display font-medium px-6 py-3.5
-                            rounded-pill text-[13.5px] flex items-center justify-center gap-2
+                className="border border-cream/30 text-cream font-display font-medium px-4 py-3.5
+                            rounded-pill text-[12.5px] flex items-center justify-center gap-2
                             transition-all backdrop-blur-sm shadow-sm whitespace-nowrap"
               >
                 <Phone size={14} className="text-[#C5D48A] flex-shrink-0" />
@@ -210,11 +243,24 @@ export default function LandingCTA() {
               </motion.a>
 
               <motion.a
-                href={buildEmailUrl(
-                  ADMIN_EMAIL,
-                  "Consulta sobre NutriOliva",
-                  "Hola Lautaro, quiero consultar sobre NutriOliva para mi consultorio."
-                )}
+                {...ctaEmailProps}
+                whileHover={{
+                  scale: 1.03,
+                  y: -2,
+                  backgroundColor: "rgba(246, 241, 231, 0.14)",
+                }}
+                whileTap={{ scale: 0.97 }}
+                className="border border-cream/30 text-cream font-display font-medium px-4 py-3.5
+                            rounded-pill text-[12.5px] flex items-center justify-center gap-2
+                            transition-all backdrop-blur-sm shadow-sm whitespace-nowrap"
+              >
+                <Mail size={14} className="text-[#C5D48A] flex-shrink-0" />
+                <span>{ADMIN_EMAIL}</span>
+                <ExternalLink size={11} className="opacity-65 flex-shrink-0" />
+              </motion.a>
+
+              <motion.a
+                href={ADMIN_INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{
@@ -223,12 +269,15 @@ export default function LandingCTA() {
                   backgroundColor: "rgba(246, 241, 231, 0.14)",
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="border border-cream/30 text-cream font-display font-medium px-6 py-3.5
-                            rounded-pill text-[13.5px] flex items-center justify-center gap-2
+                className="border border-cream/30 text-cream font-display font-medium px-4 py-3.5
+                            rounded-pill text-[12.5px] flex items-center justify-center gap-2
                             transition-all backdrop-blur-sm shadow-sm whitespace-nowrap"
               >
-                <Mail size={14} className="text-[#C5D48A] flex-shrink-0" />
-                <span>{ADMIN_EMAIL}</span>
+                <InstagramIcon
+                  size={14}
+                  className="text-[#C5D48A] flex-shrink-0"
+                />
+                <span>{ADMIN_INSTAGRAM_HANDLE}</span>
                 <ExternalLink size={11} className="opacity-65 flex-shrink-0" />
               </motion.a>
             </div>
@@ -252,6 +301,7 @@ export default function LandingCTA() {
             {FOOTER_LINKS.map(({ label, id }) => (
               <button
                 key={id}
+                type="button"
                 onClick={() => scrollToSection(id)}
                 className="font-display text-[11px] text-cream/40 hover:text-cream/70 transition-colors focus:outline-none cursor-pointer"
               >
@@ -262,11 +312,9 @@ export default function LandingCTA() {
 
           {/* Contacto & Copyright */}
           <div className="text-center md:text-right">
-            <div className="font-display text-[11px] text-cream/55 flex items-center justify-center md:justify-end gap-2">
+            <div className="font-display text-[11px] text-cream/55 flex flex-wrap items-center justify-center md:justify-end gap-2">
               <a
-                href={buildEmailUrl(ADMIN_EMAIL, "Consulta sobre NutriOliva")}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...footerEmailProps}
                 className="hover:text-cream transition-colors"
               >
                 {ADMIN_EMAIL}
@@ -275,7 +323,7 @@ export default function LandingCTA() {
               <a
                 href={buildWhatsAppUrl(
                   ADMIN_WHATSAPP,
-                  "Hola Lautaro, quiero consultar por NutriOliva"
+                  "Hola! Quiero consultar por NutriOliva"
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -283,8 +331,18 @@ export default function LandingCTA() {
               >
                 {ADMIN_TELEFONO_DISPLAY}
               </a>
+              <span>·</span>
+              <a
+                href={ADMIN_INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-cream transition-colors inline-flex items-center gap-1"
+              >
+                <InstagramIcon size={11} />
+                <span>{ADMIN_INSTAGRAM_HANDLE}</span>
+              </a>
             </div>
-            <p className="font-display text-[10px] text-cream/30 mt-0.5">
+            <p className="font-display text-[10px] text-cream/30 mt-1">
               2026 NutriOliva — Todos los derechos reservados
             </p>
           </div>
