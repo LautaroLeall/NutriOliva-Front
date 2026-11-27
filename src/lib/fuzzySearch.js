@@ -57,8 +57,8 @@ export function claveFonetica(word = "") {
   if (!word) return "";
   return word
     .replace(/^h+/, "")
-    .replace(/([a-z])\1+/g, "$1")
     .replace(/ll/g, "y")
+    .replace(/([a-z])\1+/g, "$1")
     .replace(/[zc]/g, "s")
     .replace(/b/g, "v")
     .replace(/qu/g, "k")

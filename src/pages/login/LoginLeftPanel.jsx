@@ -15,38 +15,10 @@ import {
 import Logo from "@/components/ui/Logo";
 
 const SLIDES = [
-  {
-    nav: "Nutricionistas",
-    tag: "Gestion Profesional",
-    title: "Directorio y carteras de pacientes en vivo",
-    desc: "Gestiona profesionales, planes y carteras de pacientes en tiempo real.",
-    quote: "El acompanamiento que tus pacientes necesitan, cada dia.",
-    sub: "Gestiona profesionales, planes y carteras de pacientes en tiempo real.",
-  },
-  {
-    nav: "Facturacion",
-    tag: "Control de Suscripciones",
-    title: "Control total de suscripciones, cupos y rendimiento",
-    desc: "Seguimiento transparente de planes Starter, Pro y Clinic.",
-    quote: "Control total de suscripciones, cupos y rendimiento.",
-    sub: "Seguimiento transparente de planes Starter, Pro y Clinic.",
-  },
-  {
-    nav: "Metricas",
-    tag: "Analitica en Tiempo Real",
-    title: "Sin planillas. Sin WhatsApp. Solo datos que hablan solos",
-    desc: "Metricas operativas, catalogo nutricional SARA e IA integrada.",
-    quote: "Sin planillas. Sin WhatsApp. Solo datos que hablan solos.",
-    sub: "Metricas operativas, catalogo nutricional SARA e IA integrada.",
-  },
-  {
-    nav: "Ajustes",
-    tag: "Configuracion Global",
-    title: "Esquema tarifario y cupos editables en vivo",
-    desc: "Actualiza precios por plan, cupos de pacientes y parametros de la plataforma en tiempo real.",
-    quote: "Esquema tarifario y cupos editables en vivo.",
-    sub: "Actualiza precios por plan, cupos de pacientes y parametros de la plataforma en tiempo real.",
-  },
+  { nav: "Nutricionistas", quote: "El acompanamiento que tus pacientes necesitan, cada dia." },
+  { nav: "Facturacion", quote: "Control total de suscripciones, cupos y rendimiento." },
+  { nav: "Metricas", quote: "Sin planillas. Sin WhatsApp. Solo datos que hablan solos." },
+  { nav: "Ajustes", quote: "Esquema tarifario y cupos editables en vivo." },
 ];
 
 const MINI_NAV = [
@@ -70,30 +42,9 @@ function DotPattern() {
 
 function SlideNutricionistas() {
   const rows = [
-    {
-      initials: "ML",
-      name: "Lic. Maria Lopez",
-      plan: "Pro",
-      pac: 38,
-      max: 50,
-      pct: 76,
-    },
-    {
-      initials: "CR",
-      name: "Lic. Carlos Ruiz",
-      plan: "Clinic",
-      pac: 94,
-      max: "Ilim.",
-      pct: 92,
-    },
-    {
-      initials: "AG",
-      name: "Lic. Ana Gimenez",
-      plan: "Starter",
-      pac: 13,
-      max: 15,
-      pct: 86,
-    },
+    { initials: "ML", name: "Lic. Maria Lopez", plan: "Pro", pac: 38, max: 50, pct: 76 },
+    { initials: "CR", name: "Lic. Carlos Ruiz", plan: "Clinic", pac: 94, max: "Ilim.", pct: 92 },
+    { initials: "AG", name: "Lic. Ana Gimenez", plan: "Starter", pac: 13, max: 15, pct: 86 },
   ];
 
   return (
@@ -184,9 +135,6 @@ function SlideFacturacion() {
             100% Cuentas activas y sincronizadas
           </div>
         </div>
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#6E9B5C]/25 text-[#C5D48A] text-[7.5px] font-display">
-          <CheckCircle2 size={9} /> Al dia
-        </span>
       </div>
 
       <div className="space-y-1.5">
@@ -301,9 +249,6 @@ function SlideAjustes() {
             Esquema tarifario y cupos editables en vivo
           </div>
         </div>
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#6E9B5C]/25 text-[#C5D48A] text-[7px] font-display flex-shrink-0">
-          <Settings size={8} /> En vivo
-        </span>
       </div>
 
       <div className="space-y-1.5">

@@ -1,0 +1,31 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  verify:
+    name: Build, SEO, GEO, Higiene y Pruebas Unitarias
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar y generar archivos SEO/GEO (robots, sitemap, manifest, llms.txt, security.txt)
+        run: npm run build
+
+      - name: Ejecutar suite de pruebas (validadores, fuzzySearch, higiene y SEO/HTTP)
+        run: npm test

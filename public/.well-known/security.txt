@@ -1,0 +1,5 @@
+Contact: mailto:nutriolivaa@gmail.com
+Contact: https://wa.me/5493813399463
+Canonical: https://nutri-oliva.vercel.app/.well-known/security.txt
+Preferred-Languages: es, en
+Expires: 2027-12-31T23:59:59.000Z

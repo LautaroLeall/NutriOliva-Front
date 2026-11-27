@@ -70,7 +70,15 @@ NutriOliva unifica cuatro experiencias adaptadas a cada dispositivo dentro de un
 
 ```text
 Frontend/
-├── public/                              # Favicon, iconos, robots.txt y sitemap.xml
+├── .github/workflows/ci.yml             # Pipeline GitHub Actions CI (Build, SEO/GEO, Higiene y Tests)
+├── public/                              # Favicon, iconos, robots.txt, sitemap.xml, manifest.json, llms.txt y .well-known/security.txt
+├── scripts/
+│   └── seoAutoPlugin.mjs                # Plugin Vite que auto-genera robots.txt, sitemap.xml, manifest.json, llms.txt (GEO) y security.txt
+├── tests/                               # Suite de pruebas automatizadas (npm test / npm run verify)
+│   ├── validators.test.mjs              # Pruebas unitarias de validaciones de contacto y generadores de enlaces
+│   ├── fuzzySearch.test.mjs             # Pruebas unitarias de busqueda difusa, fonetica, sinonimos y errores de tipeo
+│   ├── hygiene.test.mjs                 # Verifica UTF-8 limpio, 100% archivos <= 500 lineas y enlaces externos seguros
+│   └── seo.test.mjs                     # Verifica SEO por ruta, GEO (llms.txt), JSON-LD, PWA manifest y cabeceras vercel.json
 ├── src/
 │   ├── components/
 │   │   ├── layout/
@@ -183,12 +191,14 @@ La aplicacion estara disponible en `http://localhost:5173`.
 
 ## 6. Scripts Disponibles
 
-| Comando           | Descripcion                                                              |
-| ----------------- | ------------------------------------------------------------------------ |
-| `npm run dev`     | Inicia el servidor de desarrollo Vite con HMR en `http://localhost:5173` |
-| `npm run build`   | Genera el bundle optimizado de produccion en `dist/`                     |
-| `npm run preview` | Sirve localmente la compilacion de produccion para verificacion          |
-| `npm run lint`    | Ejecuta ESLint sobre `src/**/*.{js,jsx}` (`--max-warnings 0`)            |
+| Comando           | Descripcion                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`     | Inicia el servidor de desarrollo Vite con HMR en `http://localhost:5173`                                             |
+| `npm run build`   | Genera archivos SEO/GEO (`robots.txt`, `sitemap.xml`, `manifest.json`, `llms.txt`, `security.txt`) y compila `dist/` |
+| `npm test`        | Ejecuta las 4 suites de pruebas (`validators`, `fuzzySearch`, `hygiene`, `seo`)                                      |
+| `npm run verify`  | Ejecuta `npm run build && npm test` (verificacion integral pre-deploy)                                               |
+| `npm run preview` | Sirve localmente la compilacion de produccion para verificacion                                                      |
+| `npm run lint`    | Ejecuta ESLint sobre `src/**/*.{js,jsx}` (`--max-warnings 0`)                                                        |
 
 ---
 
