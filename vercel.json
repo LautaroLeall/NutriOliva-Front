@@ -1,10 +1,7 @@
 {
-  "rewrites": [
-    {
-      "source": "/((?!assets/|robots\\.txt|sitemap\\.xml|manifest\\.json|favicon\\.svg|icon\\.png|icon-fondo_blanco\\.png).*)",
-      "destination": "/index.html"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -16,8 +13,56 @@
       ]
     },
     {
+      "source": "/(.*\\.(?:png|jpg|jpeg|webp|svg|ico|webmanifest))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/(robots\\.txt|sitemap\\.xml|llms\\.txt|manifest\\.json)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=43200"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=43200"
+        },
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/(panel|mi-plan|admin|set-password)(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
@@ -31,6 +76,10 @@
           "value": "1; mode=block"
         },
         {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        },
+        {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
         },
@@ -39,6 +88,12 @@
           "value": "camera=(), microphone=(), geolocation=()"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!assets/|\\.well-known/|robots\\.txt|sitemap\\.xml|llms\\.txt|manifest\\.json|favicon\\.svg|icon\\.png|icon-fondo_blanco\\.png).*)",
+      "destination": "/index.html"
     }
   ]
 }

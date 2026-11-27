@@ -2,6 +2,12 @@
 User-agent: *
 Allow: /
 Allow: /login
+Allow: /llms.txt
+Allow: /.well-known/security.txt
+Allow: /manifest.json
+Allow: /icon.png
+Allow: /icon-fondo_blanco.png
+Allow: /favicon.svg
 Disallow: /panel
 Disallow: /panel/
 Disallow: /mi-plan
