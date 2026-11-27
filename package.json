@@ -1,14 +1,16 @@
 {
   "name": "nutrioliva-front",
-  "version": "0.1.0",
-  "description": "NutriOliva — Plataforma SaaS para nutricionistas",
+  "version": "1.0.0",
+  "description": "NutriOliva — Plataforma SaaS para nutricionistas y seguimiento de pacientes en tiempo real",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "test": "node tests/validators.test.mjs && node tests/fuzzySearch.test.mjs && node tests/hygiene.test.mjs && node tests/seo.test.mjs",
+    "verify": "npm run build && npm test"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.10.0",
