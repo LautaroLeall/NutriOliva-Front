@@ -85,6 +85,54 @@ check(
     assert.ok(css.includes(".pt-safe") && css.includes(".pb-safe"));
     assert.ok(css.includes("safe-area-inset-top"));
     assert.ok(css.includes("safe-area-inset-bottom"));
+    assert.ok(
+      css.includes("font-size: 16px !important") &&
+      css.includes("touch-action: manipulation"),
+      "index.css debe prevenir auto-zoom de teclado (16px) y zoom por doble toque en moviles"
+    );
+    assert.ok(
+      css.includes(".h-dvh-fixed"),
+      "index.css debe incluir utilidad .h-dvh-fixed para pantallas sin scroll"
+    );
+  }
+);
+
+check(
+  "Login, SetPassword y Modal estan configurados sin desborde ni scroll externo en movil/PC",
+  () => {
+    const loginPage = fs.readFileSync(
+      path.join(ROOT, "src", "pages", "Login.jsx"),
+      "utf8"
+    );
+    const loginLeft = fs.readFileSync(
+      path.join(ROOT, "src", "pages", "login", "LoginLeftPanel.jsx"),
+      "utf8"
+    );
+    const setPassPage = fs.readFileSync(
+      path.join(ROOT, "src", "pages", "SetPassword.jsx"),
+      "utf8"
+    );
+    const modalUi = fs.readFileSync(
+      path.join(ROOT, "src", "components", "ui", "Modal.jsx"),
+      "utf8"
+    );
+
+    assert.ok(
+      loginPage.includes("fixed inset-0 h-dvh-fixed"),
+      "Login.jsx debe ser fijo a 100dvh sin scroll de pagina"
+    );
+    assert.ok(
+      loginLeft.includes("hidden lg:flex"),
+      "LoginLeftPanel debe compactarse en movil para evitar scroll vertical"
+    );
+    assert.ok(
+      setPassPage.includes("fixed inset-0 h-dvh-fixed"),
+      "SetPassword.jsx debe ser fijo a 100dvh sin scroll de pagina"
+    );
+    assert.ok(
+      modalUi.includes("100dvh") && modalUi.includes("overscroll-contain"),
+      "Modal.jsx debe limitar altura a dvh con scroll interno controlado"
+    );
   }
 );
 
