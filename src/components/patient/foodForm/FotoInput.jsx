@@ -1,13 +1,18 @@
-// FotoInput.jsx — Selector de foto opcional con animaciones
+// FotoInput.jsx — Selector de foto opcional con compresion automatica en cliente
 
 import { useRef, useState, useEffect } from "react";
-import { Camera, X } from "lucide-react";
+import { Camera, Loader2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { comprimirImagenCliente } from "@/lib/storage";
+
+const MAX_RAW_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB entrada directa de camara
+const MAX_FINAL_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB post-compresion
 
 export default function FotoInput({ foto, onFoto, onQuitarFoto }) {
   const inputRef = useRef(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [comprimiendo, setComprimiendo] = useState(false);
 
   useEffect(() => {
     if (!foto) {
@@ -18,6 +23,26 @@ export default function FotoInput({ foto, onFoto, onQuitarFoto }) {
     setPreviewUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
   }, [foto]);
+
+  async function procesarArchivoSeleccionado(file) {
+    if (!file) return;
+    if (file.size > MAX_RAW_SIZE_BYTES) {
+      toast.error("La imagen original supera el limite maximo de 15 MB.");
+      return;
+    }
+
+    setComprimiendo(true);
+    try {
+      const optimizada = await comprimirImagenCliente(file);
+      if (optimizada.size > MAX_FINAL_SIZE_BYTES) {
+        toast.error("La foto sigue superando los 5 MB luego de optimizarla.");
+        return;
+      }
+      onFoto(optimizada);
+    } finally {
+      setComprimiendo(false);
+    }
+  }
 
   return (
     <div>
@@ -45,6 +70,7 @@ export default function FotoInput({ foto, onFoto, onQuitarFoto }) {
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.9 }}
               onClick={onQuitarFoto}
+              aria-label="Quitar foto"
               className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/55 flex items-center
                           justify-center text-white hover:bg-black/75 transition-colors"
             >
@@ -55,14 +81,25 @@ export default function FotoInput({ foto, onFoto, onQuitarFoto }) {
           <motion.button
             key="btn"
             type="button"
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
+            disabled={comprimiendo}
+            whileHover={!comprimiendo ? { scale: 1.01 } : {}}
+            whileTap={!comprimiendo ? { scale: 0.98 } : {}}
             onClick={() => inputRef.current?.click()}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed
                       border-cream-darker bg-[#F5F2EA]/60 text-muted hover:border-olive/50 hover:text-olive
-                        transition-colors font-display text-[11.5px]"
+                        transition-colors font-display text-[11.5px] disabled:opacity-60"
           >
-            <Camera size={14} /> Agregar foto
+            {comprimiendo ? (
+              <>
+                <Loader2 size={14} className="animate-spin text-olive" />
+                <span>Optimizando foto...</span>
+              </>
+            ) : (
+              <>
+                <Camera size={14} />
+                <span>Agregar foto</span>
+              </>
+            )}
           </motion.button>
         )}
       </AnimatePresence>
@@ -76,12 +113,7 @@ export default function FotoInput({ foto, onFoto, onQuitarFoto }) {
         onChange={(e) => {
           const file = e.target.files?.[0];
           e.target.value = "";
-          if (!file) return;
-          if (file.size > 5 * 1024 * 1024) {
-            toast.error("La foto no debe superar los 5 MB.");
-            return;
-          }
-          onFoto(file);
+          procesarArchivoSeleccionado(file);
         }}
       />
     </div>
