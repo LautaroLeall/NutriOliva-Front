@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { getEmailLinkProps } from "@/utils/contactLinks";
 import TabCuentaClinica from "./TabCuentaClinica";
+import TabCuentaLegalApp from "./TabCuentaLegalApp";
 
 function obtenerIniciales(nombreStr) {
   if (!nombreStr) return "P";
@@ -342,6 +343,13 @@ export default function TabCuenta({
           </button>
         </div>
       </motion.div>
+
+      {/* 5. Estado Web App / App Movil, Privacidad y Solicitud de Baja de Cuenta */}
+      <TabCuentaLegalApp
+        nombrePaciente={nombrePaciente}
+        emailPaciente={emailPaciente}
+        nutricionistaInfo={nutricionistaInfo}
+      />
     </div>
   );
 }
