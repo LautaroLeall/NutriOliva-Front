@@ -65,7 +65,7 @@ export default function LandingNav() {
       initial={{ y: -60, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+      className={`fixed top-0 left-0 right-0 z-50 pt-safe transition-all duration-300 ${scrolled
         ? "bg-white/85 backdrop-blur-md border-b border-cream-darker shadow-sm"
         : "bg-transparent"
         }`}
@@ -137,7 +137,7 @@ export default function LandingNav() {
 
       {/* Barra rapida movil (ideal para quienes entran desde el link de la bio de Instagram) */}
       <div
-        className={`md:hidden flex items-center justify-center gap-5 px-4 py-1.5 border-t transition-colors ${scrolled
+        className={`md:hidden flex items-center justify-center gap-4 sm:gap-5 px-3 py-1.5 border-t overflow-x-auto no-scrollbar whitespace-nowrap transition-colors ${scrolled
           ? "bg-white/90 border-cream-darker/70 text-muted"
           : "bg-olive-dark/45 backdrop-blur-sm border-cream/10 text-cream/80"
           }`}
