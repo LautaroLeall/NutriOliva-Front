@@ -323,7 +323,7 @@ export function StepInformacionClinica({ form, handleChange }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {CLINICA_FIELDS.map((f) => (
           <div key={f.name}>
             <label className="block text-[10px] font-display font-medium text-olive-dark mb-0.5">

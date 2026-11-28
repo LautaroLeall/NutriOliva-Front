@@ -125,7 +125,7 @@ export default function NutriCuenta() {
         </div>
 
         {/* Barra de pestañas con indicador deslizable layoutId */}
-        <div className="flex gap-1.5 bg-white rounded-2xl p-1.5 mb-6 border border-cream-darker shadow-sm">
+        <div className="flex gap-1 sm:gap-1.5 bg-white rounded-2xl p-1 sm:p-1.5 mb-6 border border-cream-darker shadow-sm">
           {TABS.map((t) => {
             const Icon = t.icon;
             const active = activeTab === t.id;
@@ -134,9 +134,9 @@ export default function NutriCuenta() {
                 key={t.id}
                 type="button"
                 onClick={() => setActiveTab(t.id)}
-                className={`relative flex-1 py-2.5 px-3 rounded-xl font-display text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer ${active
-                    ? "text-cream font-semibold"
-                    : "text-muted hover:text-olive-dark"
+                className={`relative flex-1 min-w-0 py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl font-display text-[11px] sm:text-xs font-medium flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer ${active
+                  ? "text-cream font-semibold"
+                  : "text-muted hover:text-olive-dark"
                   }`}
               >
                 {active && (
