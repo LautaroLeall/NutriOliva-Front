@@ -106,6 +106,7 @@ check(
   () => {
     const robots = fs.readFileSync(path.join(PUBLIC, "robots.txt"), "utf8");
     assert.ok(robots.includes("Allow: /"));
+    assert.ok(robots.includes("Allow: /privacidad"));
     assert.ok(robots.includes("Allow: /llms.txt"));
     assert.ok(robots.includes("Disallow: /panel"));
     assert.ok(robots.includes("Disallow: /mi-plan"));
@@ -115,6 +116,7 @@ check(
     const sitemap = fs.readFileSync(path.join(PUBLIC, "sitemap.xml"), "utf8");
     assert.ok(sitemap.includes(`<loc>${SITE_URL}/</loc>`));
     assert.ok(sitemap.includes(`<loc>${SITE_URL}/login</loc>`));
+    assert.ok(sitemap.includes(`<loc>${SITE_URL}/privacidad</loc>`));
     assert.ok(!sitemap.includes("/panel"), "sitemap no debe incluir /panel");
     assert.ok(!sitemap.includes("/admin"), "sitemap no debe incluir /admin");
 
@@ -142,7 +144,7 @@ check(
 check(
   "resolveSeoForPath indexa rutas publicas y aplica noindex, nofollow a paneles internos",
   () => {
-    for (const pub of ["/", "/login"]) {
+    for (const pub of ["/", "/login", "/privacidad"]) {
       const meta = resolveSeoForPath(pub);
       assert.ok(
         meta.robots.startsWith("index, follow"),
