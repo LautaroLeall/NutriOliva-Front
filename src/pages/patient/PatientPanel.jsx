@@ -221,7 +221,7 @@ export default function PatientPanel() {
     );
 
   return (
-    <main className="min-h-screen bg-[#EFEAE0] pb-32 pb-safe">
+    <main className="min-h-screen bg-[#EFEAE0] pb-32 pb-safe overflow-x-clip">
       <Toaster position="top-center" richColors />
 
       {/* Navbar */}
@@ -229,7 +229,7 @@ export default function PatientPanel() {
         initial={{ y: -48, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex justify-between items-center px-5 pb-3.5 pt-safe bg-white border-b border-cream-darker sticky top-0 z-30 shadow-sm"
+        className="flex justify-between items-center px-4 sm:px-5 pb-3.5 pt-safe bg-white border-b border-cream-darker sticky top-0 z-30 shadow-sm"
       >
         <button
           type="button"
@@ -265,7 +265,7 @@ export default function PatientPanel() {
         </div>
       </motion.nav>
 
-      <div className="max-w-lg mx-auto px-4 pt-5">
+      <div className="max-w-lg mx-auto px-3.5 sm:px-4 pt-4 sm:pt-5">
         <InstallAppBanner />
         {/* Tabs con layoutId deslizable */}
         <motion.div
