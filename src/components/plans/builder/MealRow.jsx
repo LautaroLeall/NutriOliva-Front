@@ -204,7 +204,7 @@ export default function MealRow({ comida, index = 0, onEditar, onEliminar, reado
       </div>
 
       {!readonly && (
-        <div className="flex gap-0.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-0.5 ml-2 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <ActionBtn onClick={() => setEditando(true)} tooltip="Editar">
             <Pencil size={12} />
           </ActionBtn>
