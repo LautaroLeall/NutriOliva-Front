@@ -1,9 +1,9 @@
 # NutriOliva — El acompanamiento que tus pacientes necesitan cada dia (https://nutri-oliva.vercel.app)
-> Ultima actualizacion: 2026-11-25
-> Plataforma web SaaS para nutricionistas y pacientes en Tucuman y toda Argentina. Integra planes alimenticios versionados con IA y Excel, historia clinica antropometrica evolutiva, catalogo nutricional SARA (+205 alimentos) y seguimiento diario de comidas y actividad fisica en tiempo real.
+> Ultima actualizacion: 2026-11-28
+> Plataforma SaaS para nutricionistas y pacientes en Tucuman y toda Argentina. Integra planes alimenticios versionados con IA y Excel, historia clinica antropometrica evolutiva, catalogo nutricional SARA (+205 alimentos) y seguimiento diario de comidas y actividad fisica en tiempo real en Web y Web App instalable (PWA).
 
 ## Que es NutriOliva
-NutriOliva reemplaza las planillas de Excel, los PDFs estaticos y el seguimiento disperso por WhatsApp en el consultorio nutricional. Conecta al profesional con sus pacientes en una interfaz web 100% responsive y mobile-first sin necesidad de descargar ni instalar ninguna aplicacion.
+NutriOliva reemplaza las planillas de Excel, los PDFs estaticos y el seguimiento disperso por WhatsApp en el consultorio nutricional. Conecta al profesional con sus pacientes tanto desde el navegador web como mediante su Web App instalable en Android e iPhone en 2 toques.
 
 ## Funcionalidades para el Nutricionista
 - **Gestion integral de pacientes y alertas de adherencia:** nomina de pacientes activos e inactivos, buscador global instantaneo (Ctrl+K) tolerante a errores de tipeo, invitacion automatica por correo electronico y alerta visual cuando un paciente lleva mas de 48 horas sin registrar.
@@ -12,13 +12,13 @@ NutriOliva reemplaza las planillas de Excel, los PDFs estaticos y el seguimiento
 - **Catalogo nutricional SARA (+205 alimentos) + catalogo propio:** base precargada con alimentos simples y preparaciones clinicas completas de la gastronomia argentina y latinoamericana, mas creacion ilimitada de alimentos personalizados del consultorio.
 
 ## Funcionalidades para el Paciente
-- **Acceso web directo sin instalar apps:** el paciente activa su contraseña desde el enlace recibido por email e ingresa a su panel movil (/mi-plan).
+- **Acceso flexible en Web y Web App instalable:** el paciente activa su contraseña desde el enlace recibido por email e ingresa al instante desde su navegador o instala el icono de NutriOliva en su pantalla de inicio a pantalla completa (/mi-plan).
 - **Registro diario en 3 modos en menos de 60 segundos:**
   1. *Mi plan:* sugiere automaticamente las comidas del plan activo segun la franja horaria actual.
   2. *Catalogo:* buscador difuso instantaneo tolerante a acentos y errores de tipeo.
-  3. *Otra comida con IA:* el paciente describe lo que comio con sus propias palabras, la IA estima las calorias de la porcion y permite adjuntar una foto privada del plato.
+  3. *Otra comida con IA:* el paciente describe lo que comio con sus propias palabras, la IA estima las calorias de la porcion y permite adjuntar una foto privada comprimida automaticamente.
 - **Actividad fisica y balance calorico en tiempo real:** registro de ejercicio por duracion e intensidad, calculo de gasto calorico, barra de progreso diaria y grafica de tendencia de los ultimos 7 dias.
-- **Pestaña Mi Cuenta:** consulta de su evolucion antropometrica, notas del profesional y contacto directo con su nutricionista asignado.
+- **Pestaña Mi Cuenta:** consulta de su evolucion antropometrica, notas del profesional, politica de privacidad y contacto directo con su nutricionista asignado.
 
 ## Planes Comerciales para Profesionales
 Todos los planes incluyen el 100% de las funcionalidades de la plataforma; solo varia el cupo de pacientes activos:
@@ -28,7 +28,7 @@ Todos los planes incluyen el 100% de las funcionalidades de la plataforma; solo 
 
 ## Privacidad y Seguridad Multi-Tenant
 - Aislamiento estricto por nutricionista y por paciente a nivel motor PostgreSQL mediante Row Level Security (RLS) en Supabase.
-- Fotografias de comidas almacenadas en buckets privados con acceso exclusivo mediante URLs firmadas temporales.
+- Fotografias de comidas almacenadas en buckets privados con acceso exclusivo mediante URLs firmadas temporales y cero cache local de datos sensibles.
 
 ## Ubicacion y Cobertura
 Desarrollado en San Miguel de Tucuman, Tucuman, Argentina, para nutricionistas, licenciados en nutricion, centros medicos y pacientes de Tucuman, Argentina y toda Hispanoamerica.
@@ -36,6 +36,7 @@ Desarrollado en San Miguel de Tucuman, Tucuman, Argentina, para nutricionistas, 
 ## Secciones Publicas
 - [Inicio y Demo Interactiva en Vivo](https://nutri-oliva.vercel.app/): tour del panel profesional, simulador movil del paciente sincronizado en tiempo real con el espejo del nutricionista, funcionalidades, preguntas frecuentes y formulario de contacto.
 - [Acceso a la Plataforma](https://nutri-oliva.vercel.app/login): inicio de sesion unificado por rol para nutricionistas, pacientes y administracion.
+- [Politica de Privacidad y Eliminacion de Datos](https://nutri-oliva.vercel.app/privacidad): proteccion de datos personales (Ley 25.326 Argentina) y derechos del usuario.
 
 ## Contacto Comercial Oficial
 - Web: https://nutri-oliva.vercel.app/
