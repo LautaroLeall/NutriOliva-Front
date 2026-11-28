@@ -1,4 +1,4 @@
-// LoginForm.jsx — Formulario principal de inicio de sesion
+// LoginForm.jsx — Formulario principal de inicio de sesion adaptable sin scroll
 // Recibe handlers y estado del hook useLogin via props
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,15 +21,15 @@ export default function LoginForm({
   return (
     <motion.div
       key="login-form"
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -16 }}
-      transition={{ duration: 0.35 }}
+      exit={{ opacity: 0, y: -14 }}
+      transition={{ duration: 0.3 }}
     >
-      <h1 className="font-display font-bold text-[26px] text-olive-dark mb-1">
+      <h1 className="font-display font-bold text-[22px] sm:text-[26px] text-olive-dark leading-tight mb-1">
         Iniciar sesion
       </h1>
-      <p className="text-[13px] text-muted mb-8">
+      <p className="text-[12.5px] sm:text-[13px] text-muted mb-5 sm:mb-7">
         Bienvenido de vuelta a NutriOliva.{" "}
         <Link
           to="/"
@@ -39,12 +39,13 @@ export default function LoginForm({
         </Link>
       </p>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-3.5 sm:space-y-4">
         {/* Email */}
         <LoginField
           id="email"
           label="Mail"
           type="email"
+          inputMode="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
@@ -64,10 +65,13 @@ export default function LoginForm({
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="text-muted hover:text-olive-dark transition-colors p-0.5"
+              aria-label={
+                showPassword ? "Ocultar contrasena" : "Mostrar contrasena"
+              }
+              className="text-muted hover:text-olive-dark transition-colors p-1 cursor-pointer"
               tabIndex={-1}
             >
-              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           }
         />
@@ -93,7 +97,7 @@ export default function LoginForm({
           disabled={loading}
           whileHover={!loading ? { scale: 1.015 } : {}}
           whileTap={!loading ? { scale: 0.985 } : {}}
-          className="btn-primary w-full py-3.5 text-[14px] mt-2 disabled:opacity-60"
+          className="btn-primary w-full py-3 sm:py-3.5 text-[14px] mt-1.5 disabled:opacity-60"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -107,18 +111,18 @@ export default function LoginForm({
       </form>
 
       {/* Footer del formulario */}
-      <div className="mt-5 flex items-center justify-between">
+      <div className="mt-4 sm:mt-5 flex items-center justify-between gap-2 flex-wrap">
         <button
           type="button"
           onClick={onForgotPassword}
-          className="text-[12px] text-muted hover:text-olive-dark transition-colors cursor-pointer"
+          className="text-[12px] py-1 text-muted hover:text-olive-dark transition-colors cursor-pointer"
         >
           Olvidaste tu contrasena?
         </button>
-        <span className="text-[12px] text-muted/40">|</span>
+        <span className="text-[12px] text-muted/40 hidden sm:inline">|</span>
         <Link
           to="/"
-          className="text-[12px] text-muted hover:text-olive-dark transition-colors"
+          className="text-[12px] py-1 text-muted hover:text-olive-dark transition-colors"
         >
           Volver al sitio
         </Link>
