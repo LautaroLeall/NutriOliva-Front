@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,9 +8,13 @@ import { useBalance } from "@/hooks/useBalance";
 import { useWeeklyBalance } from "@/hooks/useWeeklyBalance";
 import { toLocalISO } from "@/lib/dateUtils";
 
+const VALID_TABS = new Set(["hoy", "plan", "tendencia", "cuenta"]);
+
 export function usePatientPanel() {
   const { session, nombre, signOut } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const initialTabParam = searchParams.get("tab");
   const [fecha, setFecha] = useState(toLocalISO(new Date()));
   const [pacienteId, setPacienteId] = useState(null);
   const [pacienteInfo, setPacienteInfo] = useState(null);
@@ -20,8 +25,32 @@ export function usePatientPanel() {
   const [fabAbierto, setFabAbierto] = useState(false);
   const [modalComida, setModalComida] = useState(false);
   const [modalActiv, setModalActiv] = useState(false);
-  const [tab, setTab] = useState("hoy"); // 'hoy' | 'plan' | 'tendencia' | 'cuenta'
+  const [tab, setTabState] = useState(
+    VALID_TABS.has(initialTabParam) ? initialTabParam : "hoy"
+  ); // 'hoy' | 'plan' | 'tendencia' | 'cuenta'
   const [cuentaDesactivada, setCuentaDesactivada] = useState(false);
+
+  // Sincronizar si el paciente abre desde un atajo del icono PWA (?tab=plan, ?tab=tendencia, etc.)
+  useEffect(() => {
+    const param = searchParams.get("tab");
+    if (param && VALID_TABS.has(param)) {
+      setTabState(param);
+    }
+  }, [searchParams]);
+
+  const setTab = useCallback(
+    (nextTab) => {
+      if (!VALID_TABS.has(nextTab)) return;
+      setTabState(nextTab);
+      if (searchParams.has("tab")) {
+        const next = new URLSearchParams(searchParams);
+        if (nextTab === "hoy") next.delete("tab");
+        else next.set("tab", nextTab);
+        setSearchParams(next, { replace: true });
+      }
+    },
+    [searchParams, setSearchParams]
+  );
 
   // Hook de tendencia semanal — solo activo cuando el paciente ya está cargado
   const {

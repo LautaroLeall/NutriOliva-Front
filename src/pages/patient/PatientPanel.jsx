@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "@/components/ui/Logo";
 import FoodForm from "@/components/patient/FoodForm";
 import ActivityForm from "@/components/patient/ActivityForm";
+import InstallAppBanner from "@/components/patient/InstallAppBanner";
 import { usePatientPanel } from "./panel/usePatientPanel";
 import AddMenu from "./panel/AddMenu";
 import TabHoy from "./panel/TabHoy";
@@ -41,7 +42,7 @@ function CuentaDesactivada({ nombre, nutricionistaInfo, signOut }) {
         initial={{ y: -48, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex justify-between items-center px-5 py-3.5 bg-white border-b border-cream-darker shadow-sm"
+        className="flex justify-between items-center px-5 pb-3.5 pt-safe bg-white border-b border-cream-darker shadow-sm"
       >
         <div className="flex items-center gap-2 font-display font-bold text-base text-olive-dark">
           <Logo size={20} />
@@ -220,7 +221,7 @@ export default function PatientPanel() {
     );
 
   return (
-    <main className="min-h-screen bg-[#EFEAE0] pb-32">
+    <main className="min-h-screen bg-[#EFEAE0] pb-32 pb-safe">
       <Toaster position="top-center" richColors />
 
       {/* Navbar */}
@@ -228,7 +229,7 @@ export default function PatientPanel() {
         initial={{ y: -48, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex justify-between items-center px-5 py-3.5 bg-white border-b border-cream-darker sticky top-0 z-30 shadow-sm"
+        className="flex justify-between items-center px-5 pb-3.5 pt-safe bg-white border-b border-cream-darker sticky top-0 z-30 shadow-sm"
       >
         <button
           type="button"
@@ -265,6 +266,7 @@ export default function PatientPanel() {
       </motion.nav>
 
       <div className="max-w-lg mx-auto px-4 pt-5">
+        <InstallAppBanner />
         {/* Tabs con layoutId deslizable */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -425,7 +427,7 @@ export default function PatientPanel() {
             onClick={() => setFabAbierto((o) => !o)}
             aria-label={fabAbierto ? "Cerrar menu" : "Agregar registro"}
             aria-expanded={fabAbierto}
-            className="fixed bottom-8 right-6 z-50 w-14 h-14 rounded-full shadow-modal
+            className="fixed bottom-safe-fab right-6 z-50 w-14 h-14 rounded-full shadow-modal
                         flex items-center justify-center cursor-pointer"
           >
             <motion.span
