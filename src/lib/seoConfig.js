@@ -78,6 +78,14 @@ export const SEO_ROUTES = {
     canonical: `${SITE_URL}/login`,
     robots: INDEX_ROBOTS,
   },
+  "/privacidad": {
+    title:
+      "Politica de Privacidad, Seguridad Clinica y Baja de Cuenta | NutriOliva",
+    description:
+      "Conoce como NutriOliva protege tus datos personales y nutricionales bajo la Ley 25.326 en Argentina, permisos de camara y como solicitar la eliminacion de tu cuenta.",
+    canonical: `${SITE_URL}/privacidad`,
+    robots: INDEX_ROBOTS,
+  },
   "/set-password": {
     title: "Configurar Contraseña Segura — NutriOliva",
     description:
