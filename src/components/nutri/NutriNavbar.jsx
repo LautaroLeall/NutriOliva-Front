@@ -157,7 +157,7 @@ export default function NutriNavbar({
   ).slice(0, 8);
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-cream-darker shadow-sm">
+    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-cream-darker shadow-sm pt-safe">
       {/* Fila principal */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Izquierda: Boton volver (opcional) + Logo + Subtitulo contextual */}
