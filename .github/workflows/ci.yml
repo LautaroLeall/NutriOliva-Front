@@ -2,9 +2,9 @@ name: Frontend CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, LautyGod]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, LautyGod]
 
 jobs:
   verify:
