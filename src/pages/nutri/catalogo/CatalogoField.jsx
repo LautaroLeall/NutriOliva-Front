@@ -32,10 +32,10 @@ export function Field({ label, name, type = "text", value, onChange, error, icon
           placeholder=""
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          autoFocus={autoFocus}
+          autoFocus={autoFocus && typeof window !== "undefined" && window.innerWidth >= 768}
           min={min}
           step={step}
-          className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-[13px]
+          className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-base md:text-[13px] leading-tight
                       font-body text-olive-dark
                       focus:outline-none focus:ring-2 transition-all duration-150
                       [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none
@@ -113,7 +113,7 @@ export function SelectField({ label, name, value, onChange, options, icon: Icon 
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className="w-full pl-9 pr-8 pt-[22px] pb-[7px] rounded-xl border border-cream-darker
-                    text-[13px] font-body text-olive-dark bg-[#F5F2EA]
+                    text-base md:text-[13px] leading-tight font-body text-olive-dark bg-[#F5F2EA]
                     focus:outline-none focus:ring-2 focus:ring-olive/30 focus:border-olive/60
                     transition-all duration-150 appearance-none cursor-pointer"
       >
