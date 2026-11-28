@@ -250,3 +250,34 @@ h6 {
     @apply animate-fade-in;
   }
 }
+
+/* ── Safe Areas & Modo Web App Instalada (PWA / Nativo) ─────────────── */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: max(0.875rem, env(safe-area-inset-top, 0px));
+}
+
+.pb-safe {
+  padding-bottom: max(2rem, calc(1rem + env(safe-area-inset-bottom, 0px)));
+}
+
+.bottom-safe-fab {
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+
+.pb-safe-fab-menu {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (display-mode: standalone) {
+
+  html,
+  body {
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
