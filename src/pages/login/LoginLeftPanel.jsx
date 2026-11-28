@@ -366,19 +366,19 @@ export default function LoginLeftPanel({ mounted }) {
   }, []);
 
   return (
-    <div className="lg:w-[44%] relative flex flex-col bg-olive-dark overflow-hidden">
+    <div className="lg:w-[44%] flex-shrink-0 relative flex flex-col bg-olive-dark overflow-hidden">
       <DotPattern />
 
       {/* Circulos decorativos */}
       <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-olive/30 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-cream/5 blur-3xl pointer-events-none" />
 
-      {/* Header: logo + volver */}
+      {/* Header: logo + volver (visible en movil y escritorio) */}
       <motion.div
-        initial={{ opacity: 0, y: -16 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={mounted ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5, delay: 0.15 }}
-        className="relative z-10 flex items-center justify-between p-6 pb-0"
+        transition={{ duration: 0.45, delay: 0.1 }}
+        className="relative z-10 flex items-center justify-between px-5 py-4 sm:px-6 lg:p-6 lg:pb-0"
       >
         <div className="flex items-center gap-2.5">
           <Logo size={22} />
@@ -389,8 +389,9 @@ export default function LoginLeftPanel({ mounted }) {
 
         <Link to="/">
           <button
+            type="button"
             className="flex items-center gap-1.5 bg-cream/10 hover:bg-cream/20
-                        text-cream/80 hover:text-cream text-[11px] font-display
+                        text-cream/85 hover:text-cream text-[11px] font-display
                           px-3 py-1.5 rounded-full transition-all duration-200
                           border border-cream/10 hover:border-cream/20 cursor-pointer"
           >
@@ -400,14 +401,13 @@ export default function LoginLeftPanel({ mounted }) {
         </Link>
       </motion.div>
 
-      {/* Visual central con AdminPanel animado + quote superpuesta */}
+      {/* Visual central con AdminPanel animado + quote superpuesta (solo escritorio lg+) */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={mounted ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.28 }}
-        className="relative z-10 flex-1 mx-5 mt-5 mb-4 rounded-2xl overflow-hidden
-                  bg-[#2A3420] border border-cream/10 flex flex-col justify-between"
-        style={{ minHeight: 270 }}
+        transition={{ duration: 0.6, delay: 0.25 }}
+        className="hidden lg:flex relative z-10 flex-1 mx-5 mt-4 mb-3.5 rounded-2xl overflow-hidden
+                  bg-[#2A3420] border border-cream/10 flex-col justify-between min-h-[225px] xl:min-h-[265px]"
       >
         {/* Gradiente inferior para legibilidad del texto */}
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-olive-dark via-olive-dark/80 to-transparent z-10 pointer-events-none" />
@@ -419,7 +419,7 @@ export default function LoginLeftPanel({ mounted }) {
         />
 
         {/* Quote animada */}
-        <div className="absolute bottom-4 left-0 right-0 text-center px-5 z-20">
+        <div className="absolute bottom-3.5 left-0 right-0 text-center px-5 z-20">
           <AnimatePresence mode="wait">
             <motion.p
               key={slideIdx}
@@ -427,7 +427,7 @@ export default function LoginLeftPanel({ mounted }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.35 }}
-              className="font-editorial italic text-cream text-[13.5px] leading-snug"
+              className="font-editorial italic text-cream text-[13px] leading-snug"
             >
               "{SLIDES[slideIdx].quote}"
             </motion.p>
@@ -435,16 +435,18 @@ export default function LoginLeftPanel({ mounted }) {
         </div>
       </motion.div>
 
-      {/* Dots de navegacion */}
+      {/* Dots de navegacion (solo escritorio lg+) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={mounted ? { opacity: 1 } : {}}
-        transition={{ delay: 0.5 }}
-        className="relative z-10 flex justify-center gap-1.5 mb-5"
+        transition={{ delay: 0.45 }}
+        className="hidden lg:flex relative z-10 justify-center gap-1.5 mb-4"
       >
         {SLIDES.map((_, i) => (
           <button
             key={i}
+            type="button"
+            aria-label={`Ver vista ${i + 1}`}
             onClick={() => setSlideIdx(i)}
             className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${slideIdx === i
               ? "w-6 bg-cream"
