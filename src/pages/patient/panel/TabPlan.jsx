@@ -217,6 +217,13 @@ export default function TabPlan({ loadingInf, planActivo, comidasPlan }) {
           items={sec.items}
         />
       ))}
+
+      {/* Aviso de supervision profesional (estandar Salud y Bienestar en tiendas moviles) */}
+      <p className="text-[10.5px] text-muted text-center px-3 pt-2 leading-relaxed">
+        Plan alimenticio supervisado por tu profesional en nutricion. Ante
+        cualquier duda clinica o cambio en tu salud, consulta siempre con tu
+        nutricionista o medico tratante.
+      </p>
     </div>
   );
 }
