@@ -52,10 +52,10 @@ export default function ModoOtra({
             onFocus={() => setFocusDesc(true)}
             onBlur={() => setFocusDesc(false)}
             placeholder=""
-            autoFocus
+            autoFocus={typeof window !== "undefined" && window.innerWidth >= 768}
             autoComplete="off"
             maxLength={200}
-            className={`w-full pl-9 pr-12 pt-[22px] pb-[7px] rounded-xl border text-[13px]
+            className={`w-full pl-9 pr-12 pt-[22px] pb-[7px] rounded-xl border text-base md:text-[13px] leading-tight
                         font-body text-olive-dark
                         focus:outline-none focus:ring-2 transition-all duration-150
                         ${errors.descripcion
@@ -107,8 +107,8 @@ export default function ModoOtra({
 
       {/* Campo calorías con label flotante + botón IA */}
       <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <div className="relative flex-1 min-w-0">
             <motion.div
               animate={{
                 color: focusCal ? "#6E7A4B" : "#9B9484",
@@ -122,6 +122,7 @@ export default function ModoOtra({
 
             <input
               type="number"
+              inputMode="numeric"
               value={formOtra.calorias_estimadas}
               onChange={(e) => {
                 setFormOtra((f) => ({
@@ -136,7 +137,7 @@ export default function ModoOtra({
               min={1}
               max={3000}
               step={1}
-              className={`w-full pl-9 pr-11 pt-[22px] pb-[7px] rounded-xl border text-[13px]
+              className={`w-full pl-9 pr-11 pt-[22px] pb-[7px] rounded-xl border text-base md:text-[13px] leading-tight
                           font-body text-olive-dark
                           focus:outline-none focus:ring-2 transition-all duration-150
                           [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none
@@ -177,9 +178,9 @@ export default function ModoOtra({
             disabled={!puedeEstimar}
             whileHover={puedeEstimar ? { scale: 1.03 } : {}}
             whileTap={puedeEstimar ? { scale: 0.95 } : {}}
-            className="flex items-center gap-1.5 px-3 py-3.5 rounded-xl border border-olive/35
-                        bg-olive/8 text-olive-dark hover:bg-olive/15 font-display text-[10.5px] font-medium
-                        transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+            className="flex items-center justify-center gap-1.5 px-3 py-3 sm:py-3.5 rounded-xl border border-olive/35
+                        bg-olive/8 text-olive-dark hover:bg-olive/15 font-display text-[11px] sm:text-[10.5px] font-medium
+                        transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 whitespace-nowrap"
           >
             {estimandoCal ? (
               <Loader2 size={12} className="animate-spin text-olive" />

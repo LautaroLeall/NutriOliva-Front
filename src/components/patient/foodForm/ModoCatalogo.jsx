@@ -60,9 +60,9 @@ export default function ModoCatalogo({
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               placeholder=""
-              autoFocus
+              autoFocus={typeof window !== "undefined" && window.innerWidth >= 768}
               autoComplete="off"
-              className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-[13px]
+              className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-base md:text-[13px] leading-tight
                           font-body text-olive-dark
                           focus:outline-none focus:ring-2 transition-all duration-150
                           ${errors.catalogo

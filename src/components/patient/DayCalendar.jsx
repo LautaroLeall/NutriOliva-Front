@@ -37,20 +37,21 @@ export default function DayCalendar({ fechaActiva, onChange }) {
       transition={{ duration: 0.28 }}
       className="bg-white border border-cream-darker rounded-2xl overflow-hidden mb-4"
     >
-      <div className="flex items-center gap-1 px-3 py-3">
+      <div className="flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-2.5 sm:py-3">
         {/* Semana anterior */}
         <motion.button
           type="button"
           onClick={semanaAnterior}
           whileHover={{ scale: 1.08, x: -1 }}
           whileTap={{ scale: 0.92 }}
-          className="p-1.5 rounded-lg text-muted hover:bg-cream hover:text-olive-dark transition-colors flex-shrink-0"
+          aria-label="Semana anterior"
+          className="p-1.5 rounded-lg text-muted hover:bg-cream hover:text-olive-dark transition-colors flex-shrink-0 cursor-pointer"
         >
           <ChevronLeft size={15} />
         </motion.button>
 
         {/* Dias de la semana */}
-        <div className="flex-1 flex justify-between gap-1">
+        <div className="flex-1 flex justify-between gap-0.5 sm:gap-1 min-w-0">
           {semana.map(({ fecha, diaNro, diaLabel }) => {
             const esHoy = fecha === hoy;
             const esActivo = fecha === fechaActiva;
@@ -64,8 +65,8 @@ export default function DayCalendar({ fechaActiva, onChange }) {
                 disabled={esFuturo}
                 whileHover={!esFuturo && !esActivo ? { y: -2 } : {}}
                 whileTap={!esFuturo ? { scale: 0.94 } : {}}
-                className={`relative flex flex-col items-center rounded-xl px-2 py-2 transition-colors duration-150
-                            flex-1 min-w-0 disabled:opacity-30 disabled:cursor-not-allowed
+                className={`relative flex flex-col items-center rounded-xl px-1 sm:px-2 py-2 transition-colors duration-150
+                            flex-1 min-w-0 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer
                             ${esActivo
                     ? "text-cream"
                     : "hover:bg-cream text-muted hover:text-olive-dark"}`}
