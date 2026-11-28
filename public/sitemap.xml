@@ -6,7 +6,7 @@
 >
   <url>
     <loc>https://nutri-oliva.vercel.app/</loc>
-    <lastmod>2026-11-25</lastmod>
+    <lastmod>2026-11-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="es-AR" href="https://nutri-oliva.vercel.app/" />
@@ -20,11 +20,20 @@
   </url>
   <url>
     <loc>https://nutri-oliva.vercel.app/login</loc>
-    <lastmod>2026-11-25</lastmod>
+    <lastmod>2026-11-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-AR" href="https://nutri-oliva.vercel.app/login" />
     <xhtml:link rel="alternate" hreflang="es" href="https://nutri-oliva.vercel.app/login" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://nutri-oliva.vercel.app/login" />
+  </url>
+  <url>
+    <loc>https://nutri-oliva.vercel.app/privacidad</loc>
+    <lastmod>2026-11-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="https://nutri-oliva.vercel.app/privacidad" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://nutri-oliva.vercel.app/privacidad" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://nutri-oliva.vercel.app/privacidad" />
   </url>
 </urlset>
