@@ -90,11 +90,11 @@ export default function AdminPanel() {
   const adminEmail = session?.user?.email || "";
 
   return (
-    <div className="min-h-screen md:h-screen w-full bg-[#F4F0E6] flex flex-col md:flex-row md:overflow-hidden">
+    <div className="min-h-screen md:h-[100dvh] w-full bg-[#F4F0E6] flex flex-col md:flex-row md:overflow-hidden">
       <Toaster position="bottom-right" richColors />
 
       {/* Sidebar fijo a la izquierda en desktop y barra superior compacta en mobile */}
-      <aside className="w-full md:w-60 lg:w-64 md:h-screen flex-shrink-0 bg-olive-dark flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#55613A]/60 z-30 select-none">
+      <aside className="w-full md:w-60 lg:w-64 md:h-[100dvh] flex-shrink-0 bg-olive-dark flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#55613A]/60 z-30 select-none pt-safe md:pt-0">
         <div>
           {/* Cabecera del Sidebar */}
           <div className="flex items-center justify-between gap-2.5 px-4 sm:px-5 py-4 md:py-5 border-b border-[#55613A]/70">
@@ -188,7 +188,7 @@ export default function AdminPanel() {
       </aside>
 
       {/* Panel derecho: ocupa el 100% restante y hace scroll independiente segun su contenido */}
-      <main className="flex-1 min-w-0 md:h-screen md:overflow-y-auto flex flex-col">
+      <main className="flex-1 min-w-0 md:h-[100dvh] md:overflow-y-auto flex flex-col">
         {/* Cabecera superior fija dentro del area derecha */}
         <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-cream-darker px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
           <div className="min-w-0">
