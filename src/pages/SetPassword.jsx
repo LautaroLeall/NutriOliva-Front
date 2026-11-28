@@ -28,21 +28,21 @@ export default function SetPassword() {
   } = useSetPassword();
 
   return (
-    <div className="min-h-screen bg-[#E8E3D8] flex items-center justify-center p-4">
+    <div className="fixed inset-0 h-dvh-fixed w-full bg-[#E8E3D8] flex items-center justify-center p-3 sm:p-4 pt-safe pb-safe">
       <Toaster position="bottom-right" richColors />
-      {/* Contenedor split-screen */}
+      {/* Contenedor split-screen fijo sin scroll de pagina */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={mounted ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.55, ease: "easeOut" }}
-        className="w-full max-w-[860px] flex flex-col lg:flex-row rounded-[28px] overflow-hidden
-                    shadow-[0_32px_80px_rgba(63,74,43,0.22)]"
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        className="w-full max-w-[440px] lg:max-w-[860px] max-h-full flex flex-col lg:flex-row rounded-[24px] sm:rounded-[28px] overflow-hidden
+                    shadow-[0_24px_68px_rgba(63,74,43,0.22)]"
       >
-        {/* Panel izquierdo: branding + contenido segun flujo */}
+        {/* Panel izquierdo: cabecera compacta en movil + branding en escritorio */}
         <SetPasswordLeft tipoFlujo={tipoFlujo} mounted={mounted} />
 
         {/* Panel derecho: formulario o pantalla de exito */}
-        <div className="flex-1 bg-white flex flex-col justify-center px-8 py-10 lg:px-12">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-none no-scrollbar bg-white flex flex-col justify-center px-5 py-6 sm:px-8 sm:py-8 lg:px-11 lg:py-9">
           <AnimatePresence mode="wait">
             {listo ? (
               <SetPasswordSuccess key="success" tipoFlujo={tipoFlujo} />
