@@ -38,10 +38,10 @@ export default function SetPasswordForm({
       transition={{ duration: 0.35 }}
     >
       {/* Encabezado */}
-      <h1 className="font-display font-bold text-[26px] text-olive-dark mb-1">
+      <h1 className="font-display font-bold text-[22px] sm:text-[26px] text-olive-dark leading-tight mb-1">
         {isInvite ? "Crear contrasena" : "Nueva contrasena"}
       </h1>
-      <p className="text-[13px] text-muted mb-8">
+      <p className="text-[12.5px] sm:text-[13px] text-muted mb-5 sm:mb-6">
         {isInvite
           ? "Elige una contrasena para acceder a tu plan."
           : "Ingresa y confirma tu nueva contrasena."}
@@ -81,7 +81,7 @@ export default function SetPasswordForm({
         )
       )}
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-3.5 sm:space-y-4">
         {/* Nueva contraseña */}
         <div>
           <LoginField
@@ -93,7 +93,6 @@ export default function SetPasswordForm({
               setPassword(e.target.value);
               setError("");
             }}
-            autoFocus
             autoComplete="new-password"
             required
             rightEl={

@@ -29,7 +29,7 @@ export default function SetPasswordLeft({ tipoFlujo, mounted }) {
   const content = CONTENT[tipoFlujo] ?? CONTENT.invite;
 
   return (
-    <div className="lg:w-[42%] relative flex flex-col bg-olive-dark overflow-hidden">
+    <div className="lg:w-[42%] flex-shrink-0 relative flex flex-col bg-olive-dark overflow-hidden">
       {/* Patron de puntos */}
       <div
         className="absolute inset-0 opacity-[0.07]"
@@ -45,10 +45,10 @@ export default function SetPasswordLeft({ tipoFlujo, mounted }) {
 
       {/* Header: logo + volver al sitio */}
       <motion.div
-        initial={{ opacity: 0, y: -16 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={mounted ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5, delay: 0.15 }}
-        className="relative z-10 flex items-center justify-between p-6 pb-0"
+        transition={{ duration: 0.45, delay: 0.1 }}
+        className="relative z-10 flex items-center justify-between px-5 py-4 sm:px-6 lg:p-6 lg:pb-0"
       >
         <div className="flex items-center gap-2.5">
           <Logo size={22} />
@@ -58,10 +58,11 @@ export default function SetPasswordLeft({ tipoFlujo, mounted }) {
         </div>
         <Link to="/">
           <button
+            type="button"
             className="flex items-center gap-1.5 bg-cream/10 hover:bg-cream/20
-                        text-cream/80 hover:text-cream text-[11px] font-display
+                        text-cream/85 hover:text-cream text-[11px] font-display
                           px-3 py-1.5 rounded-full transition-all duration-200
-                          border border-cream/10 hover:border-cream/20"
+                          border border-cream/10 hover:border-cream/20 cursor-pointer"
           >
             Volver al sitio
             <ArrowRight size={11} />
@@ -69,12 +70,12 @@ export default function SetPasswordLeft({ tipoFlujo, mounted }) {
         </Link>
       </motion.div>
 
-      {/* Contenido central */}
+      {/* Contenido central (visible en escritorio lg+) */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={mounted ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.65, delay: 0.28 }}
-        className="relative z-10 flex-1 mx-5 mt-5 mb-6 flex flex-col items-center justify-center
+        transition={{ duration: 0.6, delay: 0.25 }}
+        className="hidden lg:flex relative z-10 flex-1 mx-5 mt-4 mb-5 flex-col items-center justify-center
                     text-center px-6"
       >
         {/* Icono grande */}

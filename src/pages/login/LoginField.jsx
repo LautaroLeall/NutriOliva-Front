@@ -1,10 +1,11 @@
-// LoginField.jsx — Input reutilizable con label flotante
-// El label sube automáticamente al hacer focus o cuando hay valor (CSS peer)
+// LoginField.jsx — Input reutilizable con label flotante sin auto-zoom en moviles
+// El label sube automaticamente al hacer focus o cuando hay valor (CSS peer)
 
 export default function LoginField({
   id,
   label,
   type = "text",
+  inputMode,
   value,
   onChange,
   autoFocus,
@@ -17,6 +18,7 @@ export default function LoginField({
       <input
         id={id}
         type={type}
+        inputMode={inputMode}
         value={value}
         onChange={onChange}
         placeholder=" "
@@ -24,18 +26,18 @@ export default function LoginField({
         autoComplete={autoComplete}
         required={required}
         className="peer w-full bg-[#F0EDE4] border border-cream-darker rounded-xl
-                    px-4 pt-5 pb-2 text-[13.5px] text-olive-dark font-body
+                    px-4 pt-[21px] pb-[7px] text-base md:text-[13.5px] leading-tight text-olive-dark font-body
                     placeholder-transparent focus:outline-none focus:ring-2
                   focus:ring-olive/40 focus:border-olive transition-all duration-150
                     pr-10"
       />
       <label
         htmlFor={id}
-        className="absolute left-4 top-2 text-[10.5px] text-muted font-display
-                    transition-all duration-150
-                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-[13px]
-                  peer-placeholder-shown:text-muted/60
-                    peer-focus:top-2 peer-focus:text-[10.5px] peer-focus:text-olive"
+        className="absolute left-4 top-1.5 text-[10px] text-muted font-display leading-none
+                    pointer-events-none transition-all duration-150
+                    peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2
+                    peer-placeholder-shown:text-[13px] peer-placeholder-shown:text-muted/70
+                    peer-focus:top-1.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-olive"
       >
         {label}
       </label>
