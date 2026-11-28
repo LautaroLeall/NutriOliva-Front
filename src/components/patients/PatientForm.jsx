@@ -75,10 +75,10 @@ function Field({ label, name, type = "text", value, onChange, error, icon: Icon,
           placeholder=""
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          autoFocus={autoFocus}
+          autoFocus={autoFocus && typeof window !== "undefined" && window.innerWidth >= 768}
           min={min}
           max={max}
-          className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-[13px]
+          className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-base md:text-[13px] leading-tight
                       font-body text-olive-dark bg-[#F5F2EA]
                       focus:outline-none focus:ring-2 transition-all duration-150
                       ${error
@@ -96,7 +96,7 @@ function Field({ label, name, type = "text", value, onChange, error, icon: Icon,
             color: focused ? "#6E7A4B" : error ? "#D85A30" : "#9B9484",
           }}
           transition={{ duration: 0.16, ease: "easeOut" }}
-          className="absolute left-9 font-display pointer-events-none leading-none"
+          className="absolute left-9 right-2 font-display pointer-events-none leading-none truncate"
         >
           {label}
         </motion.label>
@@ -235,7 +235,7 @@ export default function PatientForm({ open, onClose, paciente = null, onGuardar 
         />
 
         {/* Telefono + Fecha en grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field
             label="Telefono"
             name="telefono"
