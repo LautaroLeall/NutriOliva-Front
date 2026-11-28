@@ -10,7 +10,7 @@ export default function AddMenu({ onComida, onActividad, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.18 }}
-      className="fixed inset-0 z-40 bg-olive-dark/15 backdrop-blur-[1px] flex items-end justify-end pb-24 px-6"
+      className="fixed inset-0 z-40 bg-olive-dark/15 backdrop-blur-[1px] flex items-end justify-end pb-safe-fab-menu px-6"
       onClick={onClose}
     >
       <div
