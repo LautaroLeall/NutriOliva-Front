@@ -30,6 +30,7 @@ function generateRobotsTxt() {
     "User-agent: *",
     "Allow: /",
     "Allow: /login",
+    "Allow: /privacidad",
     "Allow: /llms.txt",
     "Allow: /.well-known/security.txt",
     "Allow: /manifest.json",
@@ -79,6 +80,15 @@ function generateSitemapXml(today) {
     <xhtml:link rel="alternate" hreflang="es" href="${SITE_URL}/login" />
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/login" />
   </url>
+  <url>
+    <loc>${SITE_URL}/privacidad</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="${SITE_URL}/privacidad" />
+    <xhtml:link rel="alternate" hreflang="es" href="${SITE_URL}/privacidad" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/privacidad" />
+  </url>
 </urlset>
 `;
 }
@@ -87,11 +97,12 @@ function generateManifestJson() {
   return (
     JSON.stringify(
       {
-        name: "NutriOliva — Seguimiento Nutricional en Tiempo Real",
+        id: "/",
+        name: "NutriOliva — Mi Plan y Seguimiento Nutricional",
         short_name: "NutriOliva",
         description:
-          "Software para nutricionistas y pacientes: planes alimenticios con IA, datos clinicos, bajar de peso y balance calorico diario.",
-        start_url: "/",
+          "Tu plan alimenticio, registro diario de comidas y evolucion nutricional en tiempo real junto a tu nutricionista.",
+        start_url: "/mi-plan",
         scope: "/",
         display: "standalone",
         orientation: "portrait",
@@ -119,6 +130,47 @@ function generateManifestJson() {
             purpose: "any",
           },
         ],
+        shortcuts: [
+          {
+            name: "Registrar mi dia",
+            short_name: "Mi dia",
+            description: "Registrar comidas o actividad fisica del dia",
+            url: "/mi-plan?tab=hoy",
+            icons: [
+              {
+                src: "/icon.png",
+                sizes: "192x192",
+                type: "image/png",
+              },
+            ],
+          },
+          {
+            name: "Ver mi plan alimenticio",
+            short_name: "Mi plan",
+            description: "Consultar mi plan alimenticio activo",
+            url: "/mi-plan?tab=plan",
+            icons: [
+              {
+                src: "/icon.png",
+                sizes: "192x192",
+                type: "image/png",
+              },
+            ],
+          },
+          {
+            name: "Ver mi tendencia",
+            short_name: "Tendencia",
+            description: "Revisar el balance calorico de los ultimos 7 dias",
+            url: "/mi-plan?tab=tendencia",
+            icons: [
+              {
+                src: "/icon.png",
+                sizes: "192x192",
+                type: "image/png",
+              },
+            ],
+          },
+        ],
       },
       null,
       2
@@ -134,10 +186,10 @@ function generateManifestJson() {
 function generateLlmsTxt(today) {
   return `# NutriOliva — El acompanamiento que tus pacientes necesitan cada dia (${SITE_URL})
 > Ultima actualizacion: ${today}
-> Plataforma web SaaS para nutricionistas y pacientes en Tucuman y toda Argentina. Integra planes alimenticios versionados con IA y Excel, historia clinica antropometrica evolutiva, catalogo nutricional SARA (+205 alimentos) y seguimiento diario de comidas y actividad fisica en tiempo real.
+> Plataforma SaaS para nutricionistas y pacientes en Tucuman y toda Argentina. Integra planes alimenticios versionados con IA y Excel, historia clinica antropometrica evolutiva, catalogo nutricional SARA (+205 alimentos) y seguimiento diario de comidas y actividad fisica en tiempo real en Web y Web App instalable (PWA).
 
 ## Que es NutriOliva
-NutriOliva reemplaza las planillas de Excel, los PDFs estaticos y el seguimiento disperso por WhatsApp en el consultorio nutricional. Conecta al profesional con sus pacientes en una interfaz web 100% responsive y mobile-first sin necesidad de descargar ni instalar ninguna aplicacion.
+NutriOliva reemplaza las planillas de Excel, los PDFs estaticos y el seguimiento disperso por WhatsApp en el consultorio nutricional. Conecta al profesional con sus pacientes tanto desde el navegador web como mediante su Web App instalable en Android e iPhone en 2 toques.
 
 ## Funcionalidades para el Nutricionista
 - **Gestion integral de pacientes y alertas de adherencia:** nomina de pacientes activos e inactivos, buscador global instantaneo (Ctrl+K) tolerante a errores de tipeo, invitacion automatica por correo electronico y alerta visual cuando un paciente lleva mas de 48 horas sin registrar.
@@ -146,13 +198,13 @@ NutriOliva reemplaza las planillas de Excel, los PDFs estaticos y el seguimiento
 - **Catalogo nutricional SARA (+205 alimentos) + catalogo propio:** base precargada con alimentos simples y preparaciones clinicas completas de la gastronomia argentina y latinoamericana, mas creacion ilimitada de alimentos personalizados del consultorio.
 
 ## Funcionalidades para el Paciente
-- **Acceso web directo sin instalar apps:** el paciente activa su contraseña desde el enlace recibido por email e ingresa a su panel movil (/mi-plan).
+- **Acceso flexible en Web y Web App instalable:** el paciente activa su contraseña desde el enlace recibido por email e ingresa al instante desde su navegador o instala el icono de NutriOliva en su pantalla de inicio a pantalla completa (/mi-plan).
 - **Registro diario en 3 modos en menos de 60 segundos:**
   1. *Mi plan:* sugiere automaticamente las comidas del plan activo segun la franja horaria actual.
   2. *Catalogo:* buscador difuso instantaneo tolerante a acentos y errores de tipeo.
-  3. *Otra comida con IA:* el paciente describe lo que comio con sus propias palabras, la IA estima las calorias de la porcion y permite adjuntar una foto privada del plato.
+  3. *Otra comida con IA:* el paciente describe lo que comio con sus propias palabras, la IA estima las calorias de la porcion y permite adjuntar una foto privada comprimida automaticamente.
 - **Actividad fisica y balance calorico en tiempo real:** registro de ejercicio por duracion e intensidad, calculo de gasto calorico, barra de progreso diaria y grafica de tendencia de los ultimos 7 dias.
-- **Pestaña Mi Cuenta:** consulta de su evolucion antropometrica, notas del profesional y contacto directo con su nutricionista asignado.
+- **Pestaña Mi Cuenta:** consulta de su evolucion antropometrica, notas del profesional, politica de privacidad y contacto directo con su nutricionista asignado.
 
 ## Planes Comerciales para Profesionales
 Todos los planes incluyen el 100% de las funcionalidades de la plataforma; solo varia el cupo de pacientes activos:
@@ -162,7 +214,7 @@ Todos los planes incluyen el 100% de las funcionalidades de la plataforma; solo 
 
 ## Privacidad y Seguridad Multi-Tenant
 - Aislamiento estricto por nutricionista y por paciente a nivel motor PostgreSQL mediante Row Level Security (RLS) en Supabase.
-- Fotografias de comidas almacenadas en buckets privados con acceso exclusivo mediante URLs firmadas temporales.
+- Fotografias de comidas almacenadas en buckets privados con acceso exclusivo mediante URLs firmadas temporales y cero cache local de datos sensibles.
 
 ## Ubicacion y Cobertura
 Desarrollado en San Miguel de Tucuman, Tucuman, Argentina, para nutricionistas, licenciados en nutricion, centros medicos y pacientes de Tucuman, Argentina y toda Hispanoamerica.
@@ -170,6 +222,7 @@ Desarrollado en San Miguel de Tucuman, Tucuman, Argentina, para nutricionistas, 
 ## Secciones Publicas
 - [Inicio y Demo Interactiva en Vivo](${SITE_URL}/): tour del panel profesional, simulador movil del paciente sincronizado en tiempo real con el espejo del nutricionista, funcionalidades, preguntas frecuentes y formulario de contacto.
 - [Acceso a la Plataforma](${SITE_URL}/login): inicio de sesion unificado por rol para nutricionistas, pacientes y administracion.
+- [Politica de Privacidad y Eliminacion de Datos](${SITE_URL}/privacidad): proteccion de datos personales (Ley 25.326 Argentina) y derechos del usuario.
 
 ## Contacto Comercial Oficial
 - Web: ${SITE_URL}/
