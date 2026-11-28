@@ -1,4 +1,4 @@
-// LoginResetForm.jsx — Formulario de recuperacion de contrasena
+// LoginResetForm.jsx — Formulario de recuperacion de contrasena adaptable sin scroll
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ArrowLeft } from "lucide-react";
@@ -16,29 +16,29 @@ export default function LoginResetForm({
   return (
     <motion.div
       key="reset-form"
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -16 }}
-      transition={{ duration: 0.35 }}
+      exit={{ opacity: 0, y: -14 }}
+      transition={{ duration: 0.3 }}
     >
-      <h1 className="font-display font-bold text-[24px] text-olive-dark mb-1">
+      <h1 className="font-display font-bold text-[21px] sm:text-[24px] text-olive-dark leading-tight mb-1">
         Restablecer contrasena
       </h1>
-      <p className="text-[13px] text-muted mb-8">
+      <p className="text-[12.5px] sm:text-[13px] text-muted mb-5 sm:mb-7">
         Ingresa tu mail y te enviamos un link para crear una nueva.
       </p>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-3.5 sm:space-y-4">
         <LoginField
           id="emailReset"
           label="Tu mail"
           type="email"
+          inputMode="email"
           value={emailReset}
           onChange={(e) => {
             setEmailReset(e.target.value);
             setError("");
           }}
-          autoFocus
           autoComplete="email"
           required
         />
@@ -61,7 +61,7 @@ export default function LoginResetForm({
         <button
           type="submit"
           disabled={loading}
-          className="btn-primary w-full py-3.5 text-[13.5px] mt-2 disabled:opacity-60"
+          className="btn-primary w-full py-3 sm:py-3.5 text-[13.5px] mt-1.5 disabled:opacity-60"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -77,8 +77,8 @@ export default function LoginResetForm({
       <button
         type="button"
         onClick={onVolver}
-        className="mt-5 w-full text-center text-[12px] text-muted hover:text-olive-dark
-                    transition-colors flex items-center justify-center gap-1.5"
+        className="mt-4 sm:mt-5 py-1 w-full text-center text-[12px] text-muted hover:text-olive-dark
+                    transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
       >
         <ArrowLeft size={12} />
         Volver al inicio de sesion
