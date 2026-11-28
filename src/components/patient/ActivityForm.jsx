@@ -141,8 +141,8 @@ export default function ActivityForm({ open, onClose, onGuardar, pacienteId }) {
               onFocus={() => setFocusTipo(true)}
               onBlur={() => setFocusTipo(false)}
               placeholder=""
-              autoFocus
-              className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-[13px]
+              autoFocus={typeof window !== "undefined" && window.innerWidth >= 768}
+              className={`w-full pl-9 pr-3 pt-[22px] pb-[7px] rounded-xl border text-base md:text-[13px] leading-tight
                           font-body text-olive-dark
                           focus:outline-none focus:ring-2 transition-all duration-150
                           ${errors.tipo
@@ -202,6 +202,7 @@ export default function ActivityForm({ open, onClose, onGuardar, pacienteId }) {
             <input
               name="duracion_min"
               type="number"
+              inputMode="numeric"
               value={form.duracion_min}
               onChange={handleChange}
               onFocus={() => setFocusDur(true)}
@@ -209,7 +210,7 @@ export default function ActivityForm({ open, onClose, onGuardar, pacienteId }) {
               placeholder=""
               min={1}
               max={480}
-              className={`w-full pl-9 pr-11 pt-[22px] pb-[7px] rounded-xl border text-[13px]
+              className={`w-full pl-9 pr-11 pt-[22px] pb-[7px] rounded-xl border text-base md:text-[13px] leading-tight
                           font-body text-olive-dark
                           focus:outline-none focus:ring-2 transition-all duration-150
                           [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none
