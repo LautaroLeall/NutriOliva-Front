@@ -15,6 +15,7 @@ export default function BalanceCard({ balance, caloriasObjetivo, loading }) {
   const rotateY = useSpring(x, { stiffness: 280, damping: 28 });
 
   function onMouseMove(e) {
+    if (e.pointerType === "touch") return;
     const rect = e.currentTarget.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -52,19 +53,19 @@ export default function BalanceCard({ balance, caloriasObjetivo, loading }) {
         </div>
       ) : (
         <>
-          <div className="flex items-end justify-between mb-3">
-            <div>
+          <div className="flex items-end justify-between gap-2 flex-wrap mb-3">
+            <div className="min-w-0">
               <p className="text-[9.5px] font-display text-muted uppercase tracking-wide mb-1">
                 Balance del dia
               </p>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline gap-1.5 flex-wrap">
                 <span
-                  className={`font-display font-bold text-3xl ${estaEnExceso ? "text-accent" : "text-olive-dark"
+                  className={`font-display font-bold text-2xl sm:text-3xl ${estaEnExceso ? "text-accent" : "text-olive-dark"
                     }`}
                 >
                   <CountUp end={netas} duration={0.75} separator="." />
                 </span>
-                <span className="text-muted text-sm font-display">
+                <span className="text-muted text-xs sm:text-sm font-display">
                   / {caloriasObjetivo} kcal
                 </span>
               </div>
